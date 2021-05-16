@@ -31,6 +31,10 @@ These are the external dependencies for the Testbed example project. If you don'
 * [GLAD](https://glad.dav1d.de/)
 * [imgui](https://github.com/ocornut/imgui)
 
+### Documentation
+
+**Note**: Use the the Testbed for learning how to use Bounce Softbody. The Testbed is a collection of visual tests and examples that can support the development of the library. As you would imagine, this application is not part of the library.
+
 ## Building
 
 Bounce Softbody uses [premake](https://premake.github.io/) for generating project files in a platform agnostic manner. [premake](https://premake.github.io/) is available at https://premake.github.io/.
