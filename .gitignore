@@ -1,0 +1,13 @@
+# Folders
+
+build/
+out/
+.vs/
+.vscode/
+
+# Files
+premake5.exe
+
+# Extensions
+
+*.ini
