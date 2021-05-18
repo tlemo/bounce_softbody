@@ -415,13 +415,13 @@ bool b3SoftBodyBoxWorldShape::CollideSphere(b3SoftBodySphereManifold* manifold, 
 	
 	if (separation < scalar(0))
 	{
-		// The center is inside the box.
-		b3Plane localPlane1 = planes[faceIndex];
+		// The sphere center is inside the box.
+		b3Plane pLocal = planes[faceIndex];
 
-		b3Vec3 c1 = b3ClosestPointOnPlane(cLocal, localPlane1);
+		b3Vec3 cBox = b3ClosestPointOnPlane(cLocal, pLocal);
 
-		manifold->point = b3Mul(m_xf, c1);
-		manifold->normal = b3Mul(m_xf.rotation, localPlane1.normal);
+		manifold->point = b3Mul(m_xf, cBox);
+		manifold->normal = b3Mul(m_xf.rotation, pLocal.normal);
 
 		return true;
 	}
@@ -440,10 +440,10 @@ bool b3SoftBodyBoxWorldShape::CollideSphere(b3SoftBodySphereManifold* manifold, 
 
 	if (distance > scalar(0))
 	{
-		b3Vec3 n = (cLocal - cBox) / distance;
+		b3Vec3 normal = (cLocal - cBox) / distance;
 
 		manifold->point = b3Mul(m_xf, cBox);
-		manifold->normal = b3Mul(m_xf.rotation, n);
+		manifold->normal = b3Mul(m_xf.rotation, normal);
 
 		return true;
 	}
