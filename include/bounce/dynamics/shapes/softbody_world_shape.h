@@ -192,9 +192,6 @@ public:
 
 	// Transform
 	b3Transform m_xf;
-
-	// Radius
-	scalar radius;
 };
 
 #endif
