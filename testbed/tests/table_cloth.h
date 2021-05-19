@@ -32,7 +32,7 @@ public:
 		
 		b3SoftBodyBoxWorldShape boxShape;
 		boxShape.m_extents.Set(4.0f, 3.0f, 3.0f);
-		boxShape.radius = 0.2f;
+		boxShape.m_radius = 0.2f;
 
 		b3SoftBodyWorldShapeDef boxShapeDef;
 		boxShapeDef.shape = &boxShape;
