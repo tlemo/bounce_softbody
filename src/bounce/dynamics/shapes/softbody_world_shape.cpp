@@ -344,7 +344,7 @@ void b3SoftBodyBoxWorldShape::Clone(const b3SoftBodyBoxWorldShape& other)
 {
 	m_extents = other.m_extents;
 	m_xf = other.m_xf;
-	m_radius = other.radius;
+	m_radius = other.m_radius;
 }
 
 b3AABB b3SoftBodyBoxWorldShape::ComputeAABB() const
