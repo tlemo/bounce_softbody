@@ -93,64 +93,44 @@ inline b3RowEntry* b3RowEntryList::Search(u32 column)
 // Each row is a list of non-zero elements in the row.
 struct b3SparseMat33
 {
-	// 
 	b3SparseMat33(u32 m);
-
-	//
+	
 	b3SparseMat33(const b3SparseMat33& _m);
 	
-	//
 	~b3SparseMat33();
 
-	//
 	b3SparseMat33& operator=(const b3SparseMat33& _m);
 
-	// 
 	void Copy(const b3SparseMat33& _m);
 
-	//
 	void Destroy();
 
-	//
 	void SetZero(u32 i, u32 j);
 
-	//
 	void SetZeroRow(u32 i);
 	
-	//
 	void SetZeroColumn(u32 j);
 
-	// 
 	b3Mat33* Search(u32 i, u32 j);
 
-	// 
 	b3Mat33& operator()(u32 i, u32 j);
 
-	// 
 	b3Mat33 operator()(u32 i, u32 j) const;
 
-	// 
 	void operator+=(const b3SparseMat33& m);
 
-	// 
 	void operator-=(const b3SparseMat33& m);
 
-	// 
 	void operator+=(const b3DiagMat33& m);
 	
-	// 
 	void operator-=(const b3DiagMat33& m);
 
-	// 
 	u32 GetElementCount() const { return 3 * rowCount * 3 * rowCount; }
 
-	// 
 	scalar& GetElement(u32 i, u32 j);
 
-	// 
 	scalar GetElement(u32 i, u32 j) const;
 	
-	//
 	void CreateMatrix(scalar* out) const;
 
 	u32 rowCount;
