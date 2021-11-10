@@ -19,9 +19,7 @@
 #ifndef B3_SOFTBODY_CONTACT_MANAGER_H
 #define B3_SOFTBODY_CONTACT_MANAGER_H
 
-#include <bounce/dynamics/contacts/softbody_sphere_triangle_contact.h>
 #include <bounce/dynamics/contacts/softbody_sphere_shape_contact.h>
-#include <bounce/dynamics/contacts/softbody_capsule_capsule_contact.h>
 #include <bounce/collision/broad_phase.h>
 #include <bounce/common/memory/block_pool.h>
 #include <bounce/common/template/list.h>
@@ -34,28 +32,17 @@ class b3SoftBodyContactManager
 public:
 	b3SoftBodyContactManager();
 
+	void AddContact(b3SoftBodySphereShape* s1, b3SoftBodyWorldShape* s2);
 	void FindNewContacts();
-	void AddPair(void* data1, void* data2);
 	void UpdateContacts();
-
-	b3SoftBodySphereAndTriangleContact* CreateSphereAndTriangleContact();
-	void Destroy(b3SoftBodySphereAndTriangleContact* c);
 
 	b3SoftBodySphereAndShapeContact* CreateSphereAndShapeContact();
 	void Destroy(b3SoftBodySphereAndShapeContact* c);
 
-	b3SoftBodyCapsuleAndCapsuleContact* CreateCapsuleAndCapsuleContact();
-	void Destroy(b3SoftBodyCapsuleAndCapsuleContact* c);
-	
-	b3BlockPool m_sphereAndTriangleContactBlocks;
 	b3BlockPool m_sphereAndShapeContactBlocks;
-	b3BlockPool m_capsuleAndCapsuleContactBlocks;
 
 	b3SoftBody* m_body;
-	b3BroadPhase m_broadPhase;
-	b3List<b3SoftBodySphereAndTriangleContact> m_sphereAndTriangleContactList;
 	b3List<b3SoftBodySphereAndShapeContact> m_sphereAndShapeContactList;
-	b3List<b3SoftBodyCapsuleAndCapsuleContact> m_capsuleAndCapsuleContactList;
 };
 
 #endif

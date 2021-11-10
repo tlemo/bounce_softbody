@@ -60,92 +60,6 @@ struct b3SoftBodySolverShapeContactPositionConstraint
 	b3Vec3 pointB;
 };
 
-struct b3SoftBodySolverTriangleContactVelocityConstraint
-{
-	u32 indexA;
-	scalar invMassA;
-
-	u32 indexB;
-	scalar invMassB;
-	u32 indexC;
-	scalar invMassC;
-	u32 indexD;
-	scalar invMassD;
-	
-	scalar wB, wC, wD;
-
-	b3Vec3 normal;
-	scalar normalMass;
-	scalar normalImpulse;
-
-	scalar friction;
-
-	b3Vec3 tangent1;
-	b3Vec3 tangent2;
-	b3Mat22 tangentMass;
-	b3Vec2 tangentImpulse;
-};
-
-struct b3SoftBodySolverTriangleContactPositionConstraint
-{
-	u32 indexA;
-	scalar invMassA;
-	scalar radiusA;
-
-	u32 indexB;
-	scalar invMassB;
-	u32 indexC;
-	scalar invMassC;
-	u32 indexD;
-	scalar invMassD;
-	scalar triangleRadius;
-
-	scalar wB, wC, wD;
-};
-
-struct b3SoftBodySolverCapsuleContactVelocityConstraint
-{
-	u32 indexA;
-	scalar invMassA;
-	u32 indexB;
-	scalar invMassB;
-
-	u32 indexC;
-	scalar invMassC;
-	u32 indexD;
-	scalar invMassD;
-
-	scalar wA, wB, wC, wD;
-
-	b3Vec3 normal;
-	scalar normalMass;
-	scalar normalImpulse;
-
-	scalar friction;
-
-	b3Vec3 tangent1;
-	b3Vec3 tangent2;
-	b3Mat22 tangentMass;
-	b3Vec2 tangentImpulse;
-};
-
-struct b3SoftBodySolverCapsuleContactPositionConstraint
-{
-	u32 indexA;
-	scalar invMassA;
-	u32 indexB;
-	scalar invMassB;
-	scalar radiusA;
-
-	u32 indexC;
-	scalar invMassC;
-	u32 indexD;
-	scalar invMassD;
-	scalar radiusB;
-
-	scalar wA, wB, wC, wD;
-};
-
 struct b3SoftBodyContactSolverDef
 {
 	b3SoftBodyTimeStep step;
@@ -156,12 +70,6 @@ struct b3SoftBodyContactSolverDef
 	
 	u32 shapeContactCount;
 	b3SoftBodySphereAndShapeContact** shapeContacts;
-
-	u32 triangleContactCount;
-	b3SoftBodySphereAndTriangleContact** triangleContacts;
-	
-	u32 capsuleContactCount;
-	b3SoftBodyCapsuleAndCapsuleContact** capsuleContacts;
 };
 
 inline scalar b3MixFriction(scalar u1, scalar u2)
@@ -176,22 +84,10 @@ public:
 	~b3SoftBodyContactSolver();
 
 	void InitializeShapeContactConstraints();
-	void InitializeTriangleContactConstraints();
-	void InitializeCapsuleContactConstraints();
-
 	void WarmStartShapeContactConstraints();
-	void WarmStartTriangleContactConstraints();
-	void WarmStartCapsuleContactConstraints();
-
 	void SolveShapeContactVelocityConstraints();
-	void SolveTriangleContactVelocityConstraints();
-	void SolveCapsuleContactVelocityConstraints();
-
 	void StoreImpulses();
-
 	bool SolveShapeContactPositionConstraints();
-	bool SolveTriangleContactPositionConstraints();
-	bool SolveCapsuleContactPositionConstraints();
 protected:
 	b3SoftBodyTimeStep m_step;
 
@@ -204,16 +100,6 @@ protected:
 	b3SoftBodySphereAndShapeContact** m_shapeContacts;
 	b3SoftBodySolverShapeContactVelocityConstraint* m_shapeVelocityConstraints;
 	b3SoftBodySolverShapeContactPositionConstraint* m_shapePositionConstraints;
-
-	u32 m_triangleContactCount;
-	b3SoftBodySphereAndTriangleContact** m_triangleContacts;
-	b3SoftBodySolverTriangleContactVelocityConstraint* m_triangleVelocityConstraints;
-	b3SoftBodySolverTriangleContactPositionConstraint* m_trianglePositionConstraints;
-	
-	u32 m_capsuleContactCount;
-	b3SoftBodyCapsuleAndCapsuleContact** m_capsuleContacts;
-	b3SoftBodySolverCapsuleContactVelocityConstraint* m_capsuleVelocityConstraints;
-	b3SoftBodySolverCapsuleContactPositionConstraint* m_capsulePositionConstraints;
 };
 
 #endif

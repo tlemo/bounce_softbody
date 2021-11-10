@@ -24,14 +24,7 @@
 
 b3SoftBodyWorldShape::b3SoftBodyWorldShape()
 {
-	m_baseType = e_softBodyWorldShapeBase;
 	m_radius = scalar(0);
-}
-
-void b3SoftBodyWorldShape::Synchronize(const b3Vec3& displacement)
-{
-	b3AABB aabb = ComputeAABB();
-	m_body->m_contactManager.m_broadPhase.MoveProxy(m_proxy.proxyId, aabb, displacement);
 }
 
 void b3SoftBodyWorldShape::DestroyContacts()
@@ -52,7 +45,7 @@ void b3SoftBodyWorldShape::DestroyContacts()
 b3SoftBodyWorldShape* b3SoftBodyWorldShape::Create(const b3SoftBodyWorldShapeDef& def)
 {
 	b3SoftBodyWorldShape* shape = nullptr;
-	switch (def.shape->GetShapeType())
+	switch (def.shape->GetType())
 	{
 	case e_softBodySphereWorldShape:
 	{
@@ -97,7 +90,7 @@ b3SoftBodyWorldShape* b3SoftBodyWorldShape::Create(const b3SoftBodyWorldShapeDef
 void b3SoftBodyWorldShape::Destroy(b3SoftBodyWorldShape* shape)
 {
 	// Free the shape from the memory.
-	switch (shape->GetShapeType())
+	switch (shape->GetType())
 	{
 	case e_softBodySphereWorldShape:
 	{
@@ -131,7 +124,7 @@ void b3SoftBodyWorldShape::Destroy(b3SoftBodyWorldShape* shape)
 
 b3SoftBodySphereWorldShape::b3SoftBodySphereWorldShape()
 {
-	m_worldShapeType = e_softBodySphereWorldShape;
+	m_type = e_softBodySphereWorldShape;
 	m_center.SetZero();
 	m_radius = scalar(0);
 }
@@ -197,7 +190,7 @@ void b3SoftBodySphereWorldShape::Draw(b3Draw* draw) const
 
 b3SoftBodyCapsuleWorldShape::b3SoftBodyCapsuleWorldShape()
 {
-	m_worldShapeType = e_softBodyCapsuleWorldShape;
+	m_type = e_softBodyCapsuleWorldShape;
 	m_center1.Set(0, 1, 0);
 	m_center1.Set(0, -1, 0);
 	m_radius = scalar(0);
@@ -327,7 +320,7 @@ void b3SoftBodyCapsuleWorldShape::Draw(b3Draw* draw) const
 
 b3SoftBodyBoxWorldShape::b3SoftBodyBoxWorldShape()
 {
-	m_worldShapeType = e_softBodyBoxWorldShape;
+	m_type = e_softBodyBoxWorldShape;
 	m_extents.Set(scalar(1), scalar(1), scalar(1));
 	m_xf.SetIdentity();
 	m_radius = scalar(0);

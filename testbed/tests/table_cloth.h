@@ -43,7 +43,6 @@ public:
 		m_body->SetGravity(b3Vec3(0.0f, -9.8f, 0.0f));
 
 		m_bodyDragger = new SoftBodyDragger(&m_ray, m_body);
-		m_bodyDragger->SetStaticDrag(false);
 	}
 
 	static Test* Create()

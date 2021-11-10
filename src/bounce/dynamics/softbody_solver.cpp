@@ -39,20 +39,10 @@ b3SoftBodySolver::b3SoftBodySolver(const b3SoftBodySolverDef& def)
 	m_shapeContactCapacity = def.shapeContactCapacity;
 	m_shapeContactCount = 0;
 	m_shapeContacts = (b3SoftBodySphereAndShapeContact**)m_stack->Allocate(m_shapeContactCapacity * sizeof(b3SoftBodySphereAndShapeContact*));
-
-	m_triangleContactCapacity = def.triangleContactCapacity;
-	m_triangleContactCount = 0;
-	m_triangleContacts = (b3SoftBodySphereAndTriangleContact**)m_stack->Allocate(m_triangleContactCapacity * sizeof(b3SoftBodySphereAndTriangleContact*));
-	
-	m_capsuleContactCapacity = def.capsuleContactCapacity;
-	m_capsuleContactCount = 0;
-	m_capsuleContacts = (b3SoftBodyCapsuleAndCapsuleContact* *)m_stack->Allocate(m_capsuleContactCapacity * sizeof(b3SoftBodyCapsuleAndCapsuleContact*));
 }
 
 b3SoftBodySolver::~b3SoftBodySolver()
 {
-	m_stack->Free(m_capsuleContacts);
-	m_stack->Free(m_triangleContacts);
 	m_stack->Free(m_shapeContacts);
 	m_stack->Free(m_forces);
 	m_stack->Free(m_particles);
@@ -72,16 +62,6 @@ void b3SoftBodySolver::Add(b3SoftBodyForce* f)
 void b3SoftBodySolver::Add(b3SoftBodySphereAndShapeContact* c)
 {
 	m_shapeContacts[m_shapeContactCount++] = c;
-}
-
-void b3SoftBodySolver::Add(b3SoftBodySphereAndTriangleContact* c)
-{
-	m_triangleContacts[m_triangleContactCount++] = c;
-}
-
-void b3SoftBodySolver::Add(b3SoftBodyCapsuleAndCapsuleContact* c)
-{
-	m_capsuleContacts[m_capsuleContactCount++] = c;
 }
 
 void b3SoftBodySolver::Solve(const b3SoftBodyTimeStep& step, const b3Vec3& gravity)
@@ -119,25 +99,17 @@ void b3SoftBodySolver::Solve(const b3SoftBodyTimeStep& step, const b3Vec3& gravi
 		contactSolverDef.velocities = velocities;
 		contactSolverDef.shapeContactCount = m_shapeContactCount;
 		contactSolverDef.shapeContacts = m_shapeContacts;
-		contactSolverDef.triangleContactCount = m_triangleContactCount;
-		contactSolverDef.triangleContacts = m_triangleContacts;
-		contactSolverDef.capsuleContactCount = m_capsuleContactCount;
-		contactSolverDef.capsuleContacts = m_capsuleContacts;
-
+		
 		b3SoftBodyContactSolver contactSolver(contactSolverDef);
 
 		{
 			// Initialize constraints
 			contactSolver.InitializeShapeContactConstraints();
-			contactSolver.InitializeTriangleContactConstraints();
-			contactSolver.InitializeCapsuleContactConstraints();
 		}
 
 		{
 			// Warm start velocity constraints
 			contactSolver.WarmStartShapeContactConstraints();
-			contactSolver.WarmStartTriangleContactConstraints();
-			contactSolver.WarmStartCapsuleContactConstraints();
 		}
 
 		{
@@ -145,8 +117,6 @@ void b3SoftBodySolver::Solve(const b3SoftBodyTimeStep& step, const b3Vec3& gravi
 			for (u32 i = 0; i < step.velocityIterations; ++i)
 			{
 				contactSolver.SolveShapeContactVelocityConstraints();
-				contactSolver.SolveTriangleContactVelocityConstraints();
-				contactSolver.SolveCapsuleContactVelocityConstraints();
 			}
 		}
 
@@ -167,11 +137,9 @@ void b3SoftBodySolver::Solve(const b3SoftBodyTimeStep& step, const b3Vec3& gravi
 			bool positionSolved = false;
 			for (u32 i = 0; i < step.positionIterations; ++i)
 			{
-				bool bodyContactsSolved = contactSolver.SolveShapeContactPositionConstraints();
-				bool triangleContactsSolved = contactSolver.SolveTriangleContactPositionConstraints();
-				bool capsuleContactsSolved = contactSolver.SolveCapsuleContactPositionConstraints();
-
-				if (bodyContactsSolved && triangleContactsSolved && capsuleContactsSolved)
+				bool shapeContactsSolved = contactSolver.SolveShapeContactPositionConstraints();
+				
+				if (shapeContactsSolved)
 				{
 					// Early out if the position errors are small.
 					positionSolved = true;

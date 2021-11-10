@@ -63,14 +63,11 @@ private:
 	friend class b3SoftBody;
 	friend class b3SoftBodyParticle;
 	friend class b3SoftBodyContactManager;
-	friend class b3SoftBodySphereAndTriangleContact;
-	friend class b3SoftBodySolver;
 	friend class b3SoftBodyContactSolver;
 	friend class b3List<b3SoftBodyTriangleShape>;
 
 	b3SoftBodyTriangleShape(const b3SoftBodyTriangleShapeDef& def, b3SoftBody* body);
-	~b3SoftBodyTriangleShape();
-
+	
 	// Compute AABB
 	b3AABB ComputeAABB() const;
 
@@ -80,9 +77,6 @@ private:
 	// Touch proxy
 	void TouchProxy();
 
-	// Destroy shape contacts
-	void DestroyContacts();
-
 	// Particles
 	b3SoftBodyParticle* m_p1;
 	b3SoftBodyParticle* m_p2;
@@ -90,6 +84,9 @@ private:
 
 	// Rest area. Used for computing the mass of the particles.
 	scalar m_area;
+
+	// Dynamic tree proxy.
+	u32 m_proxyId;
 
 	// Links to the body triangle shape list.
 	b3SoftBodyTriangleShape* m_prev;

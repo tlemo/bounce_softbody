@@ -57,12 +57,6 @@ private:
 	// Compute AABB
 	b3AABB ComputeAABB() const;
 
-	// Synchronize AABB
-	void Synchronize(const b3Vec3& displacement);
-
-	// Touch AABB proxy
-	void TouchProxy();
-
 	// Destroy contacts
 	void DestroyContacts();
 

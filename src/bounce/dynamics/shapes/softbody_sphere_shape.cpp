@@ -22,7 +22,7 @@
 
 b3SoftBodySphereShape::b3SoftBodySphereShape(const b3SoftBodySphereShapeDef& def, b3SoftBody* body)
 {
-	m_shapeType = e_softBodySphereShape;
+	m_type = e_softBodySphereShape;
 	m_body = body;
 	m_p = def.p;
 }
@@ -39,53 +39,20 @@ b3AABB b3SoftBodySphereShape::ComputeAABB() const
 	return aabb;
 }
 
-void b3SoftBodySphereShape::Synchronize(const b3Vec3& displacement)
-{
-	b3AABB aabb;
-	aabb.Set(m_p->m_position, m_radius);
-
-	m_body->m_contactManager.m_broadPhase.MoveProxy(m_proxy.proxyId, aabb, displacement);
-}
-
-void b3SoftBodySphereShape::TouchProxy()
-{
-	m_body->m_contactManager.m_broadPhase.TouchProxy(m_proxy.proxyId);
-}
-
 void b3SoftBodySphereShape::DestroyContacts()
 {
-
+	// Destroy shape contacts
+	b3SoftBodySphereAndShapeContact* c = m_body->m_contactManager.m_sphereAndShapeContactList.m_head;
+	while (c)
 	{
-		// Destroy shape contacts
-		b3SoftBodySphereAndShapeContact* c = m_body->m_contactManager.m_sphereAndShapeContactList.m_head;
-		while (c)
+		if (c->m_s1 == this)
 		{
-			if (c->m_s1 == this)
-			{
-				b3SoftBodySphereAndShapeContact* quack = c;
-				c = c->m_next;
-				m_body->m_contactManager.Destroy(quack);
-				continue;
-			}
-
+			b3SoftBodySphereAndShapeContact* quack = c;
 			c = c->m_next;
+			m_body->m_contactManager.Destroy(quack);
+			continue;
 		}
-	}
 
-	{
-		// Destroy triangle contacts
-		b3SoftBodySphereAndTriangleContact* c = m_body->m_contactManager.m_sphereAndTriangleContactList.m_head;
-		while (c)
-		{
-			if (c->m_s1 == this)
-			{
-				b3SoftBodySphereAndTriangleContact* quack = c;
-				c = c->m_next;
-				m_body->m_contactManager.Destroy(quack);
-				continue;
-			}
-
-			c = c->m_next;
-		}
+		c = c->m_next;
 	}
 }

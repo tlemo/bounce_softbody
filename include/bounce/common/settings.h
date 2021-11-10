@@ -104,12 +104,6 @@ typedef double scalar64;
 # endif
 #endif
 
-#define B3_JOIN(a, b) a##b
-#define B3_CONCATENATE(a, b) B3_JOIN(a, b)
-#define B3_UNIQUE_NAME(name) B3_CONCATENATE(name, __LINE__)
-
-#define B3_PROFILE(name) b3ProfileScope B3_UNIQUE_NAME(scope)(name)
-
 // You should implement this function to use your own memory allocator.
 void* b3Alloc(u32 size);
 
@@ -119,27 +113,6 @@ void b3Free(void* block);
 // You should implement this function to visualize log messages coming 
 // from this software.
 void b3Log(const char* string, ...);
-
-// You should implement this function to listen when a profile scope is opened.
-void b3BeginProfileScope(const char* name);
-
-// You must implement this function if you have implemented b3BeginProfileScope.
-// Implement this function to listen when a profile scope is closed.
-void b3EndProfileScope();
-
-// A profile block.
-struct b3ProfileScope
-{
-	b3ProfileScope(const char* name)
-	{
-		b3BeginProfileScope(name);
-	}
-
-	~b3ProfileScope()
-	{
-		b3EndProfileScope();
-	}
-};
 
 // The current version this software.
 struct b3Version

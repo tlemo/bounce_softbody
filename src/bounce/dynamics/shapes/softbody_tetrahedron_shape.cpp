@@ -22,7 +22,7 @@
 
 b3SoftBodyTetrahedronShape::b3SoftBodyTetrahedronShape(const b3SoftBodyTetrahedronShapeDef& def, b3SoftBody* body)
 {
-	m_shapeType = e_softBodyTetrahedronShape;
+	m_type = e_softBodyTetrahedronShape;
 	m_body = body;
 	m_p1 = def.p1;
 	m_p2 = def.p2;
@@ -45,11 +45,6 @@ b3SoftBodyTetrahedronShape::b3SoftBodyTetrahedronShape(const b3SoftBodyTetrahedr
 	m_volume = inv6 * sign * det;
 }
 
-b3SoftBodyTetrahedronShape::~b3SoftBodyTetrahedronShape()
-{
-
-}
-
 b3AABB b3SoftBodyTetrahedronShape::ComputeAABB() const
 {
 	b3AABB aabb;
@@ -57,19 +52,4 @@ b3AABB b3SoftBodyTetrahedronShape::ComputeAABB() const
 	aabb.upperBound = b3Max(m_p1->m_position, b3Max(m_p2->m_position, b3Max(m_p3->m_position, m_p4->m_position)));
 	aabb.Extend(m_radius);
 	return aabb;
-}
-
-void b3SoftBodyTetrahedronShape::DestroyContacts()
-{
-}
-
-void b3SoftBodyTetrahedronShape::Synchronize(const b3Vec3& displacement)
-{
-	b3AABB aabb = ComputeAABB();
-	m_body->m_contactManager.m_broadPhase.MoveProxy(m_proxy.proxyId, aabb, displacement);
-}
-
-void b3SoftBodyTetrahedronShape::TouchProxy()
-{
-	m_body->m_contactManager.m_broadPhase.TouchProxy(m_proxy.proxyId);
 }

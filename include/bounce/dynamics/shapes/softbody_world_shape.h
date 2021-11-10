@@ -19,7 +19,6 @@
 #ifndef B3_SOFTBODY_WORLD_SHAPE_H
 #define B3_SOFTBODY_WORLD_SHAPE_H
 
-#include <bounce/dynamics/shapes/softbody_shape_proxy.h>
 #include <bounce/collision/geometry/sphere.h>
 #include <bounce/collision/geometry/aabb.h>
 #include <bounce/common/template/list.h>
@@ -63,7 +62,7 @@ struct b3SoftBodyWorldShapeDef
 };
 
 // Collision shape in static environment.
-class b3SoftBodyWorldShape : public b3SoftBodyShapeBase
+class b3SoftBodyWorldShape
 {
 public:
 	// Default ctor.
@@ -73,7 +72,7 @@ public:
 	virtual ~b3SoftBodyWorldShape() { }
 	
 	// Return the shape type.
-	b3SoftBodyWorldShapeType GetShapeType() const { return m_worldShapeType; }
+	b3SoftBodyWorldShapeType GetType() const { return m_type; }
 	
 	// Set the coefficient of friction of this shape.
 	void SetFriction(scalar friction) { m_friction = friction; }
@@ -109,14 +108,11 @@ protected:
 	static b3SoftBodyWorldShape* Create(const b3SoftBodyWorldShapeDef& def);
 	static void Destroy(b3SoftBodyWorldShape* shape);
 
-	// Synchronize AABB.
-	void Synchronize(const b3Vec3& displacement);
-
 	// Destroy contacts.
 	void DestroyContacts();
 
 	// The shape type.
-	b3SoftBodyWorldShapeType m_worldShapeType;
+	b3SoftBodyWorldShapeType m_type;
 
 	// Body
 	b3SoftBody* m_body;

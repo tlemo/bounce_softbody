@@ -22,6 +22,7 @@
 #include <bounce/common/memory/stack_allocator.h>
 #include <bounce/common/memory/block_pool.h>
 #include <bounce/common/template/list.h>
+#include <bounce/collision/trees/dynamic_tree.h>
 #include <bounce/dynamics/softbody_contact_manager.h>
 
 class b3Draw;
@@ -34,9 +35,6 @@ class b3SoftBodyForce;
 
 struct b3SoftBodySphereShapeDef;
 class b3SoftBodySphereShape;
-
-struct b3SoftBodyCapsuleShapeDef;
-class b3SoftBodyCapsuleShape;
 
 struct b3SoftBodyTriangleShapeDef;
 class b3SoftBodyTriangleShape;
@@ -94,15 +92,6 @@ public:
 	// Return the list of sphere shapes in this body.
 	const b3List<b3SoftBodySphereShape>& GetSphereShapeList() const;
 	
-	// Create a capsule shape.
-	b3SoftBodyCapsuleShape* CreateCapsuleShape(const b3SoftBodyCapsuleShapeDef& def);
-
-	// Destroy a given capsule shape.
-	void DestroyCapsuleShape(b3SoftBodyCapsuleShape* shape);
-
-	// Return the list of capsule shapes in this body.
-	const b3List<b3SoftBodyCapsuleShape>& GetCapsuleShapeList() const;
-
 	// Create a triangle shape.
 	b3SoftBodyTriangleShape* CreateTriangleShape(const b3SoftBodyTriangleShapeDef& def);
 
@@ -150,7 +139,6 @@ public:
 protected:
 	friend class b3SoftBodyParticle;
 	friend class b3SoftBodySphereShape;
-	friend class b3SoftBodyCapsuleShape;
 	friend class b3SoftBodyTriangleShape;
 	friend class b3SoftBodyTetrahedronShape;
 	friend class b3SoftBodyWorldShape;
@@ -165,12 +153,6 @@ protected:
 
 	// Solve
 	void Solve(const b3SoftBodyTimeStep& step);
-
-	// Enable or disable self-collision.
-	void EnableSelfCollision(bool flag);
-
-	// Is self-collision enabled?
-	bool IsSelfCollisionEnabled() const;
 
 	// Stack allocator
 	b3StackAllocator m_stackAllocator;
@@ -190,9 +172,6 @@ protected:
 	// List of sphere shapes
 	b3List<b3SoftBodySphereShape> m_sphereShapeList;
 	
-	// List of capsule shapes
-	b3List<b3SoftBodyCapsuleShape> m_capsuleShapeList;
-	
 	// List of triangle shapes
 	b3List<b3SoftBodyTriangleShape> m_triangleShapeList;
 	
@@ -205,12 +184,12 @@ protected:
 	// Contact manager
 	b3SoftBodyContactManager m_contactManager;
 
+	// Dynamic tree for triangle shapes.
+	b3BroadPhase m_trianglesBroadphase;
+
 	// Used to compute the time step ratio to 
 	// support variable time steps.
 	scalar m_inv_dt0;
-
-	// Self-collision activation flag
-	bool m_enableSelfCollision;
 };
 
 inline void b3SoftBody::SetGravity(const b3Vec3& gravity)
@@ -221,11 +200,6 @@ inline void b3SoftBody::SetGravity(const b3Vec3& gravity)
 inline b3Vec3 b3SoftBody::GetGravity() const
 {
 	return m_gravity;
-}
-
-inline bool b3SoftBody::IsSelfCollisionEnabled() const
-{
-	return m_enableSelfCollision;
 }
 
 inline const b3List<b3SoftBodyForce>& b3SoftBody::GetForceList() const
@@ -241,11 +215,6 @@ inline const b3List<b3SoftBodyParticle>& b3SoftBody::GetParticleList() const
 inline const b3List<b3SoftBodySphereShape>& b3SoftBody::GetSphereShapeList() const
 {
 	return m_sphereShapeList;
-}
-
-inline const b3List<b3SoftBodyCapsuleShape>& b3SoftBody::GetCapsuleShapeList() const
-{
-	return m_capsuleShapeList;
 }
 
 inline const b3List<b3SoftBodyTriangleShape>& b3SoftBody::GetTriangleShapeList() const

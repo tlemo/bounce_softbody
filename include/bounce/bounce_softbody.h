@@ -30,7 +30,6 @@
 #include <bounce/dynamics/softbody_particle.h>
 
 #include <bounce/dynamics/shapes/softbody_sphere_shape.h>
-#include <bounce/dynamics/shapes/softbody_capsule_shape.h>
 #include <bounce/dynamics/shapes/softbody_triangle_shape.h>
 #include <bounce/dynamics/shapes/softbody_tetrahedron_shape.h>
 #include <bounce/dynamics/shapes/softbody_world_shape.h>

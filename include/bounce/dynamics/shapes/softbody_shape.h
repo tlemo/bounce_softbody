@@ -19,7 +19,7 @@
 #ifndef B3_SOFTBODY_SHAPE_H
 #define B3_SOFTBODY_SHAPE_H
 
-#include <bounce/dynamics/shapes/softbody_shape_proxy.h>
+#include <bounce/common/math/math.h>
 
 class b3SoftBody;
 
@@ -27,7 +27,6 @@ class b3SoftBody;
 enum b3SoftBodyShapeType
 {
 	e_softBodySphereShape,
-	e_softBodyCapsuleShape,
 	e_softBodyTriangleShape,
 	e_softBodyTetrahedronShape,
 	e_maxSoftBodyShapes
@@ -61,17 +60,14 @@ struct b3SoftBodyShapeDef
 };
 
 // This is an internal shape.
-class b3SoftBodyShape : public b3SoftBodyShapeBase
+class b3SoftBodyShape
 {
 public:
-	// Default ctor.
-	b3SoftBodyShape() { m_baseType = e_softBodyShapeBase; }
-
 	// Virtual dtor.
 	virtual ~b3SoftBodyShape() { }
 	
 	// Get the shape type.
-	b3SoftBodyShapeType GetShapeType() const;
+	b3SoftBodyShapeType GetType() const;
 	
 	// Get the body.
 	b3SoftBody* GetBody();
@@ -96,7 +92,7 @@ protected:
 	friend class b3SoftBodyContactSolver;
 
 	// Type
-	b3SoftBodyShapeType m_shapeType;
+	b3SoftBodyShapeType m_type;
 
 	// Body
 	b3SoftBody* m_body;
@@ -114,9 +110,9 @@ protected:
 	u32 m_meshIndex;
 };
 
-inline b3SoftBodyShapeType b3SoftBodyShape::GetShapeType() const
+inline b3SoftBodyShapeType b3SoftBodyShape::GetType() const
 {
-	return m_shapeType;
+	return m_type;
 }
 
 inline b3SoftBody* b3SoftBodyShape::GetBody()

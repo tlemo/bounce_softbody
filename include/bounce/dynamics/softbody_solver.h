@@ -27,8 +27,6 @@ class b3StackAllocator;
 class b3SoftBodyParticle;
 class b3SoftBodyForce;
 class b3SoftBodySphereAndShapeContact;
-class b3SoftBodySphereAndTriangleContact;
-class b3SoftBodyCapsuleAndCapsuleContact;
 
 struct b3SoftBodyTimeStep;
 
@@ -38,8 +36,6 @@ struct b3SoftBodySolverDef
 	u32 particleCapacity;
 	u32 forceCapacity;
 	u32 shapeContactCapacity;
-	u32 triangleContactCapacity;
-	u32 capsuleContactCapacity;
 };
 
 class b3SoftBodySolver
@@ -51,9 +47,7 @@ public:
 	void Add(b3SoftBodyParticle* p);
 	void Add(b3SoftBodyForce* f);
 	void Add(b3SoftBodySphereAndShapeContact* c);
-	void Add(b3SoftBodySphereAndTriangleContact* c);
-	void Add(b3SoftBodyCapsuleAndCapsuleContact* c);
-
+	
 	void Solve(const b3SoftBodyTimeStep& step, const b3Vec3& gravity);
 private:
 	b3StackAllocator* m_stack;
@@ -69,14 +63,6 @@ private:
 	u32 m_shapeContactCapacity;
 	u32 m_shapeContactCount;
 	b3SoftBodySphereAndShapeContact** m_shapeContacts;
-
-	u32 m_triangleContactCapacity;
-	u32 m_triangleContactCount;
-	b3SoftBodySphereAndTriangleContact** m_triangleContacts;
-	
-	u32 m_capsuleContactCapacity;
-	u32 m_capsuleContactCount;
-	b3SoftBodyCapsuleAndCapsuleContact** m_capsuleContacts;
 };
 
 #endif

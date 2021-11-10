@@ -64,19 +64,9 @@ private:
 	friend class b3List<b3SoftBodyTetrahedronShape>;
 
 	b3SoftBodyTetrahedronShape(const b3SoftBodyTetrahedronShapeDef& def, b3SoftBody* body);
-	~b3SoftBodyTetrahedronShape();
-
+	
 	// Compute AABB
 	b3AABB ComputeAABB() const;
-
-	// Synchronize the AABB
-	void Synchronize(const b3Vec3& displacement);
-
-	// Touch proxy
-	void TouchProxy();
-
-	// Destroy shape contacts
-	void DestroyContacts();
 
 	// Particles
 	b3SoftBodyParticle* m_p1;

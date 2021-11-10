@@ -18,7 +18,6 @@
 
 #include <bounce/dynamics/softbody_particle.h>
 #include <bounce/dynamics/shapes/softbody_sphere_shape.h>
-#include <bounce/dynamics/shapes/softbody_capsule_shape.h>
 #include <bounce/dynamics/shapes/softbody_triangle_shape.h>
 #include <bounce/dynamics/softbody.h>
 #include <bounce/dynamics/forces/softbody_force.h>
@@ -64,7 +63,7 @@ void b3SoftBodyParticle::SetType(b3SoftBodyParticleType type)
 	}
 
 	m_type = type;
-	
+
 	if (m_type == e_staticSoftBodyParticle || m_type == e_kinematicSoftBodyParticle)
 	{
 		m_mass = scalar(0);
@@ -108,21 +107,6 @@ void b3SoftBodyParticle::DestroyShapes()
 	}
 
 	{
-		// Destroy capsules
-		b3SoftBodyCapsuleShape* c = m_body->m_capsuleShapeList.m_head;
-		while (c)
-		{
-			b3SoftBodyCapsuleShape* c0 = c;
-			c = c->m_next;
-
-			if (c0->m_p1 == this || c0->m_p2 == this)
-			{
-				m_body->DestroyCapsuleShape(c0);
-			}
-		}
-	}
-
-	{
 		// Destroy triangles
 		b3SoftBodyTriangleShape* t = m_body->m_triangleShapeList.m_head;
 		while (t)
@@ -155,84 +139,24 @@ void b3SoftBodyParticle::DestroyForces()
 
 void b3SoftBodyParticle::DestroyContacts()
 {
+	// Destroy shape contacts
+	b3SoftBodySphereAndShapeContact* c = m_body->m_contactManager.m_sphereAndShapeContactList.m_head;
+	while (c)
 	{
-		// Destroy shape contacts
-		b3SoftBodySphereAndShapeContact* c = m_body->m_contactManager.m_sphereAndShapeContactList.m_head;
-		while (c)
+		if (c->m_s1->m_p == this)
 		{
-			if (c->m_s1->m_p == this)
-			{
-				b3SoftBodySphereAndShapeContact* quack = c;
-				c = c->m_next;
-				m_body->m_contactManager.Destroy(quack);
-				continue;
-			}
-
+			b3SoftBodySphereAndShapeContact* quack = c;
 			c = c->m_next;
+			m_body->m_contactManager.Destroy(quack);
+			continue;
 		}
-	}
 
-	{
-		// Destroy capsule contacts
-		b3SoftBodyCapsuleAndCapsuleContact* c = m_body->m_contactManager.m_capsuleAndCapsuleContactList.m_head;
-		while (c)
-		{
-			if (c->m_s1->m_p1 == this ||
-				c->m_s1->m_p2 == this ||
-				c->m_s2->m_p1 == this ||
-				c->m_s2->m_p2 == this)
-			{
-				b3SoftBodyCapsuleAndCapsuleContact* quack = c;
-				c = c->m_next;
-				m_body->m_contactManager.Destroy(quack);
-				continue;
-			}
-
-			c = c->m_next;
-		}
-	}
-
-	{
-		// Destroy triangle contacts
-		b3SoftBodySphereAndTriangleContact* c = m_body->m_contactManager.m_sphereAndTriangleContactList.m_head;
-		while (c)
-		{
-			if (c->m_s1->m_p == this ||
-				c->m_s2->m_p1 == this ||
-				c->m_s2->m_p2 == this ||
-				c->m_s2->m_p3 == this)
-			{
-				b3SoftBodySphereAndTriangleContact* quack = c;
-				c = c->m_next;
-				m_body->m_contactManager.Destroy(quack);
-				continue;
-			}
-
-			c = c->m_next;
-		}
+		c = c->m_next;
 	}
 }
 
 void b3SoftBodyParticle::SynchronizeShapes()
 {
-	// Synchronize spheres
-	for (b3SoftBodySphereShape* s = m_body->m_sphereShapeList.m_head; s; s = s->m_next)
-	{
-		if (s->m_p == this)
-		{
-			s->Synchronize(b3Vec3_zero);
-		}
-	}
-
-	// Synchronize capsules
-	for (b3SoftBodyCapsuleShape* c = m_body->m_capsuleShapeList.m_head; c; c = c->m_next)
-	{
-		if (c->m_p1 == this || c->m_p2 == this)
-		{
-			c->Synchronize(b3Vec3_zero);
-		}
-	}
-
 	// Synchronize triangles
 	for (b3SoftBodyTriangleShape* t = m_body->m_triangleShapeList.m_head; t; t = t->m_next)
 	{
@@ -245,24 +169,6 @@ void b3SoftBodyParticle::SynchronizeShapes()
 
 void b3SoftBodyParticle::TouchProxies()
 {
-	// Touch spheres
-	for (b3SoftBodySphereShape* s = m_body->m_sphereShapeList.m_head; s; s = s->m_next)
-	{
-		if (s->m_p == this)
-		{
-			s->TouchProxy();
-		}
-	}
-
-	// Touch capsules
-	for (b3SoftBodyCapsuleShape* c = m_body->m_capsuleShapeList.m_head; c; c = c->m_next)
-	{
-		if (c->m_p1 == this || c->m_p2 == this)
-		{
-			c->TouchProxy();
-		}
-	}
-
 	// Touch triangles
 	for (b3SoftBodyTriangleShape* t = m_body->m_triangleShapeList.m_head; t; t = t->m_next)
 	{
