@@ -14,8 +14,9 @@
 
 ### Testbed
 	
-* OpenGL 2 with GLFW and GLAD
+* OpenGL with GLFW and GLAD
 * UI by imgui
+* Orbit camera
 * Mouse picking
 * premake build system
 
