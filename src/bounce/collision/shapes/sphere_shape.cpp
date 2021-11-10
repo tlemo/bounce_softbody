@@ -25,6 +25,7 @@ b3SphereShape::b3SphereShape()
 {
 	m_type = e_sphere;
 	m_radius = scalar(0);
+	m_center.SetZero();
 }
 
 b3Shape* b3SphereShape::Clone(b3BlockAllocator* allocator) const
