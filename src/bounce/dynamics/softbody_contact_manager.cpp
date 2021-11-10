@@ -55,7 +55,7 @@ void b3SoftBodyContactManager::AddContact(b3SoftBodySphereShape* s1, b3SoftBodyW
 
 void b3SoftBodyContactManager::FindNewContacts()
 {
-	// Run a simple O(n^2) loop.
+	// Run a simple broadphase loop.
 	for (b3SoftBodySphereShape* s1 = m_body->m_sphereShapeList.m_head; s1 != nullptr; s1 = s1->m_next)
 	{
 		b3AABB aabb1 = s1->ComputeAABB();
