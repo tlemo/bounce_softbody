@@ -22,6 +22,16 @@
 #include <bounce/sparse/dense_vec3.h>
 #include <bounce/sparse/sparse_mat33.h>
 
+// This file contains an implementation for the stretch constraint described 
+// in the work of David Baraff and Andrew Witkin: "Large Steps in Cloth Simulation".
+// 
+// In "A Finite Element Formulation of Baraff-Witkin Cloth" by Theodore Kim, 
+// the eigensystem for the stretch energy is revealed and hence the paper describes a way for projecting 
+// the negative eigenvalues to positive values. 
+// Our projection method is equivalent to Kim's, but a little slower to converge but simpler to implement, as 
+// described in the paper "Stable but responsive cloth" of Choi. In practice we just send full force Jacobians 
+// to the solver if the eigenvalues are positive.
+
 void b3SoftBodyStretchForceDef::Initialize(const b3Vec3& A, const b3Vec3& B, const b3Vec3& C)
 {
 	b3Vec3 AB = B - A;
@@ -184,6 +194,7 @@ void b3SoftBodyStretchForce::ComputeForces(const b3SparseForceSolverData* data)
 				{
 					b3Mat33 Kij = b3Outer(dCudx[i], dCudx[j]);
 
+					// Are the eigenvalues positive?
 					if (len_wu > m_b_u)
 					{
 						b3Mat33 d2Cuxij = (alpha * inv_len_wu * dwudx[i] * dwudx[j]) * (I - b3Outer(n_wu, n_wu));
@@ -289,6 +300,7 @@ void b3SoftBodyStretchForce::ComputeForces(const b3SparseForceSolverData* data)
 				{
 					b3Mat33 Kij = b3Outer(dCvdx[i], dCvdx[j]);
 
+					// Are the eigenvalues positive?
 					if (len_wv > m_b_v)
 					{
 						b3Mat33 d2Cvxij = (alpha * inv_len_wv * dwvdx[i] * dwvdx[j]) * (I - b3Outer(n_wv, n_wv));
