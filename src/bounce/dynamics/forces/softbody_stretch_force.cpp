@@ -34,6 +34,7 @@
 
 void b3SoftBodyStretchForceDef::Initialize(const b3Vec3& A, const b3Vec3& B, const b3Vec3& C)
 {
+	// See https://irlanrobson.github.io/2019/06/29/computing-(u,v)-coordinates-for-a-triangle/
 	b3Vec3 AB = B - A;
 	b3Vec3 AC = C - A;
 
