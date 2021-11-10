@@ -19,18 +19,18 @@
 #ifndef B3_SOFTBODY_DRAGGER_H
 #define B3_SOFTBODY_DRAGGER_H
 
-#include <bounce/common/geometry.h>
-#include <bounce/dynamics/softbody.h>
+#include <bounce/common/math/vec3.h>
 #include <bounce/dynamics/softbody_particle.h>
-#include <bounce/dynamics/shapes/softbody_triangle_shape.h>
-#include <bounce/dynamics/forces/softbody_mouse_force.h>
+
+struct b3Ray;
+class b3SoftBody;
+class b3SoftBodyMouseForce;
 
 // A softbody triangle dragger.
-class b3SoftBodyDragger
+class SoftBodyDragger
 {
 public:
-	b3SoftBodyDragger(b3Ray3* ray, b3SoftBody* body);
-	~b3SoftBodyDragger();
+	SoftBodyDragger(b3Ray* ray, b3SoftBody* body);
 
 	void SetStaticDrag(bool bit);
 
@@ -56,7 +56,7 @@ public:
 
 	b3Vec3 GetPointB() const;
 private:
-	b3Ray3* m_ray;
+	b3Ray* m_ray;
 	scalar m_x;
 
 	b3SoftBody* m_body;
@@ -76,32 +76,32 @@ private:
 	b3SoftBodyParticleType m_t1, m_t2, m_t3;
 };
 
-inline bool b3SoftBodyDragger::GetStaticDrag() const
+inline bool SoftBodyDragger::GetStaticDrag() const
 {
 	return m_staticDrag;
 }
 
-inline void b3SoftBodyDragger::SetMouseStiffness(scalar k)
+inline void SoftBodyDragger::SetMouseStiffness(scalar k)
 {
 	m_km = k;
 }
 
-inline scalar b3SoftBodyDragger::GetMouseStiffness()
+inline scalar SoftBodyDragger::GetMouseStiffness()
 {
 	return m_km;
 }
 
-inline void b3SoftBodyDragger::SetMouseDamping(scalar k)
+inline void SoftBodyDragger::SetMouseDamping(scalar k)
 {
 	m_kd = k;
 }
 
-inline scalar b3SoftBodyDragger::GetMouseDamping()
+inline scalar SoftBodyDragger::GetMouseDamping()
 {
 	return m_kd;
 }
 
-inline bool b3SoftBodyDragger::IsDragging() const
+inline bool SoftBodyDragger::IsDragging() const
 {
 	return m_isDragging;
 }

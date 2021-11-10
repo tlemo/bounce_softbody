@@ -22,7 +22,7 @@
 class TableCloth : public SoftBody
 {
 public:
-	TableCloth(const TestDef& testDef) : SoftBody(testDef)
+	TableCloth()
 	{
 		m_mesh.Translate(b3Vec3(0.0f, 10.0f, 0.0f));
 		
@@ -42,13 +42,13 @@ public:
 
 		m_body->SetGravity(b3Vec3(0.0f, -9.8f, 0.0f));
 
-		m_bodyDragger = new b3SoftBodyDragger(&m_ray, m_body);
+		m_bodyDragger = new SoftBodyDragger(&m_ray, m_body);
 		m_bodyDragger->SetStaticDrag(false);
 	}
 
-	static Test* Create(const TestDef& def)
+	static Test* Create()
 	{
-		return new TableCloth(def);
+		return new TableCloth;
 	}
 
 	GridClothMesh<10, 10> m_mesh;

@@ -16,7 +16,7 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "softbody.h"
+#include "uniform_softbody.h"
 
 UniformSoftBody::UniformSoftBody()
 {

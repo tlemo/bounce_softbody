@@ -22,7 +22,7 @@
 class PlasticSoftBody : public SoftBody
 {
 public:
-	PlasticSoftBody(const TestDef& testDef) : SoftBody(testDef)
+	PlasticSoftBody()
 	{
 		// Create soft body
 		TetDef def;
@@ -48,12 +48,12 @@ public:
 		b3Vec3 gravity(0.0f, -9.8f, 0.0f);
 		m_body->SetGravity(gravity);
 
-		m_bodyDragger = new b3SoftBodyDragger(&m_ray, m_body);
+		m_bodyDragger = new SoftBodyDragger(&m_ray, m_body);
 	}
 
-	static Test* Create(const TestDef& def)
+	static Test* Create()
 	{
-		return new PlasticSoftBody(def);
+		return new PlasticSoftBody;
 	}
 
 	GridTetMesh<2, 2, 2> m_mesh;

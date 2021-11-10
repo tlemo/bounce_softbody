@@ -20,10 +20,11 @@
 #define B3_SOFTBODY_WORLD_SHAPE_H
 
 #include <bounce/dynamics/shapes/softbody_shape_proxy.h>
-#include <bounce/collision/shapes/sphere.h>
-#include <bounce/collision/shapes/aabb.h>
+#include <bounce/collision/geometry/sphere.h>
+#include <bounce/collision/geometry/aabb.h>
 #include <bounce/common/template/list.h>
 
+class b3Draw;
 class b3SoftBody;
 
 enum b3SoftBodyWorldShapeType
@@ -89,7 +90,7 @@ public:
 	virtual bool CollideSphere(b3SoftBodySphereManifold* manifold, const b3Sphere& sphere) const = 0;
 
 	// Draw this shape.
-	virtual void Draw() const = 0;
+	virtual void Draw(b3Draw* draw) const = 0;
 
 	// Return the next world shape in the body list of world shapes.
 	b3SoftBodyWorldShape* GetNext() { return m_next; }
@@ -143,7 +144,7 @@ public:
 
 	bool CollideSphere(b3SoftBodySphereManifold* manifold, const b3Sphere& sphere) const;
 	
-	void Draw() const;
+	void Draw(b3Draw* draw) const;
 
 	// Center
 	b3Vec3 m_center;
@@ -164,7 +165,7 @@ public:
 
 	bool CollideSphere(b3SoftBodySphereManifold* manifold, const b3Sphere& sphere) const;
 
-	void Draw() const;
+	void Draw(b3Draw* draw) const;
 
 	// Centers
 	b3Vec3 m_center1, m_center2;
@@ -185,7 +186,7 @@ public:
 
 	bool CollideSphere(b3SoftBodySphereManifold* manifold, const b3Sphere& sphere) const;
 
-	void Draw() const;
+	void Draw(b3Draw* draw) const;
 
 	// Extents
 	b3Vec3 m_extents;

@@ -20,7 +20,7 @@
 #include <bounce/dynamics/shapes/softbody_sphere_shape.h>
 #include <bounce/dynamics/shapes/softbody_triangle_shape.h>
 #include <bounce/dynamics/softbody_particle.h>
-#include <bounce/common/geometry.h>
+#include <bounce/collision/geometry/geometry.h>
 
 // Solve constrained Barycentric coordinates for point Q
 static void b3Solve3(scalar out[3],

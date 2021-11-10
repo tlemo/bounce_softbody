@@ -19,14 +19,14 @@
 #ifndef B3_DRAW_H
 #define B3_DRAW_H
 
-#include <bounce/common/geometry.h>
 #include <bounce/common/math/vec2.h>
 #include <bounce/common/math/vec3.h>
 #include <bounce/common/math/mat33.h>
 #include <bounce/common/math/mat44.h>
 #include <bounce/common/math/transform.h>
 #include <bounce/common/graphics/color.h>
-#include <bounce/collision/shapes/aabb.h>
+#include <bounce/collision/geometry/aabb.h>
+#include <bounce/collision/geometry/plane.h>
 
 // Debug draw interface.
 class b3Draw
@@ -89,9 +89,5 @@ public:
 	// Draw a transform.
 	virtual void DrawTransform(const b3Transform& xf, bool depthEnabled = true) = 0;
 };
-
-// The debug drawer interface used by Bounce. 
-// Set this to an implementation before calling any debug drawing function.
-extern b3Draw* b3Draw_draw;
 
 #endif

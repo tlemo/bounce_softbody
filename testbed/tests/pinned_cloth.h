@@ -22,7 +22,7 @@
 class PinnedCloth : public SoftBody
 {
 public:
-	PinnedCloth(const TestDef& testDef) : SoftBody(testDef)
+	PinnedCloth()
 	{
 		// Create cloth
 		ClothDef def;
@@ -44,12 +44,12 @@ public:
 			m_body->GetParticle(v2)->SetType(e_staticSoftBodyParticle);
 		}
 
-		m_bodyDragger = new b3SoftBodyDragger(&m_ray, m_body);
+		m_bodyDragger = new SoftBodyDragger(&m_ray, m_body);
 	}
 
-	static Test* Create(const TestDef& def)
+	static Test* Create()
 	{
-		return new PinnedCloth(def);
+		return new PinnedCloth;
 	}
 
 	GridClothMesh<10, 10> m_clothMesh;

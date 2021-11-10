@@ -54,8 +54,7 @@ workspace(solution_name)
 		kind "StaticLib"
 		location ( solution_dir .. action )
 		includedirs { bounce_softbody_inc_dir }
-		vpaths { [""] = "bounce_softbody" }
-
+		
 		files 
 		{ 
 			bounce_softbody_inc_dir .. "/bounce/**.h", 
@@ -67,13 +66,13 @@ workspace(solution_name)
 		kind "StaticLib"
 		language "C"
 		location ( solution_dir .. action )
-		includedirs { external_dir }
+		includedirs { external_dir .. "/glad/include" }
 		
 		files 
 		{ 
-			external_dir .. "/glad/khrplatform.h",
-			external_dir .. "/glad/glad.h", 
-			external_dir .. "/glad/glad.c",
+			external_dir .. "/glad/include/KHR/khrplatform.h",
+			external_dir .. "/glad/include/glad.h", 
+			external_dir .. "/glad/src/glad.c",
 		}
 		
 		filter { "system:linux" } 
@@ -159,16 +158,8 @@ workspace(solution_name)
 	
 		files 
 		{ 
-			external_dir .. "/imgui/imconfig.h", 
-			external_dir .. "/imgui/imgui.h", 
-			external_dir .. "/imgui/imgui_internal.h", 
-			external_dir .. "/imgui/imstb_rect_pack.h", 
-			external_dir .. "/imgui/imstb_textedit.h", 
-			external_dir .. "/imgui/imstb_truetype.h", 
-			external_dir .. "/imgui/imgui.cpp",
-			external_dir .. "/imgui/imgui_widgets.cpp",
-			external_dir .. "/imgui/imgui_demo.cpp",
-			external_dir .. "/imgui/imgui_draw.cpp",			
+			external_dir .. "/imgui/**.h", 
+			external_dir .. "/imgui/**.cpp",			
 		}
 		
 	project "testbed"
@@ -179,10 +170,10 @@ workspace(solution_name)
 		{ 
 				external_dir, 
 				external_dir .. "/glfw/include", 
+				external_dir .. "/glad/include", 
 				working_dir .. "/testbed", 
 				bounce_softbody_inc_dir
 		}
-		vpaths { [""] = "testbed" }
 		
 		files 
 		{ 

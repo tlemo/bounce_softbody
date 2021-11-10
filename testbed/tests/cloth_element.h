@@ -22,7 +22,7 @@
 class ClothElement : public SoftBody
 {
 public:
-	ClothElement(const TestDef& testDef) : SoftBody(testDef)
+	ClothElement()
 	{
 		ClothDef def;
 		def.mesh = &m_mesh;
@@ -37,13 +37,13 @@ public:
 
 		m_body->SetGravity(b3Vec3(0.0f, -9.8f, 0.0f));
 		
-		m_bodyDragger = new b3SoftBodyDragger(&m_ray, m_body);
+		m_bodyDragger = new SoftBodyDragger(&m_ray, m_body);
 		m_bodyDragger->SetStaticDrag(false);
 	}
 
-	static Test* Create(const TestDef& def)
+	static Test* Create()
 	{
-		return new ClothElement(def);
+		return new ClothElement;
 	}
 
 	GridClothMesh<10, 10> m_mesh;

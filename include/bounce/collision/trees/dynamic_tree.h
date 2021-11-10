@@ -20,8 +20,10 @@
 #define B3_DYNAMIC_TREE_H
 
 #include <bounce/common/template/stack.h>
-#include <bounce/collision/shapes/aabb.h>
+#include <bounce/collision/geometry/aabb.h>
 #include <bounce/collision/collision.h>
+
+class b3Draw;
 
 #define B3_NULL_NODE_D (0xFFFFFFFF)
 
@@ -66,7 +68,7 @@ public:
 	void Validate(u32 node) const;
 
 	// Draw this tree.
-	void Draw() const;
+	void Draw(b3Draw* draw) const;
 private:
 	struct b3Node
 	{

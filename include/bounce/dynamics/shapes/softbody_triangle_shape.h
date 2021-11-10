@@ -20,7 +20,7 @@
 #define B3_SOFTBODY_TRIANGLE_SHAPE_H
 
 #include <bounce/dynamics/shapes/softbody_shape.h>
-#include <bounce/collision/shapes/aabb.h>
+#include <bounce/collision/geometry/aabb.h>
 #include <bounce/common/template/list.h>
 
 struct b3RayCastInput;

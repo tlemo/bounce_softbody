@@ -348,12 +348,6 @@ inline b3Quat b3Mat33Quat(const b3Mat33& m)
 	return result;
 }
 
-// Convert a rotation quaternion to a 3-by-3 rotation matrix.
-inline b3Mat33 b3QuatMat33(const b3Quat& q)
-{
-	return q.GetRotationMatrix();
-}
-
 // Rotation about the x-axis.
 inline b3Quat b3QuatRotationX(scalar angle)
 {
@@ -390,6 +384,33 @@ inline b3Quat b3QuatRotationZ(scalar angle)
 	q.v.y = scalar(0);
 	q.v.z = sin(x);
 	q.s = cos(x);
+	return q;
+}
+
+// Rotation between two normal vectors.
+inline b3Quat b3QuatRotationBetween(const b3Vec3& a, const b3Vec3& b)
+{
+	// |a x b| = sin(theta)
+	// a . b = cos(theta)
+	// sin(theta / 2) = +/- sqrt([1 - cos(theta)] / 2)
+	// cos(theta / 2) = +/- sqrt([1 + cos(theta)] / 2)
+	// q.v = sin(theta / 2) * (a x b) / |a x b|
+	// q.s = cos(theta / 2)
+	b3Quat q;
+
+	b3Vec3 axis = b3Cross(a, b);
+	scalar s = b3Length(axis);
+	scalar c = b3Dot(a, b);
+	if (s > B3_EPSILON)
+	{
+		q.v = b3Sqrt(scalar(0.5) * (scalar(1) - c)) * (axis / s);
+		q.s = b3Sqrt(scalar(0.5) * (scalar(1) + c));
+	}
+	else
+	{
+		q.SetIdentity();
+	}
+
 	return q;
 }
 

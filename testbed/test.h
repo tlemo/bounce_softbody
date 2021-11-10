@@ -20,47 +20,49 @@
 #define TEST_H
 
 #include "GLFW/glfw3.h"
-#include "gl_debugdraw.h"
 #include "draw.h"
 #include "view_model.h"
 
-float RandomFloat(float a, float b);
+#include <bounce/bounce_softbody.h>
+#include <bounce/common/graphics/camera.h>
+#include <bounce/common/graphics/debugdraw.h>
+#include <bounce/collision/geometry/ray.h>
 
 extern void DrawString(const b3Color& color, const b3Vec2& ps, const char* string, ...);
 extern void DrawString(const b3Color& color, const b3Vec3& pw, const char* string, ...);
 extern void DrawString(const b3Color& color, const char* string, ...);
 
-struct TestDef
-{
-	b3Camera* camera;
-	b3DebugDraw* debugDraw;
-	Properties* properties;
-	TestProperties* testProperties;
-};
+extern b3Camera* g_camera;
+extern b3DebugDrawData* g_debugDrawData;
+
+float RandomFloat(float a, float b);
 
 class Test 
 {
 public:
-	Test(const TestDef& def);
-	virtual ~Test();
+	Test()
+	{
+		m_draw.m_debugDrawData = g_debugDrawData;
+		m_ray.origin.SetZero();
+		m_ray.direction.Set(0.0f, 0.0f, -1.0f);
+		m_ray.fraction = g_camera->GetZFar();
+	}
 	
-	virtual void Step();
+	virtual ~Test() { }
 	
-	virtual void MouseMove(const b3Ray3& pw) { m_ray = pw; }
-	virtual void MouseLeftDown(const b3Ray3& pw) { }
-	virtual void MouseLeftUp(const b3Ray3& pw) { }
+	virtual void Step() { }
+	
+	virtual void MouseMove(const b3Ray& pw) { m_ray = pw; }
+	virtual void MouseLeftDown(const b3Ray& pw) { }
+	virtual void MouseLeftUp(const b3Ray& pw) { }
 	virtual void KeyDown(int button) { }
 	virtual void KeyUp(int button) { }
 
 	virtual void BeginDragging() { }
 	virtual void EndDragging() { }
 protected:
-	b3Camera* m_camera;
-	b3DebugDraw* m_debugDraw;
-	Properties* m_properties;
-	TestProperties* m_testProperties;
 	Draw m_draw;
-	b3Ray3 m_ray;
+	b3Ray m_ray;
 };
 
 #endif

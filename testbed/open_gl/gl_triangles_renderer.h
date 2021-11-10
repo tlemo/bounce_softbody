@@ -16,42 +16,43 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef GL_RENDER_TRIANGLES_H
-#define GL_RENDER_TRIANGLES_H
+#ifndef GL_TRIANGLES_RENDERER_H
+#define GL_TRIANGLES_RENDERER_H
 
+#include <bounce/common/graphics/debug_triangles.h>
 #include "glad/glad.h"
-#include <stdint.h>
 
-class GLRenderTriangles
+class GLTrianglesRenderer : public b3DebugTrianglesRenderer
 {
 public:
-	GLRenderTriangles(uint32_t triangle_capacity);
-	~GLRenderTriangles();
+	GLTrianglesRenderer(int triangle_capacity);
+	~GLTrianglesRenderer();
 	
-	uint32_t GetVertexCapacity() { return m_vertex_capacity; }
-
-	uint32_t GetVertexCount() { return m_vertex_count; }
-
-	void PushVertex(float x, float y, float z, float r, float g, float b, float a, float nx, float ny, float nz);
-
+	int GetVertexCapacity() { return m_vertex_capacity; }
+	int GetVertexCount() { return m_vertex_count; }
 	void SetMVP(float* mvp);
 
-	void Flush();
+	void AddTriangle(const b3Vec3& p1, const b3Vec3& p2, const b3Vec3& p3, const b3Color& color, const b3Vec3& normal) override;
+	void FlushTriangles(bool depthEnabled) override;
 private:
-	uint32_t m_vertex_capacity;
+	void Vertex(float x, float y, float z, float r, float g, float b, float a, float nx, float ny, float nz);
+	void Flush();
+
+	int m_vertex_capacity;
 	float* m_positions;
 	float* m_colors;
 	float* m_normals;
-	uint32_t m_vertex_count;
+	int m_vertex_count;
 	float m_mvp[16];
 
+	GLuint m_vao;
 	GLuint m_vbos[3];
 
 	GLuint m_program;
+	GLuint m_projection_uniform;
 	GLuint m_position_attribute;
 	GLuint m_color_attribute;
 	GLuint m_normal_attribute;
-	GLuint m_projection_uniform;
 };
 
 #endif

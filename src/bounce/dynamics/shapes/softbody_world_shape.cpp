@@ -18,8 +18,7 @@
 
 #include <bounce/dynamics/shapes/softbody_world_shape.h>
 #include <bounce/dynamics/softbody.h>
-#include <bounce/common/template/array.h>
-#include <bounce/draw.h>
+#include <bounce/common/draw.h>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -188,10 +187,10 @@ bool b3SoftBodySphereWorldShape::CollideSphere(b3SoftBodySphereManifold* manifol
 	return false;
 }
 
-void b3SoftBodySphereWorldShape::Draw() const
+void b3SoftBodySphereWorldShape::Draw(b3Draw* draw) const
 {
-	b3Draw_draw->DrawPoint(m_center, scalar(4), b3Color_black);
-	b3Draw_draw->DrawSolidSphere(b3Vec3_y, m_center, m_radius, b3Color_gray);
+	draw->DrawPoint(m_center, scalar(4), b3Color_black);
+	draw->DrawSolidSphere(b3Vec3_y, m_center, m_radius, b3Color_gray);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -316,13 +315,12 @@ bool b3SoftBodyCapsuleWorldShape::CollideSphere(b3SoftBodySphereManifold* manifo
 	return true;
 }
 
-void b3SoftBodyCapsuleWorldShape::Draw() const
+void b3SoftBodyCapsuleWorldShape::Draw(b3Draw* draw) const
 {
-	b3Draw_draw->DrawPoint(m_center1, scalar(4), b3Color_black);
-	b3Draw_draw->DrawPoint(m_center2, scalar(4), b3Color_black);
-	b3Draw_draw->DrawSegment(m_center1, m_center2, b3Color_black);
-
-	b3Draw_draw->DrawSolidCapsule(b3Vec3_y, m_center1, m_center2, m_radius, b3Color_gray);
+	draw->DrawPoint(m_center1, scalar(4), b3Color_black);
+	draw->DrawPoint(m_center2, scalar(4), b3Color_black);
+	draw->DrawSegment(m_center1, m_center2, b3Color_black);
+	draw->DrawSolidCapsule(b3Vec3_y, m_center1, m_center2, m_radius, b3Color_gray);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -451,7 +449,7 @@ bool b3SoftBodyBoxWorldShape::CollideSphere(b3SoftBodySphereManifold* manifold, 
 	return false;
 }
 
-void b3SoftBodyBoxWorldShape::Draw() const
+void b3SoftBodyBoxWorldShape::Draw(b3Draw* draw) const
 {
 	b3Vec3 e = m_extents;
 
@@ -488,9 +486,8 @@ void b3SoftBodyBoxWorldShape::Draw() const
 		b3Vec3 A = m_xf * vertices[indices[i]];
 		b3Vec3 B = m_xf * vertices[indices[i + 1]];
 		b3Vec3 C = m_xf * vertices[indices[i + 2]];
-
 		b3Vec3 N = b3Normalize(b3Cross(B - A, C - A));
 
-		b3Draw_draw->DrawSolidTriangle(N, A, B, C, b3Color_gray);
+		draw->DrawSolidTriangle(N, A, B, C, b3Color_gray);
 	}
 }

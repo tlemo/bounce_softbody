@@ -19,60 +19,95 @@
 #ifndef MODEL_H
 #define MODEL_H
 
-#include "gl_debugdraw.h"
+#include "open_gl/gl_points_renderer.h"
+#include "open_gl/gl_lines_renderer.h"
+#include "open_gl/gl_triangles_renderer.h"
+
 #include <bounce/common/graphics/camera.h>
 #include <bounce/common/graphics/debugdraw.h>
 
 class Test;
 
-struct Properties;
-struct TestProperties;
+extern b3Camera* g_camera;
+extern b3DebugDrawData* g_debugDrawData;
 
 class Model
 {
 public:
 	Model();
 	~Model();
-	
-	void EnablePause(bool flag) { m_pause = flag; } 
-	bool IsPaused() const { return m_pause; }
-	
-	void EnableSetTest(bool flag) { m_setTest = flag; }
-	bool WillSetTest() { return m_setTest; }
-	
-	bool WillSinglePlay() { return m_singlePlay; }
 
-	void SinglePlay();
-	
-	void ResetCamera();
-	
+	void Action_SetTest();
+	void Action_ResetCamera();
+
+	void Command_Press_Key(int button);
+	void Command_Release_Key(int button);
+	void Command_Press_Mouse_Left(const b3Vec2& ps);
+	void Command_Release_Mouse_Left(const b3Vec2& ps);
+	void Command_Move_Cursor(const b3Vec2& ps);
+
+	void Command_ResizeCamera(scalar w, scalar h);
+	void Command_RotateCameraX(scalar angle);
+	void Command_RotateCameraY(scalar angle);
+	void Command_TranslateCameraX(scalar d);
+	void Command_TranslateCameraY(scalar d);
+	void Command_ZoomCamera(scalar d);
+
 	void Update();
 private:
-	friend class ViewModel;
-	
-	Properties* m_properties;
-	TestProperties* m_testProperties;
 	b3Camera m_camera;
-	b3DebugDraw m_debugDraw;
-	GLDebugDraw m_glDebugDraw;
+	b3DebugPoints m_points;
+	b3DebugLines m_lines;
+	b3DebugTriangles m_triangles;
+	b3DebugDrawData m_debugDrawData;
+	GLPointsRenderer m_pointsRenderer;
+	GLLinesRenderer m_linesRenderer;
+	GLTrianglesRenderer m_trianglesRenderer;
 	Test* m_test;
 	bool m_setTest;
-	bool m_singlePlay;
-	bool m_pause;
 };
 
-inline void Model::SinglePlay()
+inline void Model::Action_SetTest()
 {
-	m_pause = true;
-	m_singlePlay = true;
+	m_setTest = true;
 }
 
-inline void Model::ResetCamera()
+inline void Model::Action_ResetCamera()
 {
-	m_camera.SetAzimuthalAngle(0.15f * B3_PI);
-	m_camera.SetPolarAngle(0.35f * B3_PI);	
-	m_camera.SetRadius(50.0f);
+	b3Vec3 position(20.0f, 20.0f, 40.0f);
+	m_camera.SetPosition(position);
 	m_camera.SetCenter(b3Vec3_zero);
+}
+
+inline void Model::Command_ResizeCamera(scalar w, scalar h)
+{
+	m_camera.SetWidth(w);
+	m_camera.SetHeight(h);
+}
+
+inline void Model::Command_RotateCameraX(scalar angle)
+{
+	m_camera.AddPolarAngle(angle);
+}
+
+inline void Model::Command_RotateCameraY(scalar angle)
+{
+	m_camera.AddAzimuthalAngle(angle);
+}
+
+inline void Model::Command_TranslateCameraX(scalar d)
+{
+	m_camera.TranslateXAxis(d);
+}
+
+inline void Model::Command_TranslateCameraY(scalar d)
+{
+	m_camera.TranslateYAxis(d);
+}
+
+inline void Model::Command_ZoomCamera(scalar d)
+{
+	m_camera.AddRadius(d);
 }
 
 #endif

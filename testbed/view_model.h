@@ -25,9 +25,8 @@ struct GLFWwindow;
 
 class Model;
 
-struct TestDef;
 class Test;
-typedef Test* (*TestCreate)(const TestDef& def);
+typedef Test* (*TestCreate)();
 
 struct TestEntry
 {
@@ -37,9 +36,9 @@ struct TestEntry
 
 #define MAX_TESTS 256
 
-struct Properties
+struct Settings
 {
-	Properties()
+	Settings()
 	{
 		testID = 0;
 		testCount = 0;
@@ -47,14 +46,13 @@ struct Properties
 		drawLines = true;
 		drawTriangles = true;
 		drawGrid = true;
-		drawStats = false;
 	}
-
-	void RegisterTest(const char* name, TestCreate create)
+	
+	void RegisterTest(const char* name, TestCreate createFn)
 	{
 		TestEntry* test = tests + testCount++;
 		test->name = name;
-		test->create = create;
+		test->create = createFn;
 	}
 	
 	int testID; 
@@ -65,46 +63,41 @@ struct Properties
 	bool drawLines;
 	bool drawTriangles;
 	bool drawGrid;
-	bool drawStats;
 };
 
-struct TestProperties
+extern Settings* g_settings;
+
+struct TestSettings
 {
-	TestProperties()
+	TestSettings()
 	{
 		hertz = 60.0f;
 		inv_hertz = 1.0f / hertz;
-		velocityIterations = 8;
-		positionIterations = 2;
 		forceIterations = 1;
 		forceSubIterations = 30;
+		velocityIterations = 8;
+		positionIterations = 2;
 		warmStart = true;
-		drawShapes = true;
-		drawBounds = false;
-		drawContactPoints = true;
-		drawContactNormals = false;
-		drawContactTangents = false;
+		pause = true;
+		singlePlay = false;
 	}
 
 	float hertz, inv_hertz;
-	int velocityIterations;
-	int positionIterations;
 	int forceIterations;
 	int forceSubIterations;
+	int velocityIterations;
+	int positionIterations;
 	bool warmStart;
-
-	bool drawBounds;
-	bool drawShapes;
-	bool drawContactPoints;
-	bool drawContactNormals;
-	bool drawContactTangents;
-	bool drawContactPolygons;
+	bool pause;
+	bool singlePlay;
 };
+
+extern TestSettings* g_testSettings;
 
 class ViewModel
 {
 public:
-	ViewModel(GLFWwindow* window, Model* model);
+	ViewModel(Model* model, GLFWwindow* window);
 	~ViewModel();
 	
 	void Action_SetTest();
@@ -121,27 +114,15 @@ public:
 	void Event_Release_Mouse(int button);
 	void Event_Move_Cursor(float x, float y);
 	void Event_Scroll(float dx, float dy);
-
-	void Command_Press_Key(int button);
-	void Command_Release_Key(int button);
-	void Command_Press_Mouse_Left(const b3Vec2& ps);
-	void Command_Release_Mouse_Left(const b3Vec2& ps);
-	void Command_Move_Cursor(const b3Vec2& ps);
-	void Command_ResizeCamera(scalar w, scalar h);
-	void Command_RotateCameraX(scalar angle);
-	void Command_RotateCameraY(scalar angle);
-	void Command_TranslateCameraX(scalar d);
-	void Command_TranslateCameraY(scalar d);
-	void Command_ZoomCamera(scalar d);
 private:
 	friend class View;
 	
 	b3Vec2 GetCursorPosition() const;
-	
-	GLFWwindow* m_window;
-	Properties m_properties;
-	TestProperties m_testProperties;
+
 	Model* m_model;
+	Settings m_settings;
+	TestSettings m_testSettings;
+	GLFWwindow* m_window;
 	b3Vec2 m_ps0;
 };
 

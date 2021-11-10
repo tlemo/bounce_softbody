@@ -22,7 +22,7 @@
 class NodeTypes : public SoftBody
 {
 public:
-	NodeTypes(const TestDef& testDef) : SoftBody(testDef)
+	NodeTypes()
 	{
 		// Create soft body
 		TetDef def;
@@ -49,7 +49,7 @@ public:
 			}
 		}
 
-		m_bodyDragger = new b3SoftBodyDragger(&m_ray, m_body);
+		m_bodyDragger = new SoftBodyDragger(&m_ray, m_body);
 	}
 
 	void Step()
@@ -149,9 +149,9 @@ public:
 		}
 	}
 
-	static Test* Create(const TestDef& def)
+	static Test* Create()
 	{
-		return new NodeTypes(def);
+		return new NodeTypes;
 	}
 
 	GridTetMesh<2, 5, 2> m_mesh;

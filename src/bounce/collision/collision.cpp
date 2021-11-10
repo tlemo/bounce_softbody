@@ -17,7 +17,6 @@
 */
 
 #include <bounce/collision/collision.h>
-
-#include <bounce/collision/shapes/sphere.h>
+#include <bounce/collision/geometry/sphere.h>
 
 const b3Sphere b3Sphere_identity(b3Vec3_zero, scalar(1)); 

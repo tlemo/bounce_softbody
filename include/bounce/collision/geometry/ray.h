@@ -16,40 +16,42 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef GL_RENDER_LINES_H
-#define GL_RENDER_LINES_H
+#ifndef B3_RAY_H
+#define B3_RAY_H
 
-#include "glad/glad.h"
-#include <stdint.h>
+#include <bounce/common/math/vec3.h>
 
-class GLRenderLines
+// A ray in finite form.
+// R(t) = O + t * n.
+struct b3Ray
 {
-public:
-	GLRenderLines(uint32_t line_capacity);
-	~GLRenderLines();
+	// Default ctor does nothing for performance.
+	b3Ray() { }
 	
-	uint32_t GetVertexCapacity() { return m_vertex_capacity; }
+	// Construct this ray from origin, direction, and fraction.
+	b3Ray(const b3Vec3& _origin, const b3Vec3& _direction, scalar _fraction) : 
+		origin(_origin), direction(_direction), fraction(_fraction) { }
 
-	uint32_t GetVertexCount() { return m_vertex_count; }
+	// Construct this ray from a line segment.
+	b3Ray(const b3Vec3& A, const b3Vec3& B) 
+	{
+		origin = A;
+		direction = b3Normalize(B - A);
+		fraction = b3Distance(A, B);
+	}
 
-	void PushVertex(float x, float y, float z, float r, float g, float b, float a);
+	// Return the begin point of this ray.
+	b3Vec3 A() const { return origin; }
 
-	void SetMVP(float* mvp);
+	// Return the end point of this ray.
+	b3Vec3 B() const
+	{
+		return origin + fraction * direction;
+	}
 
-	void Flush();
-private:
-	uint32_t m_vertex_capacity;
-	float* m_positions;
-	float* m_colors;
-	uint32_t m_vertex_count;
-	float m_mvp[16];
-
-	GLuint m_vbos[2];
-
-	GLuint m_program;
-	GLuint m_position_attribute;
-	GLuint m_color_attribute;
-	GLuint m_projection_uniform;
+	b3Vec3 origin;
+	b3Vec3 direction;
+	scalar fraction;
 };
 
 #endif

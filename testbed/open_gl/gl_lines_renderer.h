@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2016-2019 Irlan Robson 
+* Copyright (c) 2016-2019 Irlan Robson
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -16,44 +16,41 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef GL_DEBUGDRAW_H
-#define GL_DEBUGDRAW_H
+#ifndef GL_LINES_RENDERER_H
+#define GL_LINES_RENDERER_H
 
-#include <bounce/common/graphics/debugdraw.h>
+#include <bounce/common/graphics/debug_lines.h>
+#include "glad/glad.h"
 
-class GLRenderPoints;
-class GLRenderLines;
-class GLRenderTriangles;
-
-class b3Camera;
-
-class GLDebugDraw : public b3DebugDrawCallback
+class GLLinesRenderer : public b3DebugLinesRenderer
 {
 public:
-	GLDebugDraw(int pointCapacity, int lineCapacity, int triangleCapacity);
-	~GLDebugDraw();
+	GLLinesRenderer(int line_capacity);
+	~GLLinesRenderer();
 	
-	void Begin();
-	
-	void End();
-	
-	void SetClearColor(float r, float g, float b, float a);
-	
-	void SetCamera(b3Camera* camera) { m_camera = camera; }
-	b3Camera* GetCamera() { return m_camera; };
-	
-	void AddPoint(const b3Vec3& position, const b3Color& color, scalar size) override;
+	int GetVertexCapacity() { return m_vertex_capacity; }
+	int GetVertexCount() { return m_vertex_count; }
+	void SetMVP(float* mvp);
+
 	void AddLine(const b3Vec3& p1, const b3Vec3& p2, const b3Color& color) override;
-	void AddTriangle(const b3Vec3& p1, const b3Vec3& p2, const b3Vec3& p3, const b3Color& color, const b3Vec3& normal) override;
-	
-	void FlushPoints(bool depthEnabled) override;
 	void FlushLines(bool depthEnabled) override;
-	void FlushTriangles(bool depthEnabled) override;
-protected:	
-	b3Camera* m_camera;
-	GLRenderPoints* m_points;
-	GLRenderLines* m_lines;
-	GLRenderTriangles* m_triangles;
+private:
+	void Vertex(float x, float y, float z, float r, float g, float b, float a);
+	void Flush();
+
+	int m_vertex_capacity;
+	float* m_positions;
+	float* m_colors;
+	int m_vertex_count;
+	float m_mvp[16];
+
+	GLuint m_vao;
+	GLuint m_vbos[2];
+
+	GLuint m_program;
+	GLuint m_projection_uniform;
+	GLuint m_position_attribute;
+	GLuint m_color_attribute;
 };
 
 #endif

@@ -22,7 +22,7 @@
 class Sheet : public SoftBody
 {
 public:
-	Sheet(const TestDef& testDef) : SoftBody(testDef)
+	Sheet()
 	{
 		// Downscale the block along the y axis
 		b3Vec3 scale(1.0f, 0.5f, 1.0f);
@@ -47,12 +47,12 @@ public:
 			p->SetType(e_staticSoftBodyParticle);
 		}
 
-		m_bodyDragger = new b3SoftBodyDragger(&m_ray, m_body);
+		m_bodyDragger = new SoftBodyDragger(&m_ray, m_body);
 	}
 
-	static Test* Create(const TestDef& def)
+	static Test* Create()
 	{
-		return new Sheet(def);
+		return new Sheet;
 	}
 
 	GridTetMesh<1, 10, 10> m_mesh;

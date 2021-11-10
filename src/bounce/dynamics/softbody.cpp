@@ -26,9 +26,7 @@
 #include <bounce/dynamics/shapes/softbody_triangle_shape.h>
 #include <bounce/dynamics/shapes/softbody_tetrahedron_shape.h>
 #include <bounce/dynamics/shapes/softbody_world_shape.h>
-#include <bounce/draw.h>
-
-b3Draw* b3Draw_draw = nullptr;
+#include <bounce/common/draw.h>
 
 b3SoftBody::b3SoftBody() : m_particleBlocks(sizeof(b3SoftBodyParticle))
 {
@@ -719,23 +717,23 @@ void b3SoftBody::Step(scalar dt, u32 velocityIterations, u32 positionIterations,
 	m_contactManager.FindNewContacts();
 }
 
-void b3SoftBody::Draw() const
+void b3SoftBody::Draw(b3Draw* draw) const
 {
 	for (b3SoftBodyParticle* p = m_particleList.m_head; p; p = p->m_next)
 	{
 		if (p->m_type == e_staticSoftBodyParticle)
 		{
-			b3Draw_draw->DrawPoint(p->m_position, 4.0, b3Color_white);	
+			draw->DrawPoint(p->m_position, 4.0, b3Color_white);	
 		}
 
 		if (p->m_type == e_kinematicSoftBodyParticle)
 		{
-			b3Draw_draw->DrawPoint(p->m_position, 4.0, b3Color_blue);
+			draw->DrawPoint(p->m_position, 4.0, b3Color_blue);
 		}
 
 		if (p->m_type == e_dynamicSoftBodyParticle)
 		{
-			b3Draw_draw->DrawPoint(p->m_position, 4.0, b3Color_green);
+			draw->DrawPoint(p->m_position, 4.0, b3Color_green);
 		}
 	}
 
@@ -744,7 +742,7 @@ void b3SoftBody::Draw() const
 		b3SoftBodyParticle* p1 = c->m_p1;
 		b3SoftBodyParticle* p2 = c->m_p2;
 
-		b3Draw_draw->DrawSegment(p1->m_position, p2->m_position, b3Color_black);
+		draw->DrawSegment(p1->m_position, p2->m_position, b3Color_black);
 	}
 
 	for (b3SoftBodyTriangleShape* t = m_triangleShapeList.m_head; t; t = t->m_next)
@@ -785,7 +783,7 @@ void b3SoftBody::Draw() const
 			b3Vec3 x2 = v2 + rf * n;
 			b3Vec3 x3 = v3 + rf * n;
 
-			b3Draw_draw->DrawTriangle(x1, x2, x3, frontFrameColor);
+			draw->DrawTriangle(x1, x2, x3, frontFrameColor);
 		}
 
 		{
@@ -793,7 +791,7 @@ void b3SoftBody::Draw() const
 			b3Vec3 x2 = v2 - rf * n;
 			b3Vec3 x3 = v3 - rf * n;
 
-			b3Draw_draw->DrawTriangle(x1, x2, x3, backFrameColor);
+			draw->DrawTriangle(x1, x2, x3, backFrameColor);
 		}
 
 		{
@@ -801,7 +799,7 @@ void b3SoftBody::Draw() const
 			b3Vec3 x2 = v2 + rs * n;
 			b3Vec3 x3 = v3 + rs * n;
 
-			b3Draw_draw->DrawSolidTriangle(n, x1, x2, x3, frontSolidColor);
+			draw->DrawSolidTriangle(n, x1, x2, x3, frontSolidColor);
 		}
 
 		{
@@ -809,7 +807,7 @@ void b3SoftBody::Draw() const
 			b3Vec3 x2 = v2 - rs * n;
 			b3Vec3 x3 = v3 - rs * n;
 
-			b3Draw_draw->DrawSolidTriangle(-n, x3, x2, x1, backSolidColor);
+			draw->DrawSolidTriangle(-n, x3, x2, x1, backSolidColor);
 		}
 	}
 
@@ -835,36 +833,36 @@ void b3SoftBody::Draw() const
 		v4 = s * (v4 - c) + c;
 
 		// v1, v2, v3
-		b3Draw_draw->DrawTriangle(v1, v2, v3, b3Color_black);
+		draw->DrawTriangle(v1, v2, v3, b3Color_black);
 
 		b3Vec3 n1 = b3Cross(v2 - v1, v3 - v1);
 		n1.Normalize();
-		b3Draw_draw->DrawSolidTriangle(n1, v1, v2, v3, b3Color_blue);
+		draw->DrawSolidTriangle(n1, v1, v2, v3, b3Color_blue);
 
 		// v1, v3, v4
-		b3Draw_draw->DrawTriangle(v1, v3, v4, b3Color_black);
+		draw->DrawTriangle(v1, v3, v4, b3Color_black);
 
 		b3Vec3 n2 = b3Cross(v3 - v1, v4 - v1);
 		n2.Normalize();
-		b3Draw_draw->DrawSolidTriangle(n2, v1, v3, v4, b3Color_blue);
+		draw->DrawSolidTriangle(n2, v1, v3, v4, b3Color_blue);
 
 		// v1, v4, v2
-		b3Draw_draw->DrawTriangle(v1, v4, v2, b3Color_black);
+		draw->DrawTriangle(v1, v4, v2, b3Color_black);
 
 		b3Vec3 n3 = b3Cross(v4 - v1, v2 - v1);
 		n3.Normalize();
-		b3Draw_draw->DrawSolidTriangle(n3, v1, v4, v2, b3Color_blue);
+		draw->DrawSolidTriangle(n3, v1, v4, v2, b3Color_blue);
 
 		// v2, v4, v3
-		b3Draw_draw->DrawTriangle(v2, v4, v3, b3Color_black);
+		draw->DrawTriangle(v2, v4, v3, b3Color_black);
 
 		b3Vec3 n4 = b3Cross(v4 - v2, v3 - v2);
 		n4.Normalize();
-		b3Draw_draw->DrawSolidTriangle(n4, v2, v4, v3, b3Color_blue);
+		draw->DrawSolidTriangle(n4, v2, v4, v3, b3Color_blue);
 	}
 
 	for (b3SoftBodyWorldShape* s = m_worldShapeList.m_head; s; s = s->GetNext())
 	{
-		s->Draw();
+		s->Draw(draw);
 	}
 }

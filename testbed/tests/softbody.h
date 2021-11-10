@@ -19,14 +19,14 @@
 #ifndef SOFTBODY_H
 #define SOFTBODY_H
 
-#include "../softbody.h"
+#include "uniform_softbody.h"
 #include "softbody_dragger.h"
 #include "test.h"
 
 class SoftBody : public Test
 {
 public:
-	SoftBody(const TestDef& def) : Test(def)
+	SoftBody()
 	{
 		m_body = nullptr;
 		m_bodyDragger = nullptr;
@@ -42,11 +42,11 @@ public:
 	{
 		Test::Step();
 
-		m_body->Step(m_testProperties->inv_hertz,
-			m_testProperties->velocityIterations,
-			m_testProperties->positionIterations,
-			m_testProperties->forceIterations,
-			m_testProperties->forceSubIterations);
+		m_body->Step(g_testSettings->inv_hertz,
+			g_testSettings->velocityIterations,
+			g_testSettings->positionIterations,
+			g_testSettings->forceIterations,
+			g_testSettings->forceSubIterations);
 		
 		Draw();
 		
@@ -55,11 +55,9 @@ public:
 			b3Vec3 pA = m_bodyDragger->GetPointA();
 			b3Vec3 pB = m_bodyDragger->GetPointB();
 
-			b3DrawPoint(m_debugDraw, pA, 4.0f, b3Color_green);
-
-			b3DrawPoint(m_debugDraw, pB, 4.0f, b3Color_green);
-
-			b3DrawSegment(m_debugDraw, pA, pB, b3Color_white);
+			b3DrawPoint(g_debugDrawData, pA, 4.0f, b3Color_green);
+			b3DrawPoint(g_debugDrawData, pB, 4.0f, b3Color_green);
+			b3DrawSegment(g_debugDrawData, pA, pB, b3Color_white);
 		}
 
 		extern u32 b3_softBodyForceSolverIterations;
@@ -75,10 +73,10 @@ public:
 	
 	virtual void Draw()
 	{
-		m_body->Draw();
+		m_body->Draw(&m_draw);
 	}
 	
-	void MouseMove(const b3Ray3& pw)
+	void MouseMove(const b3Ray& pw)
 	{
 		Test::MouseMove(pw);
 
@@ -88,7 +86,7 @@ public:
 		}
 	}
 
-	void MouseLeftDown(const b3Ray3& pw)
+	void MouseLeftDown(const b3Ray& pw)
 	{
 		Test::MouseLeftDown(pw);
 
@@ -98,7 +96,7 @@ public:
 		}
 	}
 
-	void MouseLeftUp(const b3Ray3& pw)
+	void MouseLeftUp(const b3Ray& pw)
 	{
 		Test::MouseLeftUp(pw);
 
@@ -109,7 +107,7 @@ public:
 	}
 
 	UniformSoftBody* m_body;
-	b3SoftBodyDragger* m_bodyDragger;
+	SoftBodyDragger* m_bodyDragger;
 };
 
 #endif

@@ -24,33 +24,35 @@
 #include "view.h"
 
 #include <stdio.h>
+#include <thread>
+#include <chrono>
 
-extern void DrawString(const b3Color& color, const char* string, ...);
+static GLFWwindow* s_window;
 
-GLFWwindow* g_window;
+// MVVM pattern
+// See https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93viewmodel
+static Model* s_model;
+static ViewModel* s_viewModel;
+static View* s_view;
 
-static Model* g_model;
-static ViewModel* g_viewModel;
-static View* g_view;
-
-void glfwErrorCallback(int error, const char* description)
+static void glfwErrorCallback(int error, const char* description)
 {
 	fprintf(stderr, "GLFW error occured. Code: %d. Description: %s\n", error, description);
 }
 
 static void WindowSize(GLFWwindow* ww, int w, int h)
 {
-	g_view->Event_SetWindowSize(w, h);
+	s_view->Event_SetWindowSize(w, h);
 }
 
 static void CursorMove(GLFWwindow* w, double x, double y)
 {
-	g_view->Event_Move_Cursor(float(x), float(y));
+	s_view->Event_Move_Cursor(float(x), float(y));
 }
 
 static void WheelScroll(GLFWwindow* w, double dx, double dy)
 {
-	g_view->Event_Scroll(float(dx), float(dy));
+	s_view->Event_Scroll(float(dx), float(dy));
 }
 
 static void MouseButton(GLFWwindow* w, int button, int action, int mods)
@@ -59,12 +61,12 @@ static void MouseButton(GLFWwindow* w, int button, int action, int mods)
 	{
 	case GLFW_PRESS:
 	{
-		g_view->Event_Press_Mouse(button);
+		s_view->Event_Press_Mouse(button);
 		break;
 	}
 	case GLFW_RELEASE:
 	{
-		g_view->Event_Release_Mouse(button);
+		s_view->Event_Release_Mouse(button);
 		break;
 	}
 	default:
@@ -80,12 +82,12 @@ static void KeyButton(GLFWwindow* w, int button, int scancode, int action, int m
 	{
 	case GLFW_PRESS:
 	{
-		g_view->Event_Press_Key(button);
+		s_view->Event_Press_Key(button);
 		break;
 	}
 	case GLFW_RELEASE:
 	{
-		g_view->Event_Release_Key(button);
+		s_view->Event_Release_Key(button);
 		break;
 	}
 	default:
@@ -98,30 +100,43 @@ static void KeyButton(GLFWwindow* w, int button, int scancode, int action, int m
 static void Run()
 {
 	int w, h;
-	glfwGetWindowSize(g_window, &w, &h);
-	g_view->Event_SetWindowSize(u32(w), u32(h));
+	glfwGetWindowSize(s_window, &w, &h);
+	s_view->Event_SetWindowSize(u32(w), u32(h));
 
-	while (glfwWindowShouldClose(g_window) == 0)
+	std::chrono::duration<double> sleepAdjust(0.0);
+
+	while (glfwWindowShouldClose(s_window) == 0)
 	{
-		g_view->BeginInterface();
+		std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
+		
+		s_view->BeginInterface();
 
-		if (g_model->IsPaused())
-		{
-			DrawString(b3Color_white, "*PAUSED*");
-		}
-		else
-		{
-			DrawString(b3Color_white, "*PLAYING*");
-		}
+		s_model->Update();
 
-		g_model->Update();
+		s_view->Interface();
 
-		g_view->Interface();
+		s_view->RenderInterface();
 
-		g_view->EndInterface();
-
-		glfwSwapBuffers(g_window);
+		glfwSwapBuffers(s_window);
 		glfwPollEvents();
+
+		// Box2D.
+		// Throttle to cap at 60Hz. This adaptive using a sleep adjustment. This could be improved by
+		// using mm_pause or equivalent for the last millisecond.
+		std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
+		std::chrono::duration<double> target(1.0 / 60.0);
+		std::chrono::duration<double> timeUsed = t2 - t1;
+		std::chrono::duration<double> sleepTime = target - timeUsed + sleepAdjust;
+		if (sleepTime > std::chrono::duration<double>(0))
+		{
+			std::this_thread::sleep_for(sleepTime);
+		}
+
+		std::chrono::steady_clock::time_point t3 = std::chrono::steady_clock::now();
+		std::chrono::duration<double> frameTime = t3 - t1;
+
+		// Compute the sleep adjustment using a low pass filter
+		sleepAdjust = 0.9 * sleepAdjust + 0.1 * (target - frameTime);
 	}
 }
 
@@ -133,60 +148,83 @@ int main(int argc, char** args)
 	//_CrtSetBreakAlloc();
 #endif
 
+	glfwSetErrorCallback(glfwErrorCallback);
+
 	if (glfwInit() == 0)
 	{
 		fprintf(stderr, "Failed to initialize GLFW\n");
 		return -1;
 	}
 
-	glfwSetErrorCallback(glfwErrorCallback);
+#if __APPLE__
+	const char* glslVersion = "#version 150";
+#else
+	const char* glslVersion = NULL;
+#endif
+
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	// Create window
-	g_window = glfwCreateWindow(1024, 768, "Bounce Softbody Testbed", NULL, NULL);
-	if (g_window == NULL)
+	char buffer[128];
+	sprintf_s(buffer, "Bounce Testbed Version %d.%d.%d", b3_version.major, b3_version.minor, b3_version.revision);
+
+	bool fullscreen = false;
+	if (fullscreen)
+	{
+		s_window = glfwCreateWindow(1920, 1080, buffer, glfwGetPrimaryMonitor(), NULL);
+	}
+	else
+	{
+		s_window = glfwCreateWindow(1280, 720, buffer, NULL, NULL);
+	}
+
+	if (s_window == NULL)
 	{
 		fprintf(stderr, "Failed to create GLFW window\n");
 		glfwTerminate();
 		return -1;
 	}
-	
-	glfwSetWindowSizeCallback(g_window, WindowSize);
-	glfwSetCursorPosCallback(g_window, CursorMove);
-	glfwSetScrollCallback(g_window, WheelScroll);
-	glfwSetMouseButtonCallback(g_window, MouseButton);
-	glfwSetKeyCallback(g_window, KeyButton);
 
-	glfwMakeContextCurrent(g_window);
-	glfwSwapInterval(1);
+	glfwMakeContextCurrent(s_window);
 
-	if (gladLoadGL() == 0)
+	// Load OpenGL functions using glad
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
-		fprintf(stderr, "Failed to load OpenGL extensions\n");
-		fprintf(stderr, "Error: %d\n", glad_glGetError());
+		fprintf(stderr, "Failed to load OpenGL functions using glad\n");
 		glfwTerminate();
 		return -1;
 	}
 
+	printf("GL %d.%d\n", GLVersion.major, GLVersion.minor);
 	printf("OpenGL %s, GLSL %s\n", glGetString(GL_VERSION), glGetString(GL_SHADING_LANGUAGE_VERSION));
 
-	g_model = new Model();
-	g_viewModel = new ViewModel(g_window, g_model);
-	g_view = new View(g_window, g_viewModel);
+	glfwSetWindowSizeCallback(s_window, WindowSize);
+	glfwSetCursorPosCallback(s_window, CursorMove);
+	glfwSetScrollCallback(s_window, WheelScroll);
+	glfwSetMouseButtonCallback(s_window, MouseButton);
+	glfwSetKeyCallback(s_window, KeyButton);
+	//glfwSwapInterval(1);
 
-	// Run
+	s_model = new Model();
+	s_viewModel = new ViewModel(s_model, s_window);
+	s_view = new View(s_viewModel, s_window, glslVersion);
+
 	Run();
 
-	delete g_viewModel;
-	g_viewModel = nullptr;
+	delete s_view;
+	s_view = nullptr;
 
-	delete g_view;
-	g_view = nullptr;
+	delete s_viewModel;
+	s_viewModel = nullptr;
 
-	delete g_model;
-	g_model = nullptr;
+	delete s_model;
+	s_model = nullptr;
 
 	glfwTerminate();
-	g_window = nullptr;
+	s_window = nullptr;
 
 	return 0;
 }

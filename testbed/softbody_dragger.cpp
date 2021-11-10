@@ -17,8 +17,13 @@
 */
 
 #include "softbody_dragger.h"
+#include <bounce/collision/geometry/geometry.h>
+#include <bounce/collision/geometry/ray.h>
+#include <bounce/dynamics/softbody.h>
+#include <bounce/dynamics/shapes/softbody_triangle_shape.h>
+#include <bounce/dynamics/forces/softbody_mouse_force.h>
 
-b3SoftBodyDragger::b3SoftBodyDragger(b3Ray3* ray, b3SoftBody* body)
+SoftBodyDragger::SoftBodyDragger(b3Ray* ray, b3SoftBody* body)
 {
 	m_staticDrag = true;
 	m_ray = ray;
@@ -28,12 +33,7 @@ b3SoftBodyDragger::b3SoftBodyDragger(b3Ray3* ray, b3SoftBody* body)
 	m_kd = 1000.0f;
 }
 
-b3SoftBodyDragger::~b3SoftBodyDragger()
-{
-
-}
-
-bool b3SoftBodyDragger::StartDragging()
+bool SoftBodyDragger::StartDragging()
 {
 	B3_ASSERT(IsDragging() == false);
 
@@ -106,7 +106,7 @@ bool b3SoftBodyDragger::StartDragging()
 	return true;
 }
 
-void b3SoftBodyDragger::Drag()
+void SoftBodyDragger::Drag()
 {
 	B3_ASSERT(IsDragging() == true);
 
@@ -128,7 +128,7 @@ void b3SoftBodyDragger::Drag()
 	}
 }
 
-void b3SoftBodyDragger::SetStaticDrag(bool bit)
+void SoftBodyDragger::SetStaticDrag(bool bit)
 {
 	if (bit == m_staticDrag)
 	{
@@ -143,7 +143,7 @@ void b3SoftBodyDragger::SetStaticDrag(bool bit)
 	m_staticDrag = bit;
 }
 
-void b3SoftBodyDragger::StopDragging()
+void SoftBodyDragger::StopDragging()
 {
 	B3_ASSERT(IsDragging() == true);
 
@@ -162,7 +162,7 @@ void b3SoftBodyDragger::StopDragging()
 	m_isDragging = false;
 }
 
-b3Vec3 b3SoftBodyDragger::GetPointA() const
+b3Vec3 SoftBodyDragger::GetPointA() const
 {
 	B3_ASSERT(IsDragging() == true);
 
@@ -173,7 +173,7 @@ b3Vec3 b3SoftBodyDragger::GetPointA() const
 	return m_u * v1 + m_v * v2 + (1.0f - m_u - m_v) * v3;
 }
 
-b3Vec3 b3SoftBodyDragger::GetPointB() const
+b3Vec3 SoftBodyDragger::GetPointB() const
 {
 	B3_ASSERT(IsDragging() == true);
 	return (1.0f - m_x) * m_ray->A() + m_x * m_ray->B();

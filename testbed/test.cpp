@@ -17,42 +17,10 @@
 */
 
 #include "test.h"
-#include <bounce/common/graphics/camera.h>
-
-extern u32 b3_allocCalls, b3_maxAllocCalls;
 
 float RandomFloat(float a, float b)
 {
 	float r = float(rand()) / float(RAND_MAX);
 	float d = b - a;
 	return a + r * d;
-}
-
-Test::Test(const TestDef& def)
-{
-	m_camera = def.camera;
-	m_debugDraw = def.debugDraw;
-	m_properties = def.properties;
-	m_testProperties = def.testProperties;
-	m_draw.m_debugDraw = def.debugDraw;
-
-	b3Draw_draw = &m_draw;
-
-	m_ray.origin.SetZero();
-	m_ray.direction.Set(0.0f, 0.0f, -1.0f);
-	m_ray.fraction = m_camera->GetZFar();
-}
-
-Test::~Test()
-{
-	b3Draw_draw = nullptr;
-}
-
-void Test::Step()
-{
-	// Draw
-	if (m_properties->drawStats)
-	{
-		DrawString(b3Color_white, "Frame Allocations %d (%d)", b3_allocCalls, b3_maxAllocCalls);
-	}
 }

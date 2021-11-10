@@ -18,20 +18,57 @@
 
 #include "view.h"
 #include "view_model.h"
-#include "test.h"
 
 #include "imgui/imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl2.h"
+#include "imgui/imgui_impl_glfw.h"
+#include "imgui/imgui_impl_opengl3.h"
 
 #include "GLFW/glfw3.h"
 
+#include <bounce/common/graphics/camera.h>
+#include <bounce/common/graphics/color.h>
+
+#include <stdio.h>
+
 static inline bool GetTestName(void* userData, int idx, const char** name)
 {
-	Properties* p = (Properties*)userData;
-	assert(u32(idx) < p->testCount);
-	*name = p->tests[idx].name;
+	assert(idx < g_settings->testCount);
+	*name = g_settings->tests[idx].name;
 	return true;
+}
+
+void DrawString(const b3Color& color, const b3Vec2& ps, const char* string, ...)
+{
+	extern b3Camera* g_camera;
+	
+	va_list args;
+	va_start(args, string);
+	ImGui::SetNextWindowBgAlpha(0.0f);
+	ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f));
+	ImGui::SetNextWindowSize(ImVec2(g_camera->GetWidth(), g_camera->GetHeight()));
+	ImGui::Begin("Superlay", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoScrollbar);
+	ImGui::SetCursorPos(ImVec2(ps.x, ps.y));
+	ImGui::TextColoredV(ImVec4(color.r, color.g, color.b, color.a), string, args);
+	ImGui::End();
+	va_end(args);
+}
+
+void DrawString(const b3Color& color, const b3Vec3& pw, const char* string, ...)
+{
+	extern b3Camera* g_camera;
+
+	b3Vec2 ps = g_camera->ConvertWorldToScreen(pw);
+	
+	va_list args;
+	va_start(args, string);
+	ImGui::SetNextWindowBgAlpha(0.0f);
+	ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f));
+	ImGui::SetNextWindowSize(ImVec2(g_camera->GetWidth(), g_camera->GetHeight()));
+	ImGui::Begin("Superlay", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoScrollbar);
+	ImGui::SetCursorPos(ImVec2(ps.x, ps.y));
+	ImGui::TextColoredV(ImVec4(color.r, color.g, color.b, color.a), string, args);
+	ImGui::End();
+	va_end(args);
 }
 
 void DrawString(const b3Color& color, const char* string, ...)
@@ -51,30 +88,36 @@ void DrawString(const b3Color& color, const char* string, ...)
 	va_end(args);	
 }
 
-View::View(GLFWwindow* window, ViewModel* viewModel)
+View::View(ViewModel* viewModel, GLFWwindow* window, const char* glslVersion)
 {
 	m_viewModel = viewModel;
 	m_window = window;
 
 	// Create UI
+	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 
-	ImGuiIO& io = ImGui::GetIO();
+	bool success = ImGui_ImplGlfw_InitForOpenGL(m_window, false);
+	if (success == false)
+	{
+		printf("ImGui_ImplGlfw_InitForOpenGL failed.\n");
+		assert(false);
+	}
 
-	io.IniFilename = NULL;
+	success = ImGui_ImplOpenGL3_Init(glslVersion);
+	if (success == false)
+	{
+		printf("ImGui_ImplOpenGL3_Init failed.\n");
+		assert(false);
+	}
 
-	ImGui_ImplGlfw_InitForOpenGL(m_window, false);
-	ImGui_ImplOpenGL2_Init();
-
-	ImGui::StyleColorsDark();
 }
 
 View::~View()
 {
 	// Destroy UI
-	ImGui_ImplOpenGL2_Shutdown();
+	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
-
 	ImGui::DestroyContext();
 }
 
@@ -115,17 +158,14 @@ void View::Event_Scroll(float dx, float dy)
 
 void View::BeginInterface()
 {
-	ImGui_ImplOpenGL2_NewFrame();
+	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
-
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 }
 
 void View::Interface()
 {
-	Properties& properties = m_viewModel->m_properties;
-	TestProperties& testProperties = m_viewModel->m_testProperties;
+	Settings& settings = m_viewModel->m_settings;
 
 	bool openControls = false;
 	bool openAbout = false;
@@ -143,31 +183,16 @@ void View::Interface()
 
 		if (ImGui::BeginMenu("View"))
 		{
-			ImGui::MenuItem("Statistics", "", &properties.drawStats);
-
 			ImGui::Separator();
 
-			ImGui::MenuItem("Points", "", &properties.drawPoints);
-			ImGui::MenuItem("Lines", "", &properties.drawLines);
-			ImGui::MenuItem("Triangles", "", &properties.drawTriangles);
+			ImGui::MenuItem("Points", "", &settings.drawPoints);
+			ImGui::MenuItem("Lines", "", &settings.drawLines);
+			ImGui::MenuItem("Triangles", "", &settings.drawTriangles);
 
 			ImGui::Separator();
 			
-			ImGui::MenuItem("Reference Grid", "", &properties.drawGrid);
+			ImGui::MenuItem("Reference Grid", "", &settings.drawGrid);
 
-			ImGui::Separator();
-
-			ImGui::MenuItem("Bounding Boxes", "", &testProperties.drawBounds);
-			ImGui::MenuItem("Shapes", "", &testProperties.drawShapes);
-			ImGui::MenuItem("Contact Points", "", &testProperties.drawContactPoints);
-			ImGui::MenuItem("Contact Normals", "", &testProperties.drawContactNormals);
-			ImGui::MenuItem("Contact Tangents", "", &testProperties.drawContactTangents);
-
-			ImGui::EndMenu();
-		}
-
-		if (ImGui::BeginMenu("Tools"))
-		{
 			ImGui::EndMenu();
 		}
 
@@ -215,11 +240,11 @@ void View::Interface()
 		ImGui::EndPopup();
 	}
 
-	if (ImGui::BeginPopupModal("About Bounce Testbed", NULL, ImGuiWindowFlags_Popup | ImGuiWindowFlags_NoResize))
+	if (ImGui::BeginPopupModal("About Bounce Softbody Testbed", NULL, ImGuiWindowFlags_Popup | ImGuiWindowFlags_NoResize))
 	{
 		extern b3Version b3_version;
 
-		ImGui::Text("Bounce Testbed");
+		ImGui::Text("Bounce Softbody Testbed");
 		ImGui::Text("Version %d.%d.%d", b3_version.major, b3_version.minor, b3_version.revision);
 		ImGui::Text("Copyright (c) Irlan Robson");
 		
@@ -235,7 +260,7 @@ void View::Interface()
 	glfwGetWindowSize(m_window, &width, &height);
 	
 	ImGui::SetNextWindowPos(ImVec2(0.0f, 20.0f));
-	ImGui::SetNextWindowSize(ImVec2(width, 20.0f));
+	ImGui::SetNextWindowSize(ImVec2(float(width), 20.0f));
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(0.0f, 0.0f));
 
 	ImGui::Begin("##ToolBar", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_MenuBar);
@@ -246,7 +271,7 @@ void View::Interface()
 
 		ImGui::Separator();
 		
-		if (ImGui::Combo("##Test", &properties.testID, GetTestName, &properties, properties.testCount, properties.testCount))
+		if (ImGui::Combo("##Test", &settings.testID, GetTestName, NULL, settings.testCount, settings.testCount))
 		{
 			m_viewModel->Action_SetTest();
 		}
@@ -265,18 +290,6 @@ void View::Interface()
 		if (ImGui::Button("Next", menuButtonSize))
 		{
 			m_viewModel->Action_NextTest();
-		}
-
-		ImGui::Separator();
-
-		if (ImGui::Button("Play/Pause", menuButtonSize))
-		{
-			m_viewModel->Action_PlayPause();
-		}
-
-		if (ImGui::Button("Single Play", menuButtonSize))
-		{
-			m_viewModel->Action_SinglePlay();
 		}
 
 		ImGui::Separator();
@@ -300,6 +313,8 @@ void View::Interface()
 	
 	ImGui::PopStyleVar();
 
+	TestSettings& testSettings = m_viewModel->m_testSettings;
+	
 	ImGui::SetNextWindowPos(ImVec2(width - 250.0f, 40.0f));
 	ImGui::SetNextWindowSize(ImVec2(250.0f, height - 40.0f));
 	ImGui::Begin("Test Settings", NULL, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
@@ -307,32 +322,39 @@ void View::Interface()
 	ImGui::PushItemWidth(-1.0f);
 
 	ImGui::Text("Hertz");
-	ImGui::SliderFloat("##Hertz", &testProperties.hertz, 0.0f, 240.0f, "%.1f");
+	ImGui::SliderFloat("##Hertz", &testSettings.hertz, 0.0f, 240.0f, "%.1f");
 
 	ImGui::Text("Force Iterations");
-	ImGui::SliderInt("##Force Iterations", &testProperties.forceIterations, 0, 50);
+	ImGui::SliderInt("##Force Iterations", &testSettings.forceIterations, 0, 50);
 
 	ImGui::Text("Force Sub-iterations");
-	ImGui::SliderInt("##Force Sub-iterations", &testProperties.forceSubIterations, 0, 50);
+	ImGui::SliderInt("##Force Sub-iterations", &testSettings.forceSubIterations, 0, 50);
 
 	ImGui::Text("Velocity Iterations");
-	ImGui::SliderInt("##Velocity Iterations", &testProperties.velocityIterations, 0, 50);
+	ImGui::SliderInt("##Velocity Iterations", &testSettings.velocityIterations, 0, 50);
 
 	ImGui::Text("Position Iterations");
-	ImGui::SliderInt("##Position Iterations", &testProperties.positionIterations, 0, 50);
+	ImGui::SliderInt("##Position Iterations", &testSettings.positionIterations, 0, 50);
 
-	ImGui::Checkbox("Warm Start", &testProperties.warmStart);
+	ImGui::Checkbox("Warm Start", &testSettings.warmStart);
+
+	if (ImGui::Button("Play/Pause", buttonSize))
+	{
+		m_viewModel->Action_PlayPause();
+	}
+
+	if (ImGui::Button("Single Play", buttonSize))
+	{
+		m_viewModel->Action_SinglePlay();
+	}
 
 	ImGui::PopItemWidth();
 
 	ImGui::End();
 }
 
-void View::EndInterface()
+void View::RenderInterface()
 {
-	ImGui::PopStyleVar();
-
 	ImGui::Render();
-
-	ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }

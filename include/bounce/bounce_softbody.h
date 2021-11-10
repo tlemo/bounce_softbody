@@ -22,7 +22,7 @@
 // Include this file header in your project to directly access Bounce Softbody objects.
 
 #include <bounce/common/settings.h>
-#include <bounce/draw.h>
+#include <bounce/common/draw.h>
 
 #include <bounce/common/math/math.h>
 

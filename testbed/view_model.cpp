@@ -21,6 +21,7 @@
 
 #include "GLFW/glfw3.h"
 
+#include "test.h"
 #include "tests/softbody.h"
 #include "tests/pinned_cloth.h"
 #include "tests/particle_types.h"
@@ -32,26 +33,33 @@
 #include "tests/plastic_softbody.h"
 #include "tests/table_cloth.h"
 
-ViewModel::ViewModel(GLFWwindow* window, Model* model)
-{
-	m_window = window;
-	m_model = model;
-	m_model->m_properties = &m_properties;
-	m_model->m_testProperties = &m_testProperties;
+TestSettings* g_testSettings = nullptr;
+Settings* g_settings = nullptr;
 	
-	m_properties.RegisterTest( "Pinned Cloth", &PinnedCloth::Create );
-	m_properties.RegisterTest( "Particle Types", &ParticleTypes::Create );
-	m_properties.RegisterTest( "Stretch Mapping", &StretchMapping::Create );
-	m_properties.RegisterTest( "Cloth Tearing", &ClothTearing::Create );
-	m_properties.RegisterTest( "Cloth Element", &ClothElement::Create );
-	m_properties.RegisterTest( "Sheet", &Sheet::Create );
-	m_properties.RegisterTest( "Node Types", &NodeTypes::Create );
-	m_properties.RegisterTest( "Plastic Soft Body", &PlasticSoftBody::Create );
-	m_properties.RegisterTest("Table Cloth", &TableCloth::Create);
+ViewModel::ViewModel(Model* model, GLFWwindow* window)
+{
+	m_model = model;
+	m_window = window;
+	m_ps0.SetZero();
+
+	m_settings.RegisterTest("Pinned Cloth", &PinnedCloth::Create );
+	m_settings.RegisterTest("Particle Types", &ParticleTypes::Create);
+	m_settings.RegisterTest("Stretch Mapping", &StretchMapping::Create);
+	m_settings.RegisterTest("Cloth Tearing", &ClothTearing::Create);
+	m_settings.RegisterTest("Cloth Element", &ClothElement::Create);
+	m_settings.RegisterTest("Sheet", &Sheet::Create);
+	m_settings.RegisterTest("Node Types", &NodeTypes::Create);
+	m_settings.RegisterTest("Plastic Soft Body", &PlasticSoftBody::Create);
+	m_settings.RegisterTest("Table Cloth", &TableCloth::Create);
+
+	g_settings = &m_settings;
+	g_testSettings = &m_testSettings;
 }
 
 ViewModel::~ViewModel()
 {
+	g_settings = nullptr;
+	g_testSettings = nullptr;
 }
 
 b3Vec2 ViewModel::GetCursorPosition() const
@@ -63,39 +71,40 @@ b3Vec2 ViewModel::GetCursorPosition() const
 
 void ViewModel::Action_SetTest()
 {
-	m_model->EnableSetTest(true);
+	m_model->Action_SetTest();
 }
 
 void ViewModel::Action_PreviousTest()
 {
-	m_properties.testID = b3Clamp(m_properties.testID - 1, 0, int(m_properties.testCount) - 1);
-	m_model->EnableSetTest(true);
+	m_settings.testID = b3Clamp(m_settings.testID - 1, 0, int(m_settings.testCount) - 1);
+	m_model->Action_SetTest();
 }
 
 void ViewModel::Action_NextTest()
 {
-	m_properties.testID = b3Clamp(m_properties.testID + 1, 0, int(m_properties.testCount) - 1);
-	m_model->EnableSetTest(true);
+	m_settings.testID = b3Clamp(m_settings.testID + 1, 0, int(m_settings.testCount) - 1);
+	m_model->Action_SetTest();
 }
 
 void ViewModel::Action_PlayPause()
 {
-	m_model->EnablePause(!m_model->IsPaused());
+	m_testSettings.pause = !m_testSettings.pause;
 }
 
 void ViewModel::Action_SinglePlay()
 {
-	m_model->SinglePlay();
+	m_testSettings.pause = true;
+	m_testSettings.singlePlay = true;
 }
 
 void ViewModel::Action_ResetCamera()
 {
-	m_model->ResetCamera();
+	m_model->Action_ResetCamera();
 }
 
 void ViewModel::Event_SetWindowSize(int w, int h)
 {
-	Command_ResizeCamera(scalar(w), scalar(h));
+	m_model->Command_ResizeCamera(scalar(w), scalar(h));
 }
 
 void ViewModel::Event_Press_Key(int button)
@@ -105,17 +114,17 @@ void ViewModel::Event_Press_Key(int button)
 	{
 		if (button == GLFW_KEY_DOWN)
 		{
-			Command_ZoomCamera(1.0f);
+			m_model->Command_ZoomCamera(1.0f);
 		}
 
 		if (button == GLFW_KEY_UP)
 		{
-			Command_ZoomCamera(-1.0f);
+			m_model->Command_ZoomCamera(-1.0f);
 		}
 	}
 	else
 	{
-		Command_Press_Key(button);
+		m_model->Command_Press_Key(button);
 	}
 }
 
@@ -124,7 +133,7 @@ void ViewModel::Event_Release_Key(int button)
 	bool shiftDown = glfwGetKey(m_window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS;
 	if (!shiftDown)
 	{
-		Command_Release_Key(button);
+		m_model->Command_Release_Key(button);
 	}
 }
 
@@ -135,7 +144,7 @@ void ViewModel::Event_Press_Mouse(int button)
 		bool shiftDown = glfwGetKey(m_window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS;
 		if (!shiftDown)
 		{
-			Command_Press_Mouse_Left(GetCursorPosition());
+			m_model->Command_Press_Mouse_Left(GetCursorPosition());
 		}
 	}
 }
@@ -147,17 +156,17 @@ void ViewModel::Event_Release_Mouse(int button)
 		bool shiftDown = glfwGetKey(m_window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS;
 		if (!shiftDown)
 		{
-			Command_Release_Mouse_Left(GetCursorPosition());
+			m_model->Command_Release_Mouse_Left(GetCursorPosition());
 		}
 	}
 }
 
 void ViewModel::Event_Move_Cursor(float x, float y)
 {
-	b3Vec2 ps;
-	ps.Set(x, y);
-
+	b3Vec2 ps(x, y);
+	
 	b3Vec2 dp = ps - m_ps0;
+
 	m_ps0 = ps;
 
 	b3Vec2 n = b3Normalize(dp);
@@ -173,8 +182,8 @@ void ViewModel::Event_Move_Cursor(float x, float y)
 			scalar ax = -0.005f * B3_PI * n.x;
 			scalar ay = -0.005f * B3_PI * n.y;
 
-			Command_RotateCameraY(ax);
-			Command_RotateCameraX(ay);
+			m_model->Command_RotateCameraY(ax);
+			m_model->Command_RotateCameraX(ay);
 		}
 
 		if (rightDown)
@@ -182,13 +191,13 @@ void ViewModel::Event_Move_Cursor(float x, float y)
 			scalar tx = 0.2f * n.x;
 			scalar ty = -0.2f * n.y;
 
-			Command_TranslateCameraX(tx);
-			Command_TranslateCameraY(ty);
+			m_model->Command_TranslateCameraX(tx);
+			m_model->Command_TranslateCameraY(ty);
 		}
 	}
 	else
 	{
-		Command_Move_Cursor(ps);
+		m_model->Command_Move_Cursor(ps);
 	}
 }
 
@@ -200,81 +209,6 @@ void ViewModel::Event_Scroll(float dx, float dy)
 	bool shiftDown = glfwGetKey(m_window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS;
 	if (shiftDown)
 	{
-		Command_ZoomCamera(1.0f * n.y);
+		m_model->Command_ZoomCamera(1.0f * n.y);
 	}
-}
-
-
-void ViewModel::Command_Press_Key(int button)
-{
-	m_model->m_test->KeyDown(button);
-}
-
-void ViewModel::Command_Release_Key(int button)
-{
-	m_model->m_test->KeyUp(button);
-}
-
-static inline b3Ray3 ConvertScreenToWorldRay(const b3Camera& camera, const b3Vec2& ps)
-{
-	b3Vec3 pw = camera.ConvertScreenToWorld(b3Vec2(ps.x, ps.y));
-	b3Vec3 cp = camera.BuildPosition();
-	
-	b3Ray3 rw;
-	rw.origin = cp;
-	rw.direction = pw;
-	rw.fraction = camera.GetZFar();
-	return rw;	
-}
-
-void ViewModel::Command_Press_Mouse_Left(const b3Vec2& ps)
-{
-	b3Ray3 rw = ConvertScreenToWorldRay(m_model->m_camera, ps);
-
-	m_model->m_test->MouseLeftDown(rw);
-}
-
-void ViewModel::Command_Release_Mouse_Left(const b3Vec2& ps)
-{
-	b3Ray3 rw = ConvertScreenToWorldRay(m_model->m_camera, ps);
-	
-	m_model->m_test->MouseLeftUp(rw);
-}
-
-void ViewModel::Command_Move_Cursor(const b3Vec2& ps)
-{
-	b3Ray3 rw = ConvertScreenToWorldRay(m_model->m_camera, ps);
-	
-	m_model->m_test->MouseMove(rw);
-}
-
-inline void ViewModel::Command_ResizeCamera(scalar w, scalar h)
-{
-	m_model->m_camera.SetWidth(w);
-	m_model->m_camera.SetHeight(h);
-}
-
-inline void ViewModel::Command_RotateCameraX(scalar angle)
-{
-	m_model->m_camera.AddPolarAngle(angle);
-}
-
-inline void ViewModel::Command_RotateCameraY(scalar angle)
-{
-	m_model->m_camera.AddAzimuthalAngle(angle);
-}
-
-inline void ViewModel::Command_TranslateCameraX(scalar d)
-{
-	m_model->m_camera.TranslateXAxis(d);
-}
-
-inline void ViewModel::Command_TranslateCameraY(scalar d)
-{
-	m_model->m_camera.TranslateYAxis(d);
-}
-
-inline void ViewModel::Command_ZoomCamera(scalar d)
-{
-	m_model->m_camera.AddRadius(d);
 }

@@ -20,11 +20,12 @@
 #define CLOTH_TEARING_H
 
 #include <bounce/common/template/array.h>
+#include <bounce/collision/geometry/plane.h>
 
 class ClothTearing : public SoftBody
 {
 public:
-	ClothTearing(const TestDef& testDef) : SoftBody(testDef) 
+	ClothTearing()	
 	{
 		m_body = new UniformSoftBody();
 
@@ -102,7 +103,7 @@ public:
 
 		m_body->SetGravity(b3Vec3(0.0f, -9.8f, 0.0f));
 
-		m_bodyDragger = new b3SoftBodyDragger(&m_ray, m_body);
+		m_bodyDragger = new SoftBodyDragger(&m_ray, m_body);
 		m_bodyDragger->SetStaticDrag(false);
 	}
 
@@ -159,7 +160,7 @@ public:
 			b3SoftBodyParticle* p1 = s->GetParticle1();
 			b3SoftBodyParticle* p2 = s->GetParticle2();
 
-			b3DrawSegment(m_debugDraw, p1->GetPosition(), p2->GetPosition(), b3Color_black);
+			b3DrawSegment(g_debugDrawData, p1->GetPosition(), p2->GetPosition(), b3Color_black);
 		}
 	}
 
@@ -499,9 +500,9 @@ public:
 		DrawSpringForces();
 	}
 
-	static Test* Create(const TestDef& def)
+	static Test* Create()
 	{
-		return new ClothTearing(def);
+		return new ClothTearing;
 	}
 };
 

@@ -19,8 +19,8 @@
 #include <bounce/dynamics/contacts/softbody_capsule_capsule_contact.h>
 #include <bounce/dynamics/shapes/softbody_capsule_shape.h>
 #include <bounce/dynamics/softbody_particle.h>
-#include <bounce/collision/shapes/capsule.h>
-#include <bounce/common/geometry.h>
+#include <bounce/collision/geometry/capsule.h>
+#include <bounce/collision/geometry/geometry.h>
 
 // Compute the closest point on a segment to a point. 
 static b3Vec3 b3ClosestPointOnSegment(const b3Vec3& Q, const b3Capsule& hull)

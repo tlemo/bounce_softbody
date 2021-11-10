@@ -16,17 +16,43 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef GL_SHADER_H
-#define GL_SHADER_H
+#ifndef GL_POINTS_RENDERER_H
+#define GL_POINTS_RENDERER_H
 
+#include <bounce/common/graphics/debug_points.h>
 #include "glad/glad.h"
 
-#define GL_PTR_ADD(ptr, size) ((void*)(((char*)ptr) + (size)))
+class GLPointsRenderer : public b3DebugPointsRenderer
+{
+public:
+	GLPointsRenderer(int point_capacity);
+	~GLPointsRenderer();
+	
+	int GetVertexCapacity() { return m_vertex_capacity; }
+	int GetVertexCount() { return m_vertex_count; }
+	void SetMVP(float* mvp);
+	
+	void AddPoint(const b3Vec3& position, const b3Color& color, scalar size) override;
+	void FlushPoints(bool depthEnabled) override;
+private:
+	void Vertex(float x, float y, float z, float r, float g, float b, float a, float point_size);
+	void Flush();
+	
+	int m_vertex_capacity;
+	float* m_positions;
+	float* m_colors;
+	float* m_sizes;
+	int m_vertex_count;
+	float m_mvp[16];
 
-void GLAssert();
-
-void GLPrintLog(GLuint id);
-
-GLuint GLCreateShaderProgram(const char* vs, const char* fs);
+	GLuint m_vao;
+	GLuint m_vbos[3];
+	
+	GLuint m_program;
+	GLuint m_projection_uniform;
+	GLuint m_position_attribute;
+	GLuint m_color_attribute;
+	GLuint m_size_attribute;
+};
 
 #endif

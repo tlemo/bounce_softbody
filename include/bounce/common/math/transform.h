@@ -42,25 +42,25 @@ struct b3Transform
 		rotation.SetIdentity();
 	}
 
+	// Convert this transform to a 4-by-4 transformation matrix.
+	b3Mat44 GetTransformMatrix() const
+	{
+		b3Vec3 t = translation;
+		b3Mat33 R = rotation.GetRotationMatrix();
+
+		return b3Mat44(
+			b3Vec4(R.x.x, R.x.y, R.x.z, scalar(0)),
+			b3Vec4(R.y.x, R.y.y, R.y.z, scalar(0)),
+			b3Vec4(R.z.x, R.z.y, R.z.z, scalar(0)),
+			b3Vec4(t.x, t.y, t.z, scalar(1)));
+	}
+
 	b3Vec3 translation;
 	b3Quat rotation;
 };
 
 // Identity transformation
 extern const b3Transform b3Transform_identity;
-
-// Convert a transform to a 4-by-4 transformation matrix. 
-inline b3Mat44 b3TransformMat44(const b3Transform& T)
-{
-	b3Vec3 t = T.translation;
-	b3Mat33 R = b3QuatMat33(T.rotation);
-
-	return b3Mat44(
-		b3Vec4(R.x.x, R.x.y, R.x.z, scalar(0)),
-		b3Vec4(R.y.x, R.y.y, R.y.z, scalar(0)),
-		b3Vec4(R.z.x, R.z.y, R.z.z, scalar(0)),
-		b3Vec4(t.x, t.y, t.z, scalar(1)));
-}
 
 // Multiply a transform times a vector.
 inline b3Vec3 b3Mul(const b3Transform& T, const b3Vec3& v)
@@ -122,45 +122,6 @@ inline b3Vec3 operator*(const b3Transform& T, const b3Vec3& v)
 inline b3Transform operator*(const b3Transform& A, const b3Transform& B)
 {
 	return b3Mul(A, B);
-}
-
-// Motion proxy for TOI computation.
-struct b3Sweep
-{
-	// Get this sweep transform at a given time between [0, 1]
-	b3Transform GetTransform(scalar t) const;
-
-	b3Vec3 localCenter; // local center
-
-	b3Quat orientation0; // last orientation
-	b3Vec3 worldCenter0; // last world center
-	
-	scalar t0; // last fraction between [0, 1]
-
-	b3Quat orientation; // world orientation
-	b3Vec3 worldCenter; // world center
-};
-
-inline b3Transform b3Sweep::GetTransform(scalar t) const
-{
-	b3Vec3 c = (scalar(1) - t) * worldCenter0 + t * worldCenter;
-
-	b3Quat q1 = orientation0;
-	b3Quat q2 = orientation;
-
-	if (b3Dot(q1, q2) < scalar(0))
-	{
-		q1 = -q1;
-	}
-
-	b3Quat q = (scalar(1) - t) * q1 + t * q2;
-	q.Normalize();
-
-	b3Transform xf;
-	xf.translation = c - b3Mul(q, localCenter);
-	xf.rotation = q;
-	
-	return xf;
 }
 
 #endif

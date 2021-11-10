@@ -24,6 +24,8 @@
 #include <bounce/common/template/list.h>
 #include <bounce/dynamics/softbody_contact_manager.h>
 
+class b3Draw;
+
 struct b3SoftBodyParticleDef;
 class b3SoftBodyParticle;
 
@@ -144,7 +146,7 @@ public:
 	scalar GetEnergy() const;
 
 	// Debug draw the body entities.
-	void Draw() const;
+	void Draw(b3Draw* draw) const;
 protected:
 	friend class b3SoftBodyParticle;
 	friend class b3SoftBodySphereShape;

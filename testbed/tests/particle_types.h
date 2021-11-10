@@ -22,10 +22,6 @@
 class ParticleTypes : public PinnedCloth
 {
 public:
-	ParticleTypes(const TestDef& testDef) : PinnedCloth(testDef)
-	{
-	}
-
 	void Step()
 	{
 		PinnedCloth::Step();
@@ -126,9 +122,9 @@ public:
 		}
 	}
 
-	static Test* Create(const TestDef& def)
+	static Test* Create()
 	{
-		return new ParticleTypes(def);
+		return new ParticleTypes();
 	}
 };
 
