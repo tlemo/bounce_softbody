@@ -27,10 +27,13 @@
 #include <bounce/dynamics/shapes/softbody_world_shape.h>
 #include <bounce/common/draw.h>
 
-b3SoftBody::b3SoftBody() : m_particleBlocks(sizeof(b3SoftBodyParticle))
+b3SoftBody::b3SoftBody()
 {
 	m_contactManager.m_body = this;
+	m_contactManager.m_allocator = &m_blockAllocator;
+
 	m_gravity.SetZero();
+	
 	m_inv_dt0 = scalar(0);
 }
 
@@ -41,7 +44,7 @@ b3SoftBody::~b3SoftBody()
 	{
 		b3SoftBodyForce* boom = f;
 		f = f->m_next;
-		b3SoftBodyForce::Destroy(boom);
+		b3SoftBodyForce::Destroy(boom, &m_blockAllocator);
 	}
 
 	b3SoftBodySphereShape* s = m_sphereShapeList.m_head;
@@ -50,7 +53,7 @@ b3SoftBody::~b3SoftBody()
 		b3SoftBodySphereShape* boom = s;
 		s = s->m_next;
 		boom->~b3SoftBodySphereShape();
-		b3Free(boom);
+		m_blockAllocator.Free(boom, sizeof(b3SoftBodySphereShape));
 	}
 
 	b3SoftBodyTriangleShape* t = m_triangleShapeList.m_head;
@@ -59,7 +62,7 @@ b3SoftBody::~b3SoftBody()
 		b3SoftBodyTriangleShape* boom = t;
 		t = t->m_next;
 		boom->~b3SoftBodyTriangleShape();
-		b3Free(boom);
+		m_blockAllocator.Free(boom, sizeof(b3SoftBodyTriangleShape));
 	}
 
 	b3SoftBodyTetrahedronShape* h = m_tetrahedronShapeList.m_head;
@@ -68,7 +71,7 @@ b3SoftBody::~b3SoftBody()
 		b3SoftBodyTetrahedronShape* boom = h;
 		h = h->m_next;
 		boom->~b3SoftBodyTetrahedronShape();
-		b3Free(boom);
+		m_blockAllocator.Free(boom, sizeof(b3SoftBodyTetrahedronShape));
 	}
 
 	b3SoftBodyWorldShape* w = m_worldShapeList.m_head;
@@ -76,13 +79,13 @@ b3SoftBody::~b3SoftBody()
 	{
 		b3SoftBodyWorldShape* boom = w;
 		w = w->m_next;
-		b3SoftBodyWorldShape::Destroy(boom);
+		boom->Destroy(&m_blockAllocator);
 	}
 }
 
 b3SoftBodyParticle* b3SoftBody::CreateParticle(const b3SoftBodyParticleDef& def)
 {
-	void* mem = m_particleBlocks.Allocate();
+	void* mem = m_blockAllocator.Allocate(sizeof(b3SoftBodyParticle));
 	b3SoftBodyParticle* p = new(mem) b3SoftBodyParticle(def, this);
 
 	m_particleList.PushFront(p);
@@ -92,18 +95,13 @@ b3SoftBodyParticle* b3SoftBody::CreateParticle(const b3SoftBodyParticleDef& def)
 
 void b3SoftBody::DestroyParticle(b3SoftBodyParticle* particle)
 {
-	// Destroy shapes
 	particle->DestroyShapes();
-
-	// Destroy forces
 	particle->DestroyForces();
-
-	// Destroy contacts
 	particle->DestroyContacts();
 
 	m_particleList.Remove(particle);
 	particle->~b3SoftBodyParticle();
-	m_particleBlocks.Free(particle);
+	m_blockAllocator.Free(particle, sizeof(b3SoftBodyParticle));
 }
 
 b3SoftBodySphereShape* b3SoftBody::CreateSphereShape(const b3SoftBodySphereShapeDef& def)
@@ -118,7 +116,7 @@ b3SoftBodySphereShape* b3SoftBody::CreateSphereShape(const b3SoftBodySphereShape
 		}
 	}
 #endif
-	void* mem = b3Alloc(sizeof(b3SoftBodySphereShape));
+	void* mem = m_blockAllocator.Allocate(sizeof(b3SoftBodySphereShape));
 	b3SoftBodySphereShape* s = new (mem)b3SoftBodySphereShape(def, this);
 	s->m_radius = def.radius;
 	s->m_friction = def.friction;
@@ -135,9 +133,12 @@ void b3SoftBody::DestroySphereShape(b3SoftBodySphereShape* shape)
 	// Destroy contacts
 	shape->DestroyContacts();
 
+	// Remove from body list.
 	m_sphereShapeList.Remove(shape);
+	
+	// Free memory.
 	shape->~b3SoftBodySphereShape();
-	b3Free(shape);
+	m_blockAllocator.Free(shape, sizeof(b3SoftBodySphereShape));
 }
 
 b3SoftBodyTriangleShape* b3SoftBody::CreateTriangleShape(const b3SoftBodyTriangleShapeDef& def)
@@ -159,7 +160,7 @@ b3SoftBodyTriangleShape* b3SoftBody::CreateTriangleShape(const b3SoftBodyTriangl
 		}
 	}
 #endif
-	void* mem = b3Alloc(sizeof(b3SoftBodyTriangleShape));
+	void* mem = m_blockAllocator.Allocate(sizeof(b3SoftBodyTriangleShape));
 	b3SoftBodyTriangleShape* t = new (mem)b3SoftBodyTriangleShape(def, this);
 
 	t->m_radius = def.radius;
@@ -186,7 +187,7 @@ void b3SoftBody::DestroyTriangleShape(b3SoftBodyTriangleShape* shape)
 	// Destroy memory
 	m_triangleShapeList.Remove(shape);
 	shape->~b3SoftBodyTriangleShape();
-	b3Free(shape);
+	m_blockAllocator.Free(shape, sizeof(b3SoftBodyTriangleShape));
 
 	// Reset the body mass
 	ResetMass();
@@ -213,7 +214,7 @@ b3SoftBodyTetrahedronShape* b3SoftBody::CreateTetrahedronShape(const b3SoftBodyT
 		}
 	}
 #endif
-	void* mem = b3Alloc(sizeof(b3SoftBodyTetrahedronShape));
+	void* mem = m_blockAllocator.Allocate(sizeof(b3SoftBodyTetrahedronShape));
 	b3SoftBodyTetrahedronShape* t = new (mem)b3SoftBodyTetrahedronShape(def, this);
 
 	t->m_radius = def.radius;
@@ -234,7 +235,7 @@ void b3SoftBody::DestroyTetrahedronShape(b3SoftBodyTetrahedronShape* shape)
 	// Destroy memory
 	m_tetrahedronShapeList.Remove(shape);
 	shape->~b3SoftBodyTetrahedronShape();
-	b3Free(shape);
+	m_blockAllocator.Free(shape, sizeof(b3SoftBodyTetrahedronShape));
 
 	// Reset the body mass
 	ResetMass();
@@ -242,7 +243,7 @@ void b3SoftBody::DestroyTetrahedronShape(b3SoftBodyTetrahedronShape* shape)
 
 b3SoftBodyForce* b3SoftBody::CreateForce(const b3SoftBodyForceDef& def)
 {
-	b3SoftBodyForce* f = b3SoftBodyForce::Create(&def);
+	b3SoftBodyForce* f = b3SoftBodyForce::Create(&def, &m_blockAllocator);
 	m_forceList.PushFront(f);
 	return f;
 }
@@ -250,20 +251,20 @@ b3SoftBodyForce* b3SoftBody::CreateForce(const b3SoftBodyForceDef& def)
 void b3SoftBody::DestroyForce(b3SoftBodyForce* force)
 {
 	m_forceList.Remove(force);
-	b3SoftBodyForce::Destroy(force);
+	b3SoftBodyForce::Destroy(force, &m_blockAllocator);
 }
 
 b3SoftBodyWorldShape* b3SoftBody::CreateWorldShape(const b3SoftBodyWorldShapeDef& def)
 {
-	// Create clone
-	b3SoftBodyWorldShape* s = b3SoftBodyWorldShape::Create(def);
-	s->m_friction = def.friction;
-	s->m_body = this;
+	// Create
+	void* mem = m_blockAllocator.Allocate(sizeof(b3SoftBodyWorldShape));
+	b3SoftBodyWorldShape* shape = new (mem) b3SoftBodyWorldShape;
+	shape->Create(&m_blockAllocator, this, def);
 
-	// Push to the body.
-	m_worldShapeList.PushFront(s);
+	// Push to the body list
+	m_worldShapeList.PushFront(shape);
 
-	return s;
+	return shape;
 }
 
 void b3SoftBody::DestroyWorldShape(b3SoftBodyWorldShape* shape)
@@ -271,11 +272,13 @@ void b3SoftBody::DestroyWorldShape(b3SoftBodyWorldShape* shape)
 	// Destroy contacts
 	shape->DestroyContacts();
 
-	// Remove from the body list of collision shapes.
+	// Remove from the body list
 	m_worldShapeList.Remove(shape);
 
-	// Destroy memory.
-	b3SoftBodyWorldShape::Destroy(shape);
+	// Destroy memory
+	shape->Destroy(&m_blockAllocator);
+	shape->~b3SoftBodyWorldShape();
+	m_blockAllocator.Free(shape, sizeof(b3SoftBodyWorldShape));
 }
 
 scalar b3SoftBody::GetEnergy() const

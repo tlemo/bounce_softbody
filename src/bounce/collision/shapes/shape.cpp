@@ -16,36 +16,40 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include <bounce/dynamics/shapes/softbody_world_shape.h>
-#include <bounce/dynamics/softbody.h>
+#include <bounce/collision/shapes/shape.h>
+#include <bounce/collision/shapes/sphere_shape.h>
+#include <bounce/collision/shapes/capsule_shape.h>
+#include <bounce/collision/shapes/box_shape.h>
+#include <bounce/common/memory/block_allocator.h>
 
-b3SoftBodyWorldShape::b3SoftBodyWorldShape()
+void b3Shape::Destroy(b3Shape* shape, b3BlockAllocator* allocator)
 {
-}
-
-void b3SoftBodyWorldShape::Create(b3BlockAllocator* allocator, b3SoftBody* body, const b3SoftBodyWorldShapeDef& def)
-{
-	m_shape = def.shape->Clone(allocator);
-	m_body = body;
-	m_friction = def.friction;
-}
-
-void b3SoftBodyWorldShape::Destroy(b3BlockAllocator* allocator)
-{
-	b3Shape::Destroy(m_shape, allocator);
-}
-
-void b3SoftBodyWorldShape::DestroyContacts()
-{
-	b3SoftBodySphereAndShapeContact* c = m_body->m_contactManager.m_sphereAndShapeContactList.m_head;
-	while (c)
+	switch (shape->m_type)
 	{
-		b3SoftBodySphereAndShapeContact* c0 = c;
-		c = c->m_next;
-
-		if (c0->m_s2 == this)
-		{
-			m_body->m_contactManager.Destroy(c0);
-		}
+	case e_sphere:
+	{
+		b3SphereShape* sphere = (b3SphereShape*)shape;
+		sphere->~b3SphereShape();
+		allocator->Free(sphere, sizeof(b3SphereShape));
+		break;
+	}
+	case e_capsule:
+	{
+		b3CapsuleShape* capsule = (b3CapsuleShape*)shape;
+		capsule->~b3CapsuleShape();
+		allocator->Free(capsule, sizeof(b3CapsuleShape));
+		break;
+	}
+	case e_box:
+	{
+		b3BoxShape* box = (b3BoxShape*)shape;
+		box->~b3BoxShape();
+		allocator->Free(box, sizeof(b3BoxShape));
+		break;
+	}
+	default:
+	{
+		B3_ASSERT(false);
+	}
 	}
 }

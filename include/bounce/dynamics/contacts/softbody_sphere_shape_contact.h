@@ -24,26 +24,18 @@
 #include <bounce/common/math/vec3.h>
 #include <bounce/common/math/transform.h>
 
+class b3BlockAllocator;
 class b3SoftBodySphereShape;
 class b3SoftBodyWorldShape;
 
-// A contact between a sphere and a shape
+// A contact between a sphere and a shape.
 class b3SoftBodySphereAndShapeContact
 {
 public:
-private:
-	friend class b3List<b3SoftBodySphereAndShapeContact>;
-	friend class b3SoftBody;
-	friend class b3SoftBodyParticle;
-	friend class b3SoftBodySphereShape;
-	friend class b3SoftBodyWorldShape;
-	friend class b3SoftBodyContactManager;
-	friend class b3SoftBodySolver;
-	friend class b3SoftBodyContactSolver;
-	friend struct b3SoftBodySphereAndShapeContactWorldPoint;
+	static b3SoftBodySphereAndShapeContact* Create(b3SoftBodySphereShape* shape1, b3SoftBodyWorldShape* shape2, b3BlockAllocator* allocator);
+	static void Destroy(b3SoftBodySphereAndShapeContact* contact, b3BlockAllocator* allocator);
 
-	b3SoftBodySphereAndShapeContact() { }
-	~b3SoftBodySphereAndShapeContact() { }
+	b3SoftBodySphereAndShapeContact(b3SoftBodySphereShape* shape1, b3SoftBodyWorldShape* shape2);
 
 	void Update();
 

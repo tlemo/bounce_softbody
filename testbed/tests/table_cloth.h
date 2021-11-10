@@ -30,8 +30,8 @@ public:
 		def.mesh = &m_mesh;
 		m_body = new UniformSoftBody(def);
 		
-		b3SoftBodyBoxWorldShape boxShape;
-		boxShape.m_extents.Set(4.0f, 3.0f, 3.0f);
+		b3BoxShape boxShape;
+		boxShape.m_extents.Set(3.0f, 3.0f, 4.0f);
 		boxShape.m_radius = 0.2f;
 
 		b3SoftBodyWorldShapeDef boxShapeDef;
@@ -39,7 +39,7 @@ public:
 		boxShapeDef.friction = 0.5f;
 		
 		m_body->CreateWorldShape(boxShapeDef);
-
+		
 		m_body->SetGravity(b3Vec3(0.0f, -9.8f, 0.0f));
 
 		m_bodyDragger = new SoftBodyDragger(&m_ray, m_body);

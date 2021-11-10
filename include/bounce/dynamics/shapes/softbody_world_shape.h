@@ -19,30 +19,11 @@
 #ifndef B3_SOFTBODY_WORLD_SHAPE_H
 #define B3_SOFTBODY_WORLD_SHAPE_H
 
-#include <bounce/collision/geometry/sphere.h>
-#include <bounce/collision/geometry/aabb.h>
+#include <bounce/collision/shapes/shape.h>
 #include <bounce/common/template/list.h>
 
 class b3Draw;
 class b3SoftBody;
-
-enum b3SoftBodyWorldShapeType
-{
-	e_softBodySphereWorldShape,
-	e_softBodyCapsuleWorldShape,
-	e_softBodyBoxWorldShape,
-};
-
-// Sphere contact manifold. 
-// c2 = center
-// separation = dot(c2 - c1, normal) - r1 - r2
-struct b3SoftBodySphereManifold
-{
-	b3Vec3 point; // contact point on the shape
-	b3Vec3 normal; // contact normal on the shape towards the sphere
-};
-
-class b3SoftBodyWorldShape;
 
 // Collision shape definition.
 // The given shape will be cloned and can be a temporary object.
@@ -51,144 +32,105 @@ struct b3SoftBodyWorldShapeDef
 	b3SoftBodyWorldShapeDef()
 	{
 		shape = nullptr;
-		friction = scalar(0);
+		friction = scalar(0.5);
 	}
 
 	// Shape to be cloned.
-	b3SoftBodyWorldShape* shape;
+	b3Shape* shape;
 	
 	// Coefficient of friction in the range [0, 1].
 	scalar friction;
 };
 
-// Collision shape in static environment.
+// Body collision shape in static environment.
 class b3SoftBodyWorldShape
 {
 public:
-	// Default ctor.
-	b3SoftBodyWorldShape();
-	
 	// Default dtor.
 	virtual ~b3SoftBodyWorldShape() { }
 	
 	// Return the shape type.
-	b3SoftBodyWorldShapeType GetType() const { return m_type; }
+	b3Shape::Type GetType() const;
 	
-	// Set the coefficient of friction of this shape.
-	void SetFriction(scalar friction) { m_friction = friction; }
-
-	// Get the coefficient of friction of this shape.
-	// This represents both static and dynamic friction.
-	scalar GetFriction() const { return m_friction; }
-
 	// Compute AABB.
-	virtual b3AABB ComputeAABB() const = 0;
+	b3AABB ComputeAABB() const;
 
 	// Generate the contact manifold for a given sphere.
 	// Return true if the given sphere is colliding with this shape, false otherwise.
-	virtual bool CollideSphere(b3SoftBodySphereManifold* manifold, const b3Sphere& sphere) const = 0;
+	bool CollideSphere(b3SphereManifold* manifold, const b3Sphere& sphere) const;
 
 	// Draw this shape.
-	virtual void Draw(b3Draw* draw) const = 0;
+	void Draw(b3Draw* draw) const;
+
+	// Set the coefficient of friction of this shape.
+	void SetFriction(scalar friction);
+
+	// Get the coefficient of friction of this shape.
+	// This represents both static and dynamic friction.
+	scalar GetFriction() const;
 
 	// Return the next world shape in the body list of world shapes.
 	b3SoftBodyWorldShape* GetNext() { return m_next; }
 	const b3SoftBodyWorldShape* GetNext() const { return m_next; }
-	
-	// Shape radius.
-	scalar m_radius;
-protected:
+private:
 	friend class b3SoftBody;
 	friend class b3SoftBodyContactManager;
 	friend class b3SoftBodySphereAndShapeContact;
 	friend class b3SoftBodyContactSolver;
 	friend class b3List<b3SoftBodyWorldShape>;
+
+	// Ctor.
+	b3SoftBodyWorldShape();
 	
-	// Factory.
-	static b3SoftBodyWorldShape* Create(const b3SoftBodyWorldShapeDef& def);
-	static void Destroy(b3SoftBodyWorldShape* shape);
+	// Create/destroy this shape. 
+	void Create(b3BlockAllocator* allocator, b3SoftBody* body, const b3SoftBodyWorldShapeDef& def);
+	void Destroy(b3BlockAllocator* allocator);
 
 	// Destroy contacts.
 	void DestroyContacts();
 
-	// The shape type.
-	b3SoftBodyWorldShapeType m_type;
-
-	// Body
-	b3SoftBody* m_body;
+	// The collision shape.
+	b3Shape* m_shape;
 
 	// Coefficient of friction.
 	scalar m_friction;
 
-	// Cloth list links.
+	// Body.
+	b3SoftBody* m_body;
+
+	// Body list links.
 	b3SoftBodyWorldShape* m_prev;
 	b3SoftBodyWorldShape* m_next;
 };
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-// Sphere collision shape.
-class b3SoftBodySphereWorldShape : public b3SoftBodyWorldShape
+inline b3Shape::Type b3SoftBodyWorldShape::GetType() const
 {
-public:
-	b3SoftBodySphereWorldShape();
-	~b3SoftBodySphereWorldShape();
-	
-	void Clone(const b3SoftBodySphereWorldShape& other);
-	
-	b3AABB ComputeAABB() const;
+	return m_shape->m_type;
+}
 
-	bool CollideSphere(b3SoftBodySphereManifold* manifold, const b3Sphere& sphere) const;
-	
-	void Draw(b3Draw* draw) const;
-
-	// Center
-	b3Vec3 m_center;
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-// Capsule collision shape.
-class b3SoftBodyCapsuleWorldShape : public b3SoftBodyWorldShape
+inline b3AABB b3SoftBodyWorldShape::ComputeAABB() const
 {
-public:
-	b3SoftBodyCapsuleWorldShape();
-	~b3SoftBodyCapsuleWorldShape();
+	return m_shape->ComputeAABB();
+}
 
-	void Clone(const b3SoftBodyCapsuleWorldShape& other);
-
-	b3AABB ComputeAABB() const;
-
-	bool CollideSphere(b3SoftBodySphereManifold* manifold, const b3Sphere& sphere) const;
-
-	void Draw(b3Draw* draw) const;
-
-	// Centers
-	b3Vec3 m_center1, m_center2;
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
-// Box collision shape.
-class b3SoftBodyBoxWorldShape : public b3SoftBodyWorldShape
+inline bool b3SoftBodyWorldShape::CollideSphere(b3SphereManifold* manifold, const b3Sphere& sphere) const
 {
-public:
-	b3SoftBodyBoxWorldShape();
-	~b3SoftBodyBoxWorldShape();
+	return m_shape->CollideSphere(manifold, sphere);
+}
 
-	void Clone(const b3SoftBodyBoxWorldShape& other);
+inline void b3SoftBodyWorldShape::Draw(b3Draw* draw) const
+{
+	m_shape->Draw(draw);
+}
 
-	b3AABB ComputeAABB() const;
+inline void b3SoftBodyWorldShape::SetFriction(scalar friction)
+{
+	m_friction = friction;
+}
 
-	bool CollideSphere(b3SoftBodySphereManifold* manifold, const b3Sphere& sphere) const;
-
-	void Draw(b3Draw* draw) const;
-
-	// Extents
-	b3Vec3 m_extents;
-
-	// Transform
-	b3Transform m_xf;
-};
+inline scalar b3SoftBodyWorldShape::GetFriction() const
+{
+	return m_friction;
+}
 
 #endif

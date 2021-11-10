@@ -64,7 +64,7 @@ void b3SoftBodyContactSolver::InitializeShapeContactConstraints()
 		pc->invMassA = p1->m_invMass;
 		pc->radiusA = s1->m_radius;
 
-		pc->radiusB = s2->m_radius;
+		pc->radiusB = s2->m_shape->m_radius;
 		
 		pc->normal = c->m_normal2;
 		pc->pointB = c->m_point2;

@@ -23,46 +23,47 @@
 #include <bounce/dynamics/forces/softbody_mouse_force.h>
 #include <bounce/dynamics/forces/softbody_triangle_element_force.h>
 #include <bounce/dynamics/forces/softbody_tetrahedron_element_force.h>
+#include <bounce/common/memory/block_allocator.h>
 
-b3SoftBodyForce* b3SoftBodyForce::Create(const b3SoftBodyForceDef* def)
+b3SoftBodyForce* b3SoftBodyForce::Create(const b3SoftBodyForceDef* def, b3BlockAllocator* allocator)
 {
 	b3SoftBodyForce* force = nullptr;
 	switch (def->type)
 	{
 	case e_softBodyStretchForce:
 	{
-		void* block = b3Alloc(sizeof(b3SoftBodyStretchForce));
-		force = new (block) b3SoftBodyStretchForce((b3SoftBodyStretchForceDef*)def);
+		void* mem = allocator->Allocate(sizeof(b3SoftBodyStretchForce));
+		force = new (mem) b3SoftBodyStretchForce((b3SoftBodyStretchForceDef*)def);
 		break;
 	}
 	case e_softBodyShearForce:
 	{
-		void* block = b3Alloc(sizeof(b3SoftBodyShearForce));
-		force = new (block) b3SoftBodyShearForce((b3SoftBodyShearForceDef*)def);
+		void* mem = allocator->Allocate(sizeof(b3SoftBodyShearForce));
+		force = new (mem) b3SoftBodyShearForce((b3SoftBodyShearForceDef*)def);
 		break;
 	}
 	case e_softBodySpringForce:
 	{
-		void* block = b3Alloc(sizeof(b3SoftBodySpringForce));
-		force = new (block) b3SoftBodySpringForce((b3SoftBodySpringForceDef*)def);
+		void* mem = allocator->Allocate(sizeof(b3SoftBodySpringForce));
+		force = new (mem) b3SoftBodySpringForce((b3SoftBodySpringForceDef*)def);
 		break;
 	}
 	case e_softBodyMouseForce:
 	{
-		void* block = b3Alloc(sizeof(b3SoftBodyMouseForce));
-		force = new (block) b3SoftBodyMouseForce((b3SoftBodyMouseForceDef*)def);
+		void* mem = allocator->Allocate(sizeof(b3SoftBodyMouseForce));
+		force = new (mem) b3SoftBodyMouseForce((b3SoftBodyMouseForceDef*)def);
 		break;
 	}
 	case e_softBodyTriangleElementForce:
 	{
-		void* block = b3Alloc(sizeof(b3SoftBodyTriangleElementForce));
-		force = new (block) b3SoftBodyTriangleElementForce((b3SoftBodyTriangleElementForceDef*)def);
+		void* mem = allocator->Allocate(sizeof(b3SoftBodyTriangleElementForce));
+		force = new (mem) b3SoftBodyTriangleElementForce((b3SoftBodyTriangleElementForceDef*)def);
 		break;
 	}
 	case e_softBodyTetrahedronElementForce:
 	{
-		void* block = b3Alloc(sizeof(b3SoftBodyTetrahedronElementForce));
-		force = new (block) b3SoftBodyTetrahedronElementForce((b3SoftBodyTetrahedronElementForceDef*)def);
+		void* mem = allocator->Allocate(sizeof(b3SoftBodyTetrahedronElementForce));
+		force = new (mem) b3SoftBodyTetrahedronElementForce((b3SoftBodyTetrahedronElementForceDef*)def);
 		break;
 	}
 	default:
@@ -74,7 +75,7 @@ b3SoftBodyForce* b3SoftBodyForce::Create(const b3SoftBodyForceDef* def)
 	return force;
 }
 
-void b3SoftBodyForce::Destroy(b3SoftBodyForce* force)
+void b3SoftBodyForce::Destroy(b3SoftBodyForce* force, b3BlockAllocator* allocator)
 {
 	B3_ASSERT(force);
 
@@ -85,42 +86,42 @@ void b3SoftBodyForce::Destroy(b3SoftBodyForce* force)
 	{
 		b3SoftBodyStretchForce* o = (b3SoftBodyStretchForce*)force;
 		o->~b3SoftBodyStretchForce();
-		b3Free(force);
+		allocator->Free(o, sizeof(b3SoftBodyStretchForce));
 		break;
 	}
 	case e_softBodyShearForce:
 	{
 		b3SoftBodyShearForce* o = (b3SoftBodyShearForce*)force;
 		o->~b3SoftBodyShearForce();
-		b3Free(force);
+		allocator->Free(o, sizeof(b3SoftBodyShearForce));
 		break;
 	}
 	case e_softBodySpringForce:
 	{
 		b3SoftBodySpringForce* o = (b3SoftBodySpringForce*)force;
 		o->~b3SoftBodySpringForce();
-		b3Free(force);
+		allocator->Free(o, sizeof(b3SoftBodySpringForce));
 		break;
 	}
 	case e_softBodyMouseForce:
 	{
 		b3SoftBodyMouseForce* o = (b3SoftBodyMouseForce*)force;
 		o->~b3SoftBodyMouseForce();
-		b3Free(force);
+		allocator->Free(o, sizeof(b3SoftBodyMouseForce));
 		break;
 	}
 	case e_softBodyTriangleElementForce:
 	{
 		b3SoftBodyTriangleElementForce* o = (b3SoftBodyTriangleElementForce*)force;
 		o->~b3SoftBodyTriangleElementForce();
-		b3Free(force);
+		allocator->Free(o, sizeof(b3SoftBodyTriangleElementForce));
 		break;
 	}
 	case e_softBodyTetrahedronElementForce:
 	{
 		b3SoftBodyTetrahedronElementForce* o = (b3SoftBodyTetrahedronElementForce*)force;
 		o->~b3SoftBodyTetrahedronElementForce();
-		b3Free(force);
+		allocator->Free(o, sizeof(b3SoftBodyTetrahedronElementForce));
 		break;
 	}
 	default:

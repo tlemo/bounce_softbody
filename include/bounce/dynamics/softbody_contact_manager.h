@@ -20,28 +20,23 @@
 #define B3_SOFTBODY_CONTACT_MANAGER_H
 
 #include <bounce/dynamics/contacts/softbody_sphere_shape_contact.h>
-#include <bounce/collision/broad_phase.h>
-#include <bounce/common/memory/block_pool.h>
 #include <bounce/common/template/list.h>
 
 class b3SoftBody;
+class b3BlockAllocator;
 
 // Contact delegator for b3SoftBody.
 class b3SoftBodyContactManager
 {
 public:
-	b3SoftBodyContactManager();
-
-	void AddContact(b3SoftBodySphereShape* s1, b3SoftBodyWorldShape* s2);
+	void AddContact(b3SoftBodySphereShape* shape1, b3SoftBodyWorldShape* shape2);
 	void FindNewContacts();
 	void UpdateContacts();
 
-	b3SoftBodySphereAndShapeContact* CreateSphereAndShapeContact();
-	void Destroy(b3SoftBodySphereAndShapeContact* c);
-
-	b3BlockPool m_sphereAndShapeContactBlocks;
+	void Destroy(b3SoftBodySphereAndShapeContact* contact);
 
 	b3SoftBody* m_body;
+	b3BlockAllocator* m_allocator;
 	b3List<b3SoftBodySphereAndShapeContact> m_sphereAndShapeContactList;
 };
 

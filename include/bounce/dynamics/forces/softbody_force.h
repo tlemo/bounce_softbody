@@ -22,6 +22,7 @@
 #include <bounce/common/math/transform.h>
 #include <bounce/common/template/list.h>
 
+class b3BlockAllocator;
 class b3SoftBodyParticle;
 
 struct b3SparseForceSolverData;
@@ -72,8 +73,8 @@ protected:
 	friend class b3SoftBodyForceModel;
 
 	// Factory create and destroy.
-	static b3SoftBodyForce* Create(const b3SoftBodyForceDef* def);
-	static void Destroy(b3SoftBodyForce* f);
+	static b3SoftBodyForce* Create(const b3SoftBodyForceDef* def, b3BlockAllocator* allocator);
+	static void Destroy(b3SoftBodyForce* force, b3BlockAllocator* allocator);
 
 	b3SoftBodyForce() { }
 	virtual ~b3SoftBodyForce() { }

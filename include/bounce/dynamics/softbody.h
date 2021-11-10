@@ -20,9 +20,9 @@
 #define B3_SOFTBODY_H
 
 #include <bounce/common/memory/stack_allocator.h>
-#include <bounce/common/memory/block_pool.h>
+#include <bounce/common/memory/block_allocator.h>
 #include <bounce/common/template/list.h>
-#include <bounce/collision/trees/dynamic_tree.h>
+#include <bounce/collision/broad_phase.h>
 #include <bounce/dynamics/softbody_contact_manager.h>
 
 class b3Draw;
@@ -157,11 +157,11 @@ protected:
 	// Stack allocator
 	b3StackAllocator m_stackAllocator;
 
+	// Block allocator
+	b3BlockAllocator m_blockAllocator;
+
 	// Gravity acceleration
 	b3Vec3 m_gravity;
-
-	// Pool of particles
-	b3BlockPool m_particleBlocks;
 
 	// List of particles
 	b3List<b3SoftBodyParticle> m_particleList;
@@ -184,7 +184,7 @@ protected:
 	// Contact manager
 	b3SoftBodyContactManager m_contactManager;
 
-	// Dynamic tree for triangle shapes.
+	// Broadphase for triangles.
 	b3BroadPhase m_trianglesBroadphase;
 
 	// Used to compute the time step ratio to 

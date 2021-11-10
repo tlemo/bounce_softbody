@@ -20,6 +20,29 @@
 #include <bounce/dynamics/shapes/softbody_sphere_shape.h>
 #include <bounce/dynamics/shapes/softbody_world_shape.h>
 #include <bounce/dynamics/softbody_particle.h>
+#include <bounce/collision/geometry/sphere.h>
+#include <bounce/common/memory/block_allocator.h>
+
+b3SoftBodySphereAndShapeContact* b3SoftBodySphereAndShapeContact::Create(b3SoftBodySphereShape* s1, b3SoftBodyWorldShape* s2, b3BlockAllocator* allocator)
+{
+	void* mem = allocator->Allocate(sizeof(b3SoftBodySphereAndShapeContact));
+	return new(mem) b3SoftBodySphereAndShapeContact(s1, s2);	
+}
+
+void b3SoftBodySphereAndShapeContact::Destroy(b3SoftBodySphereAndShapeContact* contact, b3BlockAllocator* allocator)
+{
+	contact->~b3SoftBodySphereAndShapeContact();
+	allocator->Free(contact, sizeof(b3SoftBodySphereAndShapeContact));
+}
+
+b3SoftBodySphereAndShapeContact::b3SoftBodySphereAndShapeContact(b3SoftBodySphereShape* s1, b3SoftBodyWorldShape* s2)
+{
+	m_s1 = s1;
+	m_s2 = s2;
+	m_active = false;
+	m_normalImpulse = scalar(0);
+	m_tangentImpulse.SetZero();
+}
 
 void b3SoftBodySphereAndShapeContact::Update()
 {
@@ -29,7 +52,7 @@ void b3SoftBodySphereAndShapeContact::Update()
 	sphere.vertex = m_s1->m_p->m_position;
 	sphere.radius = m_s1->m_radius;
 
-	b3SoftBodySphereManifold manifold;
+	b3SphereManifold manifold;
 	if (m_s2->CollideSphere(&manifold, sphere) == false)
 	{
 		return;

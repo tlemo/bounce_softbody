@@ -16,36 +16,31 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include <bounce/dynamics/shapes/softbody_world_shape.h>
-#include <bounce/dynamics/softbody.h>
+#ifndef B3_BOX_SHAPE_H
+#define B3_BOX_SHAPE_H
 
-b3SoftBodyWorldShape::b3SoftBodyWorldShape()
+#include <bounce/collision/shapes/shape.h>
+#include <bounce/common/math/transform.h>
+
+// Box collision shape.
+class b3BoxShape : public b3Shape
 {
-}
+public:
+	b3BoxShape();
 
-void b3SoftBodyWorldShape::Create(b3BlockAllocator* allocator, b3SoftBody* body, const b3SoftBodyWorldShapeDef& def)
-{
-	m_shape = def.shape->Clone(allocator);
-	m_body = body;
-	m_friction = def.friction;
-}
+	b3Shape* Clone(b3BlockAllocator* allocator) const;
 
-void b3SoftBodyWorldShape::Destroy(b3BlockAllocator* allocator)
-{
-	b3Shape::Destroy(m_shape, allocator);
-}
+	b3AABB ComputeAABB() const;
 
-void b3SoftBodyWorldShape::DestroyContacts()
-{
-	b3SoftBodySphereAndShapeContact* c = m_body->m_contactManager.m_sphereAndShapeContactList.m_head;
-	while (c)
-	{
-		b3SoftBodySphereAndShapeContact* c0 = c;
-		c = c->m_next;
+	bool CollideSphere(b3SphereManifold* manifold, const b3Sphere& sphere) const;
 
-		if (c0->m_s2 == this)
-		{
-			m_body->m_contactManager.Destroy(c0);
-		}
-	}
-}
+	void Draw(b3Draw* draw) const;
+
+	// Extents
+	b3Vec3 m_extents;
+
+	// Transform
+	b3Transform m_xf;
+};
+
+#endif

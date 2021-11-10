@@ -21,12 +21,7 @@
 #include <bounce/dynamics/shapes/softbody_sphere_shape.h>
 #include <bounce/dynamics/shapes/softbody_world_shape.h>
 #include <bounce/dynamics/softbody_particle.h>
-
-b3SoftBodyContactManager::b3SoftBodyContactManager() :
-	m_sphereAndShapeContactBlocks(sizeof(b3SoftBodySphereAndShapeContact))
-{
-
-}
+#include <bounce/common/memory/block_allocator.h>
 
 void b3SoftBodyContactManager::AddContact(b3SoftBodySphereShape* s1, b3SoftBodyWorldShape* s2)
 {
@@ -41,13 +36,7 @@ void b3SoftBodyContactManager::AddContact(b3SoftBodySphereShape* s1, b3SoftBodyW
 	}
 
 	// Create a new contact.
-	b3SoftBodySphereAndShapeContact* c = CreateSphereAndShapeContact();
-
-	c->m_s1 = s1;
-	c->m_s2 = s2;
-	c->m_active = false;
-	c->m_normalImpulse = scalar(0);
-	c->m_tangentImpulse.SetZero();
+	b3SoftBodySphereAndShapeContact* c = b3SoftBodySphereAndShapeContact::Create(s1, s2, m_allocator);
 
 	// Push the contact to the contact list.
 	m_sphereAndShapeContactList.PushFront(c);
@@ -72,17 +61,13 @@ void b3SoftBodyContactManager::FindNewContacts()
 	}
 }
 
-b3SoftBodySphereAndShapeContact* b3SoftBodyContactManager::CreateSphereAndShapeContact()
+void b3SoftBodyContactManager::Destroy(b3SoftBodySphereAndShapeContact* contact)
 {
-	void* block = m_sphereAndShapeContactBlocks.Allocate();
-	return new(block) b3SoftBodySphereAndShapeContact();
-}
-
-void b3SoftBodyContactManager::Destroy(b3SoftBodySphereAndShapeContact* c)
-{
-	m_sphereAndShapeContactList.Remove(c);
-	c->~b3SoftBodySphereAndShapeContact();
-	m_sphereAndShapeContactBlocks.Free(c);
+	// Remove from the body.
+	m_sphereAndShapeContactList.Remove(contact);
+	
+	// Call the factory.
+	b3SoftBodySphereAndShapeContact::Destroy(contact, m_allocator);
 }
 
 void b3SoftBodyContactManager::UpdateContacts()

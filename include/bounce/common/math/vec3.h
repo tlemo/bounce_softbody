@@ -221,6 +221,12 @@ inline b3Vec3 b3Max(const b3Vec3& a, const b3Vec3& b)
 	return b3Vec3(b3Max(a.x, b.x), b3Max(a.y, b.y), b3Max(a.z, b.z));
 }
 
+// Clamp the given vector component-wise.
+inline b3Vec3 b3Clamp(const b3Vec3& v, const b3Vec3& low, const b3Vec3& high)
+{
+	return b3Max(low, b3Min(v, high));
+}
+
 // Compute the absolute vector of a given vector.
 inline b3Vec3 b3Abs(const b3Vec3& v)
 {
