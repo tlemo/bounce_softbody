@@ -46,13 +46,14 @@ struct b3SoftBodyWorldShapeDef
 class b3SoftBodyWorldShape
 {
 public:
-	// Default dtor.
-	virtual ~b3SoftBodyWorldShape() { }
-	
-	// Return the shape type.
+	// Return the type of the child shape.
 	b3Shape::Type GetType() const;
 	
-	// Compute AABB.
+	// Return the child shape.
+	b3Shape* GetShape();
+	const b3Shape* GetShape() const;
+
+	// Compute an AABB for the shape.
 	b3AABB ComputeAABB() const;
 
 	// Generate the contact manifold for a given sphere.
@@ -106,6 +107,16 @@ private:
 inline b3Shape::Type b3SoftBodyWorldShape::GetType() const
 {
 	return m_shape->m_type;
+}
+
+inline b3Shape* b3SoftBodyWorldShape::GetShape()
+{
+	return m_shape;
+}
+
+inline const b3Shape* b3SoftBodyWorldShape::GetShape() const
+{
+	return m_shape;
 }
 
 inline b3AABB b3SoftBodyWorldShape::ComputeAABB() const

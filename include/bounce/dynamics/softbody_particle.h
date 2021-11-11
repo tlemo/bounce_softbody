@@ -135,12 +135,9 @@ private:
 	friend class b3SoftBodyForceSolver;
 	friend class b3SoftBodyForceModel;
 	friend class b3SoftBodySphereShape;
-	friend class b3SoftBodyCapsuleShape;
 	friend class b3SoftBodyTriangleShape;
 	friend class b3SoftBodyTetrahedronShape;
 	friend class b3SoftBodySphereAndShapeContact;
-	friend class b3SoftBodySphereAndTriangleContact;
-	friend class b3SoftBodyCapsuleAndCapsuleContact;
 	friend class b3SoftBodyContactSolver;
 	friend class b3SoftBodyForce;
 	friend class b3SoftBodyStretchForce;

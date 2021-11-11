@@ -18,9 +18,9 @@
 
 #include <bounce/dynamics/softbody.h>
 #include <bounce/dynamics/softbody_particle.h>
-#include <bounce/dynamics/forces/softbody_force.h>
 #include <bounce/dynamics/softbody_time_step.h>
 #include <bounce/dynamics/softbody_solver.h>
+#include <bounce/dynamics/forces/softbody_force.h>
 #include <bounce/dynamics/shapes/softbody_sphere_shape.h>
 #include <bounce/dynamics/shapes/softbody_triangle_shape.h>
 #include <bounce/dynamics/shapes/softbody_tetrahedron_shape.h>
@@ -39,48 +39,7 @@ b3SoftBody::b3SoftBody()
 
 b3SoftBody::~b3SoftBody()
 {
-	b3SoftBodyForce* f = m_forceList.m_head;
-	while (f)
-	{
-		b3SoftBodyForce* boom = f;
-		f = f->m_next;
-		b3SoftBodyForce::Destroy(boom, &m_blockAllocator);
-	}
-
-	b3SoftBodySphereShape* s = m_sphereShapeList.m_head;
-	while (s)
-	{
-		b3SoftBodySphereShape* boom = s;
-		s = s->m_next;
-		boom->~b3SoftBodySphereShape();
-		m_blockAllocator.Free(boom, sizeof(b3SoftBodySphereShape));
-	}
-
-	b3SoftBodyTriangleShape* t = m_triangleShapeList.m_head;
-	while (t)
-	{
-		b3SoftBodyTriangleShape* boom = t;
-		t = t->m_next;
-		boom->~b3SoftBodyTriangleShape();
-		m_blockAllocator.Free(boom, sizeof(b3SoftBodyTriangleShape));
-	}
-
-	b3SoftBodyTetrahedronShape* h = m_tetrahedronShapeList.m_head;
-	while (h)
-	{
-		b3SoftBodyTetrahedronShape* boom = h;
-		h = h->m_next;
-		boom->~b3SoftBodyTetrahedronShape();
-		m_blockAllocator.Free(boom, sizeof(b3SoftBodyTetrahedronShape));
-	}
-
-	b3SoftBodyWorldShape* w = m_worldShapeList.m_head;
-	while (w)
-	{
-		b3SoftBodyWorldShape* boom = w;
-		w = w->m_next;
-		boom->Destroy(&m_blockAllocator);
-	}
+	// None of the objects use b3Alloc.
 }
 
 b3SoftBodyParticle* b3SoftBody::CreateParticle(const b3SoftBodyParticleDef& def)
@@ -100,6 +59,7 @@ void b3SoftBody::DestroyParticle(b3SoftBodyParticle* particle)
 	particle->DestroyContacts();
 
 	m_particleList.Remove(particle);
+	
 	particle->~b3SoftBodyParticle();
 	m_blockAllocator.Free(particle, sizeof(b3SoftBodyParticle));
 }
