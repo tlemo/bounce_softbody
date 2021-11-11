@@ -22,9 +22,7 @@
 #include <bounce/collision/trees/dynamic_tree.h>
 #include <algorithm>
 
-class b3Draw;
-
-#define B3_NULL_PROXY (0xFFFFFFFF)
+#define B3_NULL_PROXY B3_MAX_U32
 
 // A pair of broad-phase proxies.
 struct b3Pair

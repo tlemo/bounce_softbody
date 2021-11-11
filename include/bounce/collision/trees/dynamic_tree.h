@@ -36,10 +36,10 @@ public:
 	// Create a proxy. Give it a tight fitting AABB and user pointer.
 	u32 CreateProxy(const b3AABB& aabb, void* userData);
 
-	// Remove a node from the tree.
+	// Destroy a given proxy.
 	void DestroyProxy(u32 proxyId);
 
-	// Update an existing node AABB with a given AABB and a displacement.
+	// Update an existing proxy AABB with a given AABB and a displacement.
 	// displacement = dt * velocity
 	// Return true if the proxy has moved.
 	bool MoveProxy(u32 proxyId, const b3AABB& aabb, const b3Vec3& displacement);
