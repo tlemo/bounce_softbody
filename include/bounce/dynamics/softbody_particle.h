@@ -148,13 +148,9 @@ private:
 	friend class b3SoftBodyTetrahedronElementForce;
 
 	b3SoftBodyParticle(const b3SoftBodyParticleDef& def, b3SoftBody* body);
-	~b3SoftBodyParticle();
-
+	
 	// Synchronize shapes
 	void SynchronizeShapes();
-
-	// Touch shape proxies
-	void TouchProxies();
 
 	// Destroy shapes.
 	void DestroyShapes();

@@ -52,8 +52,7 @@ private:
 	friend class b3List<b3SoftBodySphereShape>;
 
 	b3SoftBodySphereShape(const b3SoftBodySphereShapeDef& def, b3SoftBody* body);
-	~b3SoftBodySphereShape();
-
+	
 	// Compute AABB
 	b3AABB ComputeAABB() const;
 

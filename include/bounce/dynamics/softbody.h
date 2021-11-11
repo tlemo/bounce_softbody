@@ -22,7 +22,7 @@
 #include <bounce/common/memory/stack_allocator.h>
 #include <bounce/common/memory/block_allocator.h>
 #include <bounce/common/template/list.h>
-#include <bounce/collision/broad_phase.h>
+#include <bounce/collision/trees/dynamic_tree.h>
 #include <bounce/dynamics/softbody_contact_manager.h>
 
 class b3Draw;
@@ -184,8 +184,8 @@ protected:
 	// Contact manager
 	b3SoftBodyContactManager m_contactManager;
 
-	// Broadphase for triangles.
-	b3BroadPhase m_trianglesBroadphase;
+	// Dynamic tree for triangles.
+	b3DynamicTree m_tree;
 
 	// Used to compute the time step ratio to 
 	// support variable time steps.

@@ -20,10 +20,10 @@
 #include <bounce/dynamics/softbody_particle.h>
 #include <bounce/dynamics/softbody.h>
 
-b3SoftBodyTetrahedronShape::b3SoftBodyTetrahedronShape(const b3SoftBodyTetrahedronShapeDef& def, b3SoftBody* body)
+b3SoftBodyTetrahedronShape::b3SoftBodyTetrahedronShape(const b3SoftBodyTetrahedronShapeDef& def, b3SoftBody* body) : b3SoftBodyShape(def, body)
 {
 	m_type = e_softBodyTetrahedronShape;
-	m_body = body;
+	
 	m_p1 = def.p1;
 	m_p2 = def.p2;
 	m_p3 = def.p3;

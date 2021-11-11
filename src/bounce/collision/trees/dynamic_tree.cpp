@@ -105,22 +105,29 @@ void b3DynamicTree::AddToFreeList(u32 node)
 	m_freeList = node;
 }
 
-u32 b3DynamicTree::InsertNode(const b3AABB& aabb, void* userData)
+u32 b3DynamicTree::CreateProxy(const b3AABB& aabb, void* userData)
 {
 	// Insert into the array.
-	u32 node = AllocateNode();
-	m_nodes[node].aabb = aabb;
-	m_nodes[node].userData = userData;
-	m_nodes[node].height = 0;
+	u32 proxyId = AllocateNode();
+	m_nodes[proxyId].aabb = aabb;
+	m_nodes[proxyId].userData = userData;
+	m_nodes[proxyId].height = 0;
 
+	// Fatten the aabb.
+	b3Vec3 r(B3_AABB_EXTENSION, B3_AABB_EXTENSION, B3_AABB_EXTENSION);
+	m_nodes[proxyId].aabb.lowerBound = aabb.lowerBound - r;
+	m_nodes[proxyId].aabb.upperBound = aabb.upperBound + r;
+	m_nodes[proxyId].userData = userData;
+	m_nodes[proxyId].height = 0;
+	
 	// Insert into the tree.
-	InsertLeaf(node);
+	InsertLeaf(proxyId);
 
-	// Return the node ID.
-	return node;
+	// Return the proxy ID.
+	return proxyId;
 }
 
-void b3DynamicTree::RemoveNode(u32 proxyId)
+void b3DynamicTree::DestroyProxy(u32 proxyId)
 {
 	// Remove from the tree.
 	RemoveLeaf(proxyId);
@@ -129,17 +136,74 @@ void b3DynamicTree::RemoveNode(u32 proxyId)
 	FreeNode(proxyId);
 }
 
-void b3DynamicTree::UpdateNode(u32 proxyId, const b3AABB& aabb)
+bool b3DynamicTree::MoveProxy(u32 proxyId, const b3AABB& aabb, const b3Vec3& displacement)
 {
-	B3_ASSERT(m_root != B3_NULL_NODE_D);
+	B3_ASSERT(0 <= proxyId && proxyId < m_nodeCapacity);
 	B3_ASSERT(m_nodes[proxyId].IsLeaf());
+
+	// Extend the AABB.
+	b3AABB fatAABB = aabb;
+	fatAABB.Extend(B3_AABB_EXTENSION);
+
+	// Predict AABB displacement.
+	b3Vec3 d = B3_AABB_MULTIPLIER * displacement;
+
+	if (d.x < scalar(0))
+	{
+		fatAABB.lowerBound.x += d.x;
+	}
+	else
+	{
+		fatAABB.upperBound.x += d.x;
+	}
+
+	if (d.y < scalar(0))
+	{
+		fatAABB.lowerBound.y += d.y;
+	}
+	else
+	{
+		fatAABB.upperBound.y += d.y;
+	}
+
+	if (d.z < scalar(0))
+	{
+		fatAABB.lowerBound.z += d.z;
+	}
+	else
+	{
+		fatAABB.upperBound.z += d.z;
+	}
+
+	const b3AABB& treeAABB = GetAABB(proxyId);
+	if (treeAABB.Contains(aabb))
+	{
+		// The tree AABB still contains the object, but it might be too large.
+		// Perhaps the object was moving fast but has since gone to sleep.
+		// The huge AABB is larger than the new fat AABB.
+		b3AABB hugeAABB = fatAABB;
+		hugeAABB.Extend(scalar(4) * B3_AABB_EXTENSION);
+		
+		if (hugeAABB.Contains(treeAABB))
+		{
+			// The tree AABB contains the object AABB and the tree AABB is
+			// not too large. No tree update needed.
+			return false;
+		}
+
+		// Otherwise the tree AABB is huge and needs to be shrunk
+	}
 
 	// Remove old AABB from the tree.
 	RemoveLeaf(proxyId);
 
 	// Insert the new AABB to the tree.
-	m_nodes[proxyId].aabb = aabb;
+	m_nodes[proxyId].aabb = fatAABB;
+	
 	InsertLeaf(proxyId);
+
+	// Notify the proxy has moved.
+	return true;
 }
 
 u32 b3DynamicTree::PickBest(const b3AABB& leafAABB) const

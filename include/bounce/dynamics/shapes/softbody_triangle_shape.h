@@ -71,11 +71,8 @@ private:
 	// Compute AABB
 	b3AABB ComputeAABB() const;
 
-	// Synchronize the AABB
+	// Synchronize AABB
 	void Synchronize(const b3Vec3& displacement);
-
-	// Touch proxy
-	void TouchProxy();
 
 	// Particles
 	b3SoftBodyParticle* m_p1;

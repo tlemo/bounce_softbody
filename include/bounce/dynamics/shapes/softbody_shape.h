@@ -23,7 +23,6 @@
 
 class b3SoftBody;
 
-// Cloth shape type
 enum b3SoftBodyShapeType
 {
 	e_softBodySphereShape,
@@ -63,9 +62,6 @@ struct b3SoftBodyShapeDef
 class b3SoftBodyShape
 {
 public:
-	// Virtual dtor.
-	virtual ~b3SoftBodyShape() { }
-	
 	// Get the shape type.
 	b3SoftBodyShapeType GetType() const;
 	
@@ -91,6 +87,9 @@ protected:
 	friend class b3SoftBodyContactManager;
 	friend class b3SoftBodyContactSolver;
 
+	b3SoftBodyShape(const b3SoftBodyShapeDef& def, b3SoftBody* body);
+	virtual ~b3SoftBodyShape() { }
+
 	// Type
 	b3SoftBodyShapeType m_type;
 
@@ -109,6 +108,15 @@ protected:
 	// Mesh index
 	u32 m_meshIndex;
 };
+
+inline b3SoftBodyShape::b3SoftBodyShape(const b3SoftBodyShapeDef& def, b3SoftBody* body)
+{
+	m_body = body;
+	m_radius = def.radius;
+	m_friction = def.friction;
+	m_density = def.density;
+	m_meshIndex = def.meshIndex;
+}
 
 inline b3SoftBodyShapeType b3SoftBodyShape::GetType() const
 {

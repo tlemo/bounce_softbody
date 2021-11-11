@@ -20,11 +20,9 @@
 #include <bounce/dynamics/softbody_particle.h>
 #include <bounce/dynamics/softbody.h>
 
-b3SoftBodyTriangleShape::b3SoftBodyTriangleShape(const b3SoftBodyTriangleShapeDef& def, b3SoftBody* body)
+b3SoftBodyTriangleShape::b3SoftBodyTriangleShape(const b3SoftBodyTriangleShapeDef& def, b3SoftBody* body) : b3SoftBodyShape(def, body)
 {
 	m_type = e_softBodyTriangleShape;
-	
-	m_body = body;
 	
 	m_p1 = def.p1;
 	m_p2 = def.p2;
@@ -50,19 +48,11 @@ b3AABB b3SoftBodyTriangleShape::ComputeAABB() const
 void b3SoftBodyTriangleShape::Synchronize(const b3Vec3& displacement)
 {
 	b3AABB aabb = ComputeAABB();
-	m_body->m_trianglesBroadphase.MoveProxy(m_proxyId, aabb, displacement);
-}
-
-void b3SoftBodyTriangleShape::TouchProxy()
-{
-	m_body->m_trianglesBroadphase.TouchProxy(m_proxyId);
+	m_body->m_tree.MoveProxy(m_proxyId, aabb, displacement);
 }
 
 bool b3SoftBodyTriangleShape::RayCast(b3RayCastOutput* output, const b3RayCastInput& input) const
 {
-	// Put the ray into the triangle's frame of reference.
-	//b3Vec3 p1 = b3MulT(xf, input.p1);
-	//b3Vec3 p2 = b3MulT(xf, input.p2);
 	b3Vec3 p1 = input.p1;
 	b3Vec3 p2 = input.p2;
 	scalar maxFraction = input.maxFraction;

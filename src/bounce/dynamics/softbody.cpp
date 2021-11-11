@@ -47,6 +47,7 @@ b3SoftBodyParticle* b3SoftBody::CreateParticle(const b3SoftBodyParticleDef& def)
 	void* mem = m_blockAllocator.Allocate(sizeof(b3SoftBodyParticle));
 	b3SoftBodyParticle* p = new(mem) b3SoftBodyParticle(def, this);
 
+	// Add to body list.
 	m_particleList.PushFront(p);
 
 	return p;
@@ -54,10 +55,12 @@ b3SoftBodyParticle* b3SoftBody::CreateParticle(const b3SoftBodyParticleDef& def)
 
 void b3SoftBody::DestroyParticle(b3SoftBodyParticle* particle)
 {
+	// Delete the attached objects.
 	particle->DestroyShapes();
 	particle->DestroyForces();
 	particle->DestroyContacts();
 
+	// Remove from body list.
 	m_particleList.Remove(particle);
 	
 	particle->~b3SoftBodyParticle();
@@ -66,7 +69,6 @@ void b3SoftBody::DestroyParticle(b3SoftBodyParticle* particle)
 
 b3SoftBodySphereShape* b3SoftBody::CreateSphereShape(const b3SoftBodySphereShapeDef& def)
 {
-#if 0
 	// Check if the shape exists.
 	for (b3SoftBodySphereShape* s = m_sphereShapeList.m_head; s; s = s->m_next)
 	{
@@ -75,14 +77,11 @@ b3SoftBodySphereShape* b3SoftBody::CreateSphereShape(const b3SoftBodySphereShape
 			return s;
 		}
 	}
-#endif
+	
 	void* mem = m_blockAllocator.Allocate(sizeof(b3SoftBodySphereShape));
 	b3SoftBodySphereShape* s = new (mem)b3SoftBodySphereShape(def, this);
-	s->m_radius = def.radius;
-	s->m_friction = def.friction;
-	s->m_density = def.density;
-	s->m_meshIndex = def.meshIndex;
-
+	
+	// Add to body list.
 	m_sphereShapeList.PushFront(s);
 
 	return s;
@@ -90,24 +89,20 @@ b3SoftBodySphereShape* b3SoftBody::CreateSphereShape(const b3SoftBodySphereShape
 
 void b3SoftBody::DestroySphereShape(b3SoftBodySphereShape* shape)
 {
-	// Destroy contacts
+	// Destroy attached objects.
 	shape->DestroyContacts();
 
 	// Remove from body list.
 	m_sphereShapeList.Remove(shape);
 	
-	// Free memory.
 	shape->~b3SoftBodySphereShape();
 	m_blockAllocator.Free(shape, sizeof(b3SoftBodySphereShape));
 }
 
 b3SoftBodyTriangleShape* b3SoftBody::CreateTriangleShape(const b3SoftBodyTriangleShapeDef& def)
 {
-#if 0
-	b3SoftBodyParticle * p1 = def.p1;
-	b3SoftBodyParticle* p2 = def.p2;
-	b3SoftBodyParticle* p3 = def.p3;
-
+	// Check if the shape exists.
+	b3SoftBodyParticle * p1 = def.p1, * p2 = def.p2, * p3 = def.p3;
 	for (b3SoftBodyTriangleShape* t = m_triangleShapeList.m_head; t; t = t->m_next)
 	{
 		bool hasP1 = t->m_p1 == p1 || t->m_p2 == p1 || t->m_p3 == p1;
@@ -119,18 +114,15 @@ b3SoftBodyTriangleShape* b3SoftBody::CreateTriangleShape(const b3SoftBodyTriangl
 			return t;
 		}
 	}
-#endif
+	
 	void* mem = m_blockAllocator.Allocate(sizeof(b3SoftBodyTriangleShape));
 	b3SoftBodyTriangleShape* t = new (mem)b3SoftBodyTriangleShape(def, this);
 
-	t->m_radius = def.radius;
-	t->m_friction = def.friction;
-	t->m_density = def.density;
-	t->m_meshIndex = def.meshIndex;
-
+	// Create broadphase proxy.
 	b3AABB aabb = t->ComputeAABB();
-	t->m_proxyId = m_trianglesBroadphase.CreateProxy(aabb, t);
+	t->m_proxyId = m_tree.CreateProxy(aabb, t);
 
+	// Add to body list.
 	m_triangleShapeList.PushFront(t);
 
 	// Reset the body mass
@@ -141,11 +133,12 @@ b3SoftBodyTriangleShape* b3SoftBody::CreateTriangleShape(const b3SoftBodyTriangl
 
 void b3SoftBody::DestroyTriangleShape(b3SoftBodyTriangleShape* shape)
 {
-	// Destroy broadphase proxy
-	m_trianglesBroadphase.DestroyProxy(shape->m_proxyId);
+	// Destroy broadphase proxy.
+	m_tree.DestroyProxy(shape->m_proxyId);
 
-	// Destroy memory
+	// Remove from body list.
 	m_triangleShapeList.Remove(shape);
+	
 	shape->~b3SoftBodyTriangleShape();
 	m_blockAllocator.Free(shape, sizeof(b3SoftBodyTriangleShape));
 
@@ -155,12 +148,8 @@ void b3SoftBody::DestroyTriangleShape(b3SoftBodyTriangleShape* shape)
 
 b3SoftBodyTetrahedronShape* b3SoftBody::CreateTetrahedronShape(const b3SoftBodyTetrahedronShapeDef& def)
 {
-#if 0
-	b3SoftBodyParticle * p1 = def.p1;
-	b3SoftBodyParticle* p2 = def.p2;
-	b3SoftBodyParticle* p3 = def.p3;
-	b3SoftBodyParticle* p4 = def.p4;
-
+	// Check if the shape exists.
+	b3SoftBodyParticle * p1 = def.p1, * p2 = def.p2, * p3 = def.p3, * p4 = def.p4;
 	for (b3SoftBodyTetrahedronShape* t = m_tetrahedronShapeList.m_head; t; t = t->m_next)
 	{
 		bool hasP1 = t->m_p1 == p1 || t->m_p2 == p1 || t->m_p3 == p1 || t->m_p4 == p1;
@@ -173,18 +162,14 @@ b3SoftBodyTetrahedronShape* b3SoftBody::CreateTetrahedronShape(const b3SoftBodyT
 			return t;
 		}
 	}
-#endif
+
 	void* mem = m_blockAllocator.Allocate(sizeof(b3SoftBodyTetrahedronShape));
 	b3SoftBodyTetrahedronShape* t = new (mem)b3SoftBodyTetrahedronShape(def, this);
 
-	t->m_radius = def.radius;
-	t->m_friction = def.friction;
-	t->m_density = def.density;
-	t->m_meshIndex = def.meshIndex;
-
+	// Add to body list.
 	m_tetrahedronShapeList.PushFront(t);
 
-	// Reset the body mass
+	// Reset the body mass.
 	ResetMass();
 
 	return t;
@@ -192,8 +177,9 @@ b3SoftBodyTetrahedronShape* b3SoftBody::CreateTetrahedronShape(const b3SoftBodyT
 
 void b3SoftBody::DestroyTetrahedronShape(b3SoftBodyTetrahedronShape* shape)
 {
-	// Destroy memory
+	// Remove from body list.
 	m_tetrahedronShapeList.Remove(shape);
+	
 	shape->~b3SoftBodyTetrahedronShape();
 	m_blockAllocator.Free(shape, sizeof(b3SoftBodyTetrahedronShape));
 
@@ -216,12 +202,11 @@ void b3SoftBody::DestroyForce(b3SoftBodyForce* force)
 
 b3SoftBodyWorldShape* b3SoftBody::CreateWorldShape(const b3SoftBodyWorldShapeDef& def)
 {
-	// Create
 	void* mem = m_blockAllocator.Allocate(sizeof(b3SoftBodyWorldShape));
 	b3SoftBodyWorldShape* shape = new (mem) b3SoftBodyWorldShape;
 	shape->Create(&m_blockAllocator, this, def);
 
-	// Push to the body list
+	// Add to the body list
 	m_worldShapeList.PushFront(shape);
 
 	return shape;
@@ -229,13 +214,12 @@ b3SoftBodyWorldShape* b3SoftBody::CreateWorldShape(const b3SoftBodyWorldShapeDef
 
 void b3SoftBody::DestroyWorldShape(b3SoftBodyWorldShape* shape)
 {
-	// Destroy contacts
+	// Destroy attached contacts.
 	shape->DestroyContacts();
 
-	// Remove from the body list
+	// Remove from the body list.
 	m_worldShapeList.Remove(shape);
 
-	// Destroy memory
 	shape->Destroy(&m_blockAllocator);
 	shape->~b3SoftBodyWorldShape();
 	m_blockAllocator.Free(shape, sizeof(b3SoftBodyWorldShape));
@@ -327,7 +311,7 @@ struct b3SoftBodyRayCastSingleWrapper
 	scalar Report(const b3RayCastInput& input, u32 proxyId)
 	{
 		// Get shape associated with the proxy.
-		void* userData = broadPhase->GetUserData(proxyId);
+		void* userData = tree->GetUserData(proxyId);
 		b3SoftBodyTriangleShape* triangleShape = (b3SoftBodyTriangleShape*)userData;
 
 		b3RayCastOutput subOutput;
@@ -346,7 +330,7 @@ struct b3SoftBodyRayCastSingleWrapper
 		return input.maxFraction;
 	}
 
-	const b3BroadPhase* broadPhase;
+	const b3DynamicTree* tree;
 	b3SoftBodyTriangleShape* triangle0;
 	b3RayCastOutput output0;
 };
@@ -354,7 +338,7 @@ struct b3SoftBodyRayCastSingleWrapper
 bool b3SoftBody::RayCastSingle(b3SoftBodyRayCastSingleOutput* output, const b3Vec3& p1, const b3Vec3& p2) const
 {
 	b3SoftBodyRayCastSingleWrapper wrapper;
-	wrapper.broadPhase = &m_trianglesBroadphase;
+	wrapper.tree = &m_tree;
 	wrapper.triangle0 = nullptr;
 	wrapper.output0.fraction = B3_MAX_SCALAR;
 	
@@ -363,7 +347,7 @@ bool b3SoftBody::RayCastSingle(b3SoftBodyRayCastSingleOutput* output, const b3Ve
 	input.p2 = p2;
 	input.maxFraction = scalar(1);
 
-	m_trianglesBroadphase.RayCast(&wrapper, input);
+	m_tree.RayCast(&wrapper, input);
 
 	if (wrapper.triangle0 != nullptr)
 	{

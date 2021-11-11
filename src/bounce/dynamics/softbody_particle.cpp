@@ -17,9 +17,9 @@
 */
 
 #include <bounce/dynamics/softbody_particle.h>
+#include <bounce/dynamics/softbody.h>
 #include <bounce/dynamics/shapes/softbody_sphere_shape.h>
 #include <bounce/dynamics/shapes/softbody_triangle_shape.h>
-#include <bounce/dynamics/softbody.h>
 #include <bounce/dynamics/forces/softbody_force.h>
 #include <bounce/sparse/sparse_force_solver.h>
 #include <bounce/sparse/dense_vec3.h>
@@ -48,11 +48,6 @@ b3SoftBodyParticle::b3SoftBodyParticle(const b3SoftBodyParticleDef& def, b3SoftB
 
 	m_meshIndex = def.meshIndex;
 	m_userData = def.userData;
-}
-
-b3SoftBodyParticle::~b3SoftBodyParticle()
-{
-
 }
 
 void b3SoftBodyParticle::SetType(b3SoftBodyParticleType type)
@@ -84,9 +79,6 @@ void b3SoftBodyParticle::SetType(b3SoftBodyParticleType type)
 	}
 
 	DestroyContacts();
-
-	// Move the proxies so new contacts can be created.
-	TouchProxies();
 }
 
 void b3SoftBodyParticle::DestroyShapes()
@@ -163,18 +155,6 @@ void b3SoftBodyParticle::SynchronizeShapes()
 		if (t->m_p1 == this || t->m_p2 == this || t->m_p3 == this)
 		{
 			t->Synchronize(b3Vec3_zero);
-		}
-	}
-}
-
-void b3SoftBodyParticle::TouchProxies()
-{
-	// Touch triangles
-	for (b3SoftBodyTriangleShape* t = m_body->m_triangleShapeList.m_head; t; t = t->m_next)
-	{
-		if (t->m_p1 == this || t->m_p2 == this || t->m_p3 == this)
-		{
-			t->TouchProxy();
 		}
 	}
 }

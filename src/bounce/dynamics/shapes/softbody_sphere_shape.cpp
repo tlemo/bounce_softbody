@@ -20,16 +20,10 @@
 #include <bounce/dynamics/softbody_particle.h>
 #include <bounce/dynamics/softbody.h>
 
-b3SoftBodySphereShape::b3SoftBodySphereShape(const b3SoftBodySphereShapeDef& def, b3SoftBody* body)
+b3SoftBodySphereShape::b3SoftBodySphereShape(const b3SoftBodySphereShapeDef& def, b3SoftBody* body) : b3SoftBodyShape(def, body)
 {
 	m_type = e_softBodySphereShape;
-	m_body = body;
 	m_p = def.p;
-}
-
-b3SoftBodySphereShape::~b3SoftBodySphereShape()
-{
-
 }
 
 b3AABB b3SoftBodySphereShape::ComputeAABB() const
