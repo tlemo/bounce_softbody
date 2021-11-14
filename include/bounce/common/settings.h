@@ -79,7 +79,7 @@ typedef double scalar64;
 // Damping stiffness for the contact normal force.
 #define B3_CONTACT_DAMPING_STIFFNESS scalar(0.0)
 
-// The maximum position error used when solving contact forces. 
+// The maximum position error used when computing contact forces. 
 // This helps to prevent large forces.
 #define B3_MAX_CONTACT_LINEAR_CORRECTION scalar(0.1)
 
