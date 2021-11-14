@@ -27,6 +27,7 @@ class b3StackAllocator;
 
 class b3SoftBodyParticle;
 class b3SoftBodyForce;
+class b3SoftBodySphereAndShapeContact;
 
 struct b3SoftBodyForceSolverDef
 {
@@ -36,6 +37,8 @@ struct b3SoftBodyForceSolverDef
 	b3SoftBodyParticle** particles;
 	u32 forceCount;
 	b3SoftBodyForce** forces;
+	b3SoftBodySphereAndShapeContact** shapeContacts;
+	u32 shapeContactCount;
 };
 
 class b3SoftBodyForceSolver
@@ -55,6 +58,9 @@ private:
 
 	u32 m_forceCount;
 	b3SoftBodyForce** m_forces;
+
+	b3SoftBodySphereAndShapeContact** m_shapeContacts;
+	u32 m_shapeContactCount;
 };
 
 #endif

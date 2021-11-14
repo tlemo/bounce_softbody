@@ -28,6 +28,8 @@ class b3BlockAllocator;
 class b3SoftBodySphereShape;
 class b3SoftBodyWorldShape;
 
+struct b3SparseForceSolverData;
+
 // A contact between a sphere and a shape.
 class b3SoftBodySphereAndShapeContact
 {
@@ -38,30 +40,15 @@ public:
 	b3SoftBodySphereAndShapeContact(b3SoftBodySphereShape* shape1, b3SoftBodyWorldShape* shape2);
 
 	void Update();
+	
+	void ComputeForces(const b3SparseForceSolverData* data);
 
 	b3SoftBodySphereShape* m_s1;
 	b3SoftBodyWorldShape* m_s2;
-
-	bool m_active;
-	
-	b3Vec3 m_normal2;
-	b3Vec3 m_point2;
-	scalar m_normalImpulse;
-
 	b3Vec3 m_tangent1, m_tangent2;
-	b3Vec2 m_tangentImpulse;
-
+	bool m_active;
 	b3SoftBodySphereAndShapeContact* m_prev;
 	b3SoftBodySphereAndShapeContact* m_next;
-};
-
-struct b3SoftBodySphereAndShapeContactWorldPoint
-{
-	void Initialize(const b3SoftBodySphereAndShapeContact* c, scalar rA, const b3Vec3& cA, scalar rB);
-
-	b3Vec3 point;
-	b3Vec3 normal;
-	scalar separation;
 };
 
 #endif

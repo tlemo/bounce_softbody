@@ -18,7 +18,7 @@
 
 #include <bounce/dynamics/softbody_solver.h>
 #include <bounce/dynamics/softbody_force_solver.h>
-#include <bounce/dynamics/contacts/softbody_contact_solver.h>
+#include <bounce/dynamics/softbody_friction_solver.h>
 #include <bounce/dynamics/softbody.h>
 #include <bounce/dynamics/softbody_time_step.h>
 #include <bounce/dynamics/softbody_particle.h>
@@ -67,7 +67,7 @@ void b3SoftBodySolver::Add(b3SoftBodySphereAndShapeContact* c)
 void b3SoftBodySolver::Solve(const b3SoftBodyTimeStep& step, const b3Vec3& gravity)
 {
 	{
-		// Solve internal dynamics
+		// Solve internal dynamics.
 		b3SoftBodyForceSolverDef forceSolverDef;
 		forceSolverDef.step = step;
 		forceSolverDef.stack = m_stack;
@@ -75,87 +75,30 @@ void b3SoftBodySolver::Solve(const b3SoftBodyTimeStep& step, const b3Vec3& gravi
 		forceSolverDef.particles = m_particles;
 		forceSolverDef.forceCount = m_forceCount;
 		forceSolverDef.forces = m_forces;
+		forceSolverDef.shapeContactCount = m_shapeContactCount;
+		forceSolverDef.shapeContacts = m_shapeContacts;
 
 		b3SoftBodyForceSolver forceSolver(forceSolverDef);
 
 		forceSolver.Solve(gravity);
 	}
-	
-	// Copy particle state to state buffer
-	b3Vec3* positions = (b3Vec3*)m_stack->Allocate(m_particleCount * sizeof(b3Vec3));
-	b3Vec3* velocities = (b3Vec3*)m_stack->Allocate(m_particleCount * sizeof(b3Vec3));
-	for (u32 i = 0; i < m_particleCount; ++i)
-	{
-		positions[i] = m_particles[i]->m_position;
-		velocities[i] = m_particles[i]->m_velocity;
-	}
 
 	{
-		// Solve constraints
-		b3SoftBodyContactSolverDef contactSolverDef;
-		contactSolverDef.step = step;
-		contactSolverDef.allocator = m_stack;
-		contactSolverDef.positions = positions;
-		contactSolverDef.velocities = velocities;
-		contactSolverDef.shapeContactCount = m_shapeContactCount;
-		contactSolverDef.shapeContacts = m_shapeContacts;
+		// Solve friction constraints.
+		b3SoftBodyFrictionSolverDef frictionSolverDef;
+		frictionSolverDef.step = step;
+		frictionSolverDef.shapeContactCount = m_shapeContactCount;
+		frictionSolverDef.shapeContacts = m_shapeContacts;
 		
-		b3SoftBodyContactSolver contactSolver(contactSolverDef);
+		b3SoftBodyFrictionSolver frictionSolver(frictionSolverDef);
 
-		{
-			// Initialize constraints
-			contactSolver.InitializeShapeContactConstraints();
-		}
-
-		{
-			// Warm start velocity constraints
-			contactSolver.WarmStartShapeContactConstraints();
-		}
-
-		{
-			// Solve velocity constraints
-			for (u32 i = 0; i < step.velocityIterations; ++i)
-			{
-				contactSolver.SolveShapeContactVelocityConstraints();
-			}
-		}
-
-		{
-			// Cache impulses for warm-starting
-			contactSolver.StoreImpulses();
-		}
-
-		// Integrate positions
-		scalar h = step.dt;
-		for (u32 i = 0; i < m_particleCount; ++i)
-		{
-			positions[i] += h * velocities[i];
-		}
-
-		{
-			// Solve position constraints
-			bool positionSolved = false;
-			for (u32 i = 0; i < step.positionIterations; ++i)
-			{
-				bool shapeContactsSolved = contactSolver.SolveShapeContactPositionConstraints();
-				
-				if (shapeContactsSolved)
-				{
-					// Early out if the position errors are small.
-					positionSolved = true;
-					break;
-				}
-			}
-		}
+		frictionSolver.Solve();
 	}
 
-	// Copy state buffers back to the particles
+	// Integrate positions.
+	scalar h = step.dt;
 	for (u32 i = 0; i < m_particleCount; ++i)
 	{
-		m_particles[i]->m_position = positions[i];
-		m_particles[i]->m_velocity = velocities[i];
+		m_particles[i]->m_position += h * m_particles[i]->m_velocity;
 	}
-
-	m_stack->Free(velocities);
-	m_stack->Free(positions);
 }

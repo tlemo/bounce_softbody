@@ -29,7 +29,7 @@ class b3BlockAllocator;
 class b3SoftBodyContactManager
 {
 public:
-	void AddContact(b3SoftBodySphereShape* shape1, b3SoftBodyWorldShape* shape2);
+	void AddPair(b3SoftBodySphereShape* shape1, b3SoftBodyWorldShape* shape2);
 	void FindNewContacts();
 	void UpdateContacts();
 
@@ -37,7 +37,7 @@ public:
 
 	b3SoftBody* m_body;
 	b3BlockAllocator* m_allocator;
-	b3List<b3SoftBodySphereAndShapeContact> m_sphereAndShapeContactList;
+	b3List<b3SoftBodySphereAndShapeContact> m_shapeContactList;
 };
 
 #endif

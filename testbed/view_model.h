@@ -75,9 +75,6 @@ struct TestSettings
 		inv_hertz = 1.0f / hertz;
 		forceIterations = 1;
 		forceSubIterations = 30;
-		velocityIterations = 8;
-		positionIterations = 2;
-		warmStart = true;
 		pause = true;
 		singlePlay = false;
 	}
@@ -85,9 +82,6 @@ struct TestSettings
 	float hertz, inv_hertz;
 	int forceIterations;
 	int forceSubIterations;
-	int velocityIterations;
-	int positionIterations;
-	bool warmStart;
 	bool pause;
 	bool singlePlay;
 };

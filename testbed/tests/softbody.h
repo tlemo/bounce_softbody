@@ -43,8 +43,6 @@ public:
 		Test::Step();
 
 		m_body->Step(g_testSettings->inv_hertz,
-			g_testSettings->velocityIterations,
-			g_testSettings->positionIterations,
 			g_testSettings->forceIterations,
 			g_testSettings->forceSubIterations);
 		

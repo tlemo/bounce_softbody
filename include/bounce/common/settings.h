@@ -68,23 +68,20 @@ typedef double scalar64;
 // This is a dimensionless multiplier.
 #define B3_AABB_MULTIPLIER scalar(2)
 
-// Collision and constraint tolerance.
-#define B3_LINEAR_SLOP scalar(0.005)
-#define B3_ANGULAR_SLOP (scalar(2.0) / scalar(180) * B3_PI)
-
-// The maximum position correction used when solving constraints. This helps to
-// prevent overshoot.
-#define B3_MAX_LINEAR_CORRECTION scalar(0.2)
-
 // Maximum translation per step to prevent numerical instability 
 // due to large linear velocity.
 #define B3_MAX_TRANSLATION scalar(2.0)
 #define B3_MAX_TRANSLATION_SQUARED (B3_MAX_TRANSLATION * B3_MAX_TRANSLATION)
 
-// This controls how faster overlaps should be resolved per step.
-// This is less than and would be close to 1, so that the all overlap is resolved per step.
-// However values very close to 1 may lead to overshoot.
-#define B3_BAUMGARTE scalar(0.1)
+// Stiffness for the contact normal force.
+#define B3_CONTACT_STIFFNESS scalar(1000.0)
+
+// Damping stiffness for the contact normal force.
+#define B3_CONTACT_DAMPING_STIFFNESS scalar(0.0)
+
+// The maximum position error used when solving contact forces. 
+// This helps to prevent large forces.
+#define B3_MAX_CONTACT_LINEAR_CORRECTION scalar(0.1)
 
 // Memory
 

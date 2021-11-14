@@ -32,6 +32,7 @@ b3SoftBodyParticle::b3SoftBodyParticle(const b3SoftBodyParticleDef& def, b3SoftB
 	m_position = def.position;
 	m_velocity = def.velocity;
 	m_force.SetZero();
+	m_normalForce.SetZero();
 	m_translation.SetZero();
 	m_massDamping = def.massDamping;
 
@@ -132,7 +133,7 @@ void b3SoftBodyParticle::DestroyForces()
 void b3SoftBodyParticle::DestroyContacts()
 {
 	// Destroy shape contacts
-	b3SoftBodySphereAndShapeContact* c = m_body->m_contactManager.m_sphereAndShapeContactList.m_head;
+	b3SoftBodySphereAndShapeContact* c = m_body->m_contactManager.m_shapeContactList.m_head;
 	while (c)
 	{
 		if (c->m_s1->m_p == this)

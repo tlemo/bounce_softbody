@@ -16,41 +16,41 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef TABLE_CLOTH_H
-#define TABLE_CLOTH_H
+#ifndef B3_SOFTBODY_FRICTION_SOLVER_H
+#define B3_SOFTBODY_FRICTION_SOLVER_H
 
-class TableCloth : public SoftBody
+#include <bounce/common/math/mat22.h>
+#include <bounce/common/math/mat33.h>
+#include <bounce/dynamics/softbody_time_step.h>
+
+class b3StackAllocator;
+class b3SoftBodyParticle;
+class b3SoftBodySphereAndShapeContact;
+
+struct b3SoftBodyFrictionSolverDef
+{
+	b3SoftBodyTimeStep step;
+	u32 shapeContactCount;
+	b3SoftBodySphereAndShapeContact** shapeContacts;
+};
+
+// Mixed friction law.
+inline scalar b3MixFriction(scalar u1, scalar u2)
+{
+	return b3Sqrt(u1 * u2);
+}
+
+class b3SoftBodyFrictionSolver
 {
 public:
-	TableCloth()
-	{
-		m_mesh.Translate(b3Vec3(0.0f, 10.0f, 0.0f));
-		
-		ClothDef def;
-		def.mesh = &m_mesh;
-		m_body = new UniformSoftBody(def);
-		
-		b3BoxShape boxShape;
-		boxShape.m_extents.Set(3.0f, 3.0f, 4.0f);
-		boxShape.m_radius = 0.2f;
-
-		b3SoftBodyWorldShapeDef boxShapeDef;
-		boxShapeDef.shape = &boxShape;
-		boxShapeDef.friction = 0.5f;
-		
-		m_body->CreateWorldShape(boxShapeDef);
-		
-		m_body->SetGravity(b3Vec3(0.0f, -9.8f, 0.0f));
-
-		m_bodyDragger = new SoftBodyDragger(&m_ray, m_body);
-	}
-
-	static Test* Create()
-	{
-		return new TableCloth;
-	}
-
-	GridClothMesh<10, 10> m_mesh;
+	b3SoftBodyFrictionSolver(const b3SoftBodyFrictionSolverDef& def);
+	
+	void Solve();
+protected:
+	b3SoftBodyTimeStep m_step;
+	b3StackAllocator* m_allocator;
+	u32 m_shapeContactCount;
+	b3SoftBodySphereAndShapeContact** m_shapeContacts;
 };
 
 #endif

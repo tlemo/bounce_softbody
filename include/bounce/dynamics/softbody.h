@@ -126,7 +126,7 @@ public:
 	b3Vec3 GetGravity() const;
 
 	// Perform a time step. 
-	void Step(scalar dt, u32 velocityIterations, u32 positionIterations, u32 forceIterations, u32 forceSubIterations);
+	void Step(scalar dt, u32 forceIterations, u32 forceSubIterations);
 
 	// Perform a ray cast with the body.
 	bool RayCastSingle(b3SoftBodyRayCastSingleOutput* output, const b3Vec3& p1, const b3Vec3& p2) const;
@@ -184,7 +184,7 @@ protected:
 	// Contact manager
 	b3SoftBodyContactManager m_contactManager;
 
-	// Dynamic tree for triangles.
+	// Dynamic tree.
 	b3DynamicTree m_tree;
 
 	// Used to compute the time step ratio to 

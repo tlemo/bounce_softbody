@@ -23,6 +23,9 @@
 
 #include "test.h"
 #include "tests/softbody.h"
+#include "tests/sphere_contact.h"
+#include "tests/capsule_contact.h"
+#include "tests/box_contact.h"
 #include "tests/pinned_cloth.h"
 #include "tests/particle_types.h"
 #include "tests/stretch_mapping.h"
@@ -31,7 +34,6 @@
 #include "tests/sheet.h"
 #include "tests/node_types.h"
 #include "tests/plastic_softbody.h"
-#include "tests/table_cloth.h"
 
 TestSettings* g_testSettings = nullptr;
 Settings* g_settings = nullptr;
@@ -42,6 +44,9 @@ ViewModel::ViewModel(Model* model, GLFWwindow* window)
 	m_window = window;
 	m_ps0.SetZero();
 
+	m_settings.RegisterTest("Sphere Contact", &SphereContact::Create);
+	m_settings.RegisterTest("Capsule Contact", &CapsuleContact::Create);
+	m_settings.RegisterTest("Box Contact", &BoxContact::Create);
 	m_settings.RegisterTest("Pinned Cloth", &PinnedCloth::Create );
 	m_settings.RegisterTest("Particle Types", &ParticleTypes::Create);
 	m_settings.RegisterTest("Stretch Mapping", &StretchMapping::Create);
@@ -50,7 +55,6 @@ ViewModel::ViewModel(Model* model, GLFWwindow* window)
 	m_settings.RegisterTest("Sheet", &Sheet::Create);
 	m_settings.RegisterTest("Node Types", &NodeTypes::Create);
 	m_settings.RegisterTest("Plastic Soft Body", &PlasticSoftBody::Create);
-	m_settings.RegisterTest("Table Cloth", &TableCloth::Create);
 
 	g_settings = &m_settings;
 	g_testSettings = &m_testSettings;

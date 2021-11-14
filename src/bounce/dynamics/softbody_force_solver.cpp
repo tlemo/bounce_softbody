@@ -19,6 +19,7 @@
 #include <bounce/dynamics/softbody_force_solver.h>
 #include <bounce/dynamics/softbody_particle.h>
 #include <bounce/dynamics/forces/softbody_force.h>
+#include <bounce/dynamics/contacts/softbody_sphere_shape_contact.h>
 #include <bounce/sparse/sparse_force_solver.h>
 #include <bounce/sparse/dense_vec3.h>
 #include <bounce/sparse/diag_mat33.h>
@@ -42,6 +43,9 @@ b3SoftBodyForceSolver::b3SoftBodyForceSolver(const b3SoftBodyForceSolverDef& def
 
 	m_forceCount = def.forceCount;
 	m_forces = def.forces;
+
+	m_shapeContactCount = def.shapeContactCount;
+	m_shapeContacts = def.shapeContacts;
 }
 
 b3SoftBodyForceSolver::~b3SoftBodyForceSolver()
@@ -62,6 +66,11 @@ public:
 		{
 			m_forces[i]->ComputeForces(data);
 		}
+
+		for (u32 i = 0; i < m_shapeContactCount; ++i)
+		{
+			m_shapeContacts[i]->ComputeForces(data);
+		}
 	}
 
 	u32 m_particleCount;
@@ -69,6 +78,9 @@ public:
 
 	u32 m_forceCount;
 	b3SoftBodyForce** m_forces;
+
+	b3SoftBodySphereAndShapeContact** m_shapeContacts;
+	u32 m_shapeContactCount;
 };
 
 void b3SoftBodyForceSolver::Solve(const b3Vec3& gravity)
@@ -128,6 +140,8 @@ void b3SoftBodyForceSolver::Solve(const b3Vec3& gravity)
 	forceModel.m_particles = m_particles;
 	forceModel.m_forceCount = m_forceCount;
 	forceModel.m_forces = m_forces;
+	forceModel.m_shapeContactCount = m_shapeContactCount;
+	forceModel.m_shapeContacts = m_shapeContacts;
 
 	// Prepare input.
 	b3SolveBEInput solverInput;

@@ -37,7 +37,7 @@ void b3SoftBodyWorldShape::Destroy(b3BlockAllocator* allocator)
 
 void b3SoftBodyWorldShape::DestroyContacts()
 {
-	b3SoftBodySphereAndShapeContact* c = m_body->m_contactManager.m_sphereAndShapeContactList.m_head;
+	b3SoftBodySphereAndShapeContact* c = m_body->m_contactManager.m_shapeContactList.m_head;
 	while (c)
 	{
 		b3SoftBodySphereAndShapeContact* c0 = c;

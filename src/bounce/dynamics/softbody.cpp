@@ -118,7 +118,7 @@ b3SoftBodyTriangleShape* b3SoftBody::CreateTriangleShape(const b3SoftBodyTriangl
 	void* mem = m_blockAllocator.Allocate(sizeof(b3SoftBodyTriangleShape));
 	b3SoftBodyTriangleShape* t = new (mem)b3SoftBodyTriangleShape(def, this);
 
-	// Create broadphase proxy.
+	// Create tree proxy.
 	b3AABB aabb = t->ComputeAABB();
 	t->m_proxyId = m_tree.CreateProxy(aabb, t);
 
@@ -133,7 +133,7 @@ b3SoftBodyTriangleShape* b3SoftBody::CreateTriangleShape(const b3SoftBodyTriangl
 
 void b3SoftBody::DestroyTriangleShape(b3SoftBodyTriangleShape* shape)
 {
-	// Destroy broadphase proxy.
+	// Destroy tree proxy.
 	m_tree.DestroyProxy(shape->m_proxyId);
 
 	// Remove from body list.
@@ -363,12 +363,11 @@ bool b3SoftBody::RayCastSingle(b3SoftBodyRayCastSingleOutput* output, const b3Ve
 
 void b3SoftBody::Solve(const b3SoftBodyTimeStep& step)
 {
-	// Solve
 	b3SoftBodySolverDef solverDef;
 	solverDef.stack = &m_stackAllocator;
 	solverDef.particleCapacity = m_particleList.m_count;
 	solverDef.forceCapacity = m_forceList.m_count;
-	solverDef.shapeContactCapacity = m_contactManager.m_sphereAndShapeContactList.m_count;
+	solverDef.shapeContactCapacity = m_contactManager.m_shapeContactList.m_count;
 	
 	b3SoftBodySolver solver(solverDef);
 
@@ -382,7 +381,7 @@ void b3SoftBody::Solve(const b3SoftBodyTimeStep& step)
 		solver.Add(f);
 	}
 
-	for (b3SoftBodySphereAndShapeContact* c = m_contactManager.m_sphereAndShapeContactList.m_head; c; c = c->m_next)
+	for (b3SoftBodySphereAndShapeContact* c = m_contactManager.m_shapeContactList.m_head; c; c = c->m_next)
 	{
 		if (c->m_active)
 		{
@@ -390,17 +389,15 @@ void b3SoftBody::Solve(const b3SoftBodyTimeStep& step)
 		}
 	}
 
-	// Solve	
+	// Solve
 	solver.Solve(step, m_gravity);
 }
 
-void b3SoftBody::Step(scalar dt, u32 velocityIterations, u32 positionIterations, u32 forceIterations, u32 forceSubIterations)
+void b3SoftBody::Step(scalar dt, u32 forceIterations, u32 forceSubIterations)
 {
 	// Time step parameters
 	b3SoftBodyTimeStep step;
 	step.dt = dt;
-	step.velocityIterations = velocityIterations;
-	step.positionIterations = positionIterations;
 	step.forceIterations = forceIterations;
 	step.forceSubIterations = forceSubIterations;
 	step.inv_dt = dt > scalar(0) ? scalar(1) / dt : scalar(0);
@@ -420,10 +417,11 @@ void b3SoftBody::Step(scalar dt, u32 velocityIterations, u32 positionIterations,
 		m_inv_dt0 = step.inv_dt;
 	}
 
-	// Clear external applied forces and translations
+	// Clear forces and translations
 	for (b3SoftBodyParticle* p = m_particleList.m_head; p; p = p->m_next)
 	{
 		p->m_force.SetZero();
+		p->m_normalForce.SetZero();
 		p->m_translation.SetZero();
 	}
 

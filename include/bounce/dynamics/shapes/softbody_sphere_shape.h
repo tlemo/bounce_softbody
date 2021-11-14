@@ -45,10 +45,9 @@ private:
 	friend class b3SoftBody;
 	friend class b3SoftBodyParticle;
 	friend class b3SoftBodyContactManager;
-	friend class b3SoftBodySphereAndTriangleContact;
 	friend class b3SoftBodySphereAndShapeContact;
 	friend class b3SoftBodySolver;
-	friend class b3SoftBodyContactSolver;
+	friend class b3SoftBodyFrictionSolver;
 	friend class b3List<b3SoftBodySphereShape>;
 
 	b3SoftBodySphereShape(const b3SoftBodySphereShapeDef& def, b3SoftBody* body);

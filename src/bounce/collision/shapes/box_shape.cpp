@@ -55,7 +55,6 @@ b3AABB b3BoxShape::ComputeAABB() const
 
 	b3AABB aabb;
 	aabb.Set(vertices, 8, m_xf);
-	
 	aabb.Extend(m_radius);
 
 	return aabb;
@@ -118,17 +117,20 @@ bool b3BoxShape::CollideSphere(b3SphereManifold* manifold, const b3Sphere& spher
 
 	// Closest point on box to sphere center
 	b3Vec3 cBox = b3Clamp(cLocal, -e, e);
+	
+	b3Vec3 d = cLocal - cBox;
 
-	scalar distance = b3Length(cLocal - cBox);
+	scalar dd = b3LengthSquared(d);
 
-	if (distance > radius)
+	if (dd > radius * radius)
 	{
 		return false;
 	}
 
-	if (distance > scalar(0))
+	if (dd > B3_EPSILON * B3_EPSILON)
 	{
-		b3Vec3 normal = (cLocal - cBox) / distance;
+		scalar distance = b3Sqrt(dd);
+		b3Vec3 normal = d / distance;
 
 		manifold->point = b3Mul(m_xf, cBox);
 		manifold->normal = b3Mul(m_xf.rotation, normal);

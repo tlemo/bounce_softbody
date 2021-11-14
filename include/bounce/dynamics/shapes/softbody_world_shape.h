@@ -77,7 +77,7 @@ private:
 	friend class b3SoftBody;
 	friend class b3SoftBodyContactManager;
 	friend class b3SoftBodySphereAndShapeContact;
-	friend class b3SoftBodyContactSolver;
+	friend class b3SoftBodyFrictionSolver;
 	friend class b3List<b3SoftBodyWorldShape>;
 
 	// Ctor.

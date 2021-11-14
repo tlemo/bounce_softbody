@@ -330,14 +330,6 @@ void View::Interface()
 	ImGui::Text("Force Sub-iterations");
 	ImGui::SliderInt("##Force Sub-iterations", &testSettings.forceSubIterations, 0, 50);
 
-	ImGui::Text("Velocity Iterations");
-	ImGui::SliderInt("##Velocity Iterations", &testSettings.velocityIterations, 0, 50);
-
-	ImGui::Text("Position Iterations");
-	ImGui::SliderInt("##Position Iterations", &testSettings.positionIterations, 0, 50);
-
-	ImGui::Checkbox("Warm Start", &testSettings.warmStart);
-
 	if (ImGui::Button("Play/Pause", buttonSize))
 	{
 		m_viewModel->Action_PlayPause();

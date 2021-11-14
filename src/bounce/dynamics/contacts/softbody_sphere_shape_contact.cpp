@@ -22,11 +22,14 @@
 #include <bounce/dynamics/softbody_particle.h>
 #include <bounce/collision/geometry/sphere.h>
 #include <bounce/common/memory/block_allocator.h>
+#include <bounce/sparse/sparse_force_solver.h>
+#include <bounce/sparse/sparse_mat33.h>
+#include <bounce/sparse/dense_vec3.h>
 
 b3SoftBodySphereAndShapeContact* b3SoftBodySphereAndShapeContact::Create(b3SoftBodySphereShape* s1, b3SoftBodyWorldShape* s2, b3BlockAllocator* allocator)
 {
 	void* mem = allocator->Allocate(sizeof(b3SoftBodySphereAndShapeContact));
-	return new(mem) b3SoftBodySphereAndShapeContact(s1, s2);	
+	return new(mem) b3SoftBodySphereAndShapeContact(s1, s2);
 }
 
 void b3SoftBodySphereAndShapeContact::Destroy(b3SoftBodySphereAndShapeContact* contact, b3BlockAllocator* allocator)
@@ -40,8 +43,6 @@ b3SoftBodySphereAndShapeContact::b3SoftBodySphereAndShapeContact(b3SoftBodySpher
 	m_s1 = s1;
 	m_s2 = s2;
 	m_active = false;
-	m_normalImpulse = scalar(0);
-	m_tangentImpulse.SetZero();
 }
 
 void b3SoftBodySphereAndShapeContact::Update()
@@ -59,21 +60,95 @@ void b3SoftBodySphereAndShapeContact::Update()
 	}
 
 	m_active = true;
-	m_normal2 = manifold.normal;
-	m_point2 = manifold.point;
-	m_tangent1 = b3Perp(m_normal2);
-	m_tangent2 = b3Cross(m_tangent1, m_normal2);
+	
+	// The friction solver uses the initial tangents.
+	m_tangent1 = b3Perp(manifold.normal);
+	m_tangent2 = b3Cross(m_tangent1, manifold.normal);
 }
 
-void b3SoftBodySphereAndShapeContactWorldPoint::Initialize(const b3SoftBodySphereAndShapeContact* c, scalar rA, const b3Vec3& cA, scalar rB)
+void b3SoftBodySphereAndShapeContact::ComputeForces(const b3SparseForceSolverData* data)
 {
-	b3Vec3 nB = c->m_normal2;
-	b3Vec3 cB = c->m_point2;
+	const b3DenseVec3& x = *data->x;
+	const b3DenseVec3& v = *data->v;
+	b3DenseVec3& f = *data->f;
+	b3SparseMat33& dfdx = *data->dfdx;
+	b3SparseMat33& dfdv = *data->dfdv;
 
-	b3Vec3 pA = cA - rA * nB;
-	b3Vec3 pB = cB + rB * nB;
+	b3SoftBodyParticle* p1 = m_s1->m_p;
+	
+	u32 i1 = p1->m_solverId;
+	
+	b3Vec3 x1 = x[i1];
+	b3Vec3 v1 = v[i1];
 
-	point = scalar(0.5) * (pA + pB);
-	normal = nB;
-	separation = b3Dot(cA - cB, nB) - rA - rB;
+	scalar r1 = m_s1->m_radius;
+	scalar r2 = m_s2->m_shape->m_radius;
+
+	b3Sphere sphere1;
+	sphere1.vertex = x1;
+	sphere1.radius = m_s1->m_radius;
+
+	// Evaluate the contact manifold.
+	b3SphereManifold manifold2;
+	if (m_s2->CollideSphere(&manifold2, sphere1) == false)
+	{
+		return;
+	}
+
+	b3Vec3 x2 = manifold2.point;
+	b3Vec3 n2 = manifold2.normal;
+
+	b3Vec3 c1 = x1 - r1 * n2;
+	b3Vec3 c2 = x2 + r2 * n2;
+
+	// Contact force based in the work:
+	// "Dynamic Deformables: Implementation and Production Practicalities".
+	
+	// There is no spring rest lenght.
+	// Therefore, there is no compression force.
+	scalar C = b3Length(c2 - c1);
+
+	// Clamp correction to prevent large forces.
+	C = b3Min(C, B3_MAX_CONTACT_LINEAR_CORRECTION);
+
+	// Force computation requires direction from shape 1 to shape 2.
+	b3Vec3 n1 = -n2;
+
+	b3Mat33 I = b3Mat33_identity;
+	
+	const scalar ks = B3_CONTACT_STIFFNESS;
+
+	if (ks > scalar(0))
+	{
+		// Spring force
+		b3Vec3 f1 = -ks * C * n1;
+
+		// Jacobian
+		b3Mat33 K11 = -ks * (b3Outer(n1, n1) + C * (I - b3Outer(n1, n1)));
+
+		// Apply
+		f[i1] += f1;
+		dfdx(i1, i1) += K11;
+
+		// Cache normal force for friction.
+		p1->m_normalForce += f1;
+	}
+	
+	// Apply damping.
+	const scalar kd = B3_CONTACT_DAMPING_STIFFNESS;
+
+	if (kd > scalar(0))
+	{
+		scalar dCdt = b3Dot(v1, n1);
+
+		// Damping force
+		b3Vec3 f1 = -kd * dCdt * n1;
+
+		// Jacobian
+		b3Mat33 K11 = -kd * b3Outer(n1, n1);
+		
+		// Apply force and Jacobian
+		f[i1] += f1;
+		dfdv(i1, i1) += K11;
+	}
 }

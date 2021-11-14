@@ -83,7 +83,7 @@ struct ClothDef
 	{
 		density = scalar(0.1);
 		massDamping = scalar(0);
-		thickness = scalar(0.02);
+		thickness = scalar(0.0);
 		friction = scalar(0.3);
 
 		stretchingStiffness = scalar(1234);

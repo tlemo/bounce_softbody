@@ -57,12 +57,12 @@ bool b3SphereShape::CollideSphere(b3SphereManifold* manifold, const b3Sphere& sp
 
 	if (dd <= rr)
 	{
-		scalar distance = b3Sqrt(dd);
-
 		manifold->point = center;
 
-		if (distance > B3_EPSILON)
+		if (dd > B3_EPSILON * B3_EPSILON)
 		{
+			scalar distance = b3Sqrt(dd);
+			
 			manifold->normal = d / distance;
 		}
 		else

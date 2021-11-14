@@ -23,10 +23,10 @@
 #include <bounce/dynamics/softbody_particle.h>
 #include <bounce/common/memory/block_allocator.h>
 
-void b3SoftBodyContactManager::AddContact(b3SoftBodySphereShape* s1, b3SoftBodyWorldShape* s2)
+void b3SoftBodyContactManager::AddPair(b3SoftBodySphereShape* s1, b3SoftBodyWorldShape* s2)
 {
 	// Check if there is a contact between the two entities.
-	for (b3SoftBodySphereAndShapeContact* c = m_sphereAndShapeContactList.m_head; c; c = c->m_next)
+	for (b3SoftBodySphereAndShapeContact* c = m_shapeContactList.m_head; c; c = c->m_next)
 	{
 		if (c->m_s1 == s1 && c->m_s2 == s2)
 		{
@@ -39,7 +39,7 @@ void b3SoftBodyContactManager::AddContact(b3SoftBodySphereShape* s1, b3SoftBodyW
 	b3SoftBodySphereAndShapeContact* c = b3SoftBodySphereAndShapeContact::Create(s1, s2, m_allocator);
 
 	// Push the contact to the contact list.
-	m_sphereAndShapeContactList.PushFront(c);
+	m_shapeContactList.PushFront(c);
 }
 
 void b3SoftBodyContactManager::FindNewContacts()
@@ -55,7 +55,7 @@ void b3SoftBodyContactManager::FindNewContacts()
 
 			if (b3TestOverlap(aabb1, aabb2))
 			{
-				AddContact(s1, s2);
+				AddPair(s1, s2);
 			}
 		}
 	}
@@ -64,7 +64,7 @@ void b3SoftBodyContactManager::FindNewContacts()
 void b3SoftBodyContactManager::Destroy(b3SoftBodySphereAndShapeContact* contact)
 {
 	// Remove from the body.
-	m_sphereAndShapeContactList.Remove(contact);
+	m_shapeContactList.Remove(contact);
 	
 	// Call the factory.
 	b3SoftBodySphereAndShapeContact::Destroy(contact, m_allocator);
@@ -73,7 +73,7 @@ void b3SoftBodyContactManager::Destroy(b3SoftBodySphereAndShapeContact* contact)
 void b3SoftBodyContactManager::UpdateContacts()
 {
 	// Update the state of sphere and shape contacts.
-	b3SoftBodySphereAndShapeContact* c = m_sphereAndShapeContactList.m_head;
+	b3SoftBodySphereAndShapeContact* c = m_shapeContactList.m_head;
 	while (c)
 	{
 		b3SoftBodySphereShape* s1 = c->m_s1;
