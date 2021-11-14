@@ -116,6 +116,7 @@ void b3SoftBodySphereAndShapeContact::ComputeForces(const b3SparseForceSolverDat
 
 	b3Mat33 I = b3Mat33_identity;
 	
+	// Apply normal force.
 	const scalar ks = B3_CONTACT_STIFFNESS;
 
 	if (ks > scalar(0))
