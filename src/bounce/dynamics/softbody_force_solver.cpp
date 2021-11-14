@@ -179,7 +179,7 @@ void b3SoftBodyForceSolver::Solve(const b3Vec3& gravity)
 	b3_softBodyForceSolverMinSubIterations = solverOutput.minSubIterations;
 	b3_softBodyForceSolverMaxSubIterations = solverOutput.maxSubIterations;
 
-	// Copy velocity buffer back to the particles.
+	// Copy buffers back to the particles.
 	for (u32 i = 0; i < m_particleCount; ++i)
 	{
 		m_particles[i]->m_position = x[i];
