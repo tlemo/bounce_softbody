@@ -177,9 +177,6 @@ private:
 	// Applied external force
 	b3Vec3 m_force;
 
-	// Applied contact normal force
-	b3Vec3 m_normalForce;
-
 	// Applied translation
 	b3Vec3 m_translation;
 

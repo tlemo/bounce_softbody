@@ -42,13 +42,15 @@ b3SoftBodySphereAndShapeContact::b3SoftBodySphereAndShapeContact(b3SoftBodySpher
 {
 	m_s1 = s1;
 	m_s2 = s2;
+	m_normalForce.SetZero();
 	m_active = false;
 }
 
 void b3SoftBodySphereAndShapeContact::Update()
 {
 	m_active = false;
-	
+	m_normalForce.SetZero();
+
 	b3Sphere sphere;
 	sphere.vertex = m_s1->m_p->m_position;
 	sphere.radius = m_s1->m_radius;
@@ -61,7 +63,7 @@ void b3SoftBodySphereAndShapeContact::Update()
 
 	m_active = true;
 	
-	// The friction solver uses the initial tangents.
+	// The friction solver uses initial tangents.
 	m_tangent1 = b3Perp(manifold.normal);
 	m_tangent2 = b3Cross(m_tangent1, manifold.normal);
 }
@@ -113,40 +115,36 @@ void b3SoftBodySphereAndShapeContact::ComputeForces(const b3SparseForceSolverDat
 
 	// Force computation requires direction from shape 1 to shape 2.
 	b3Vec3 n1 = -n2;
-
-	b3Mat33 I = b3Mat33_identity;
 	
 	// Apply normal force.
-	const scalar ks = B3_CONTACT_STIFFNESS;
-
-	if (ks > scalar(0))
+	if (B3_CONTACT_STIFFNESS > scalar(0))
 	{
 		// Spring force
-		b3Vec3 f1 = -ks * C * n1;
+		b3Vec3 f1 = -B3_CONTACT_STIFFNESS * C * n1;
+		
+		b3Mat33 I = b3Mat33_identity;
 
 		// Jacobian
-		b3Mat33 K11 = -ks * (b3Outer(n1, n1) + C * (I - b3Outer(n1, n1)));
+		b3Mat33 K11 = -B3_CONTACT_STIFFNESS * (b3Outer(n1, n1) + C * (I - b3Outer(n1, n1)));
 
-		// Apply
+		// Apply 
 		f[i1] += f1;
 		dfdx(i1, i1) += K11;
 
 		// Cache normal force for friction.
-		p1->m_normalForce += f1;
+		m_normalForce += f1;
 	}
 	
-	// Apply damping.
-	const scalar kd = B3_CONTACT_DAMPING_STIFFNESS;
-
-	if (kd > scalar(0))
+	// Apply damping force.
+	if (B3_CONTACT_DAMPING_STIFFNESS > scalar(0))
 	{
 		scalar dCdt = b3Dot(v1, n1);
 
 		// Damping force
-		b3Vec3 f1 = -kd * dCdt * n1;
+		b3Vec3 f1 = -B3_CONTACT_DAMPING_STIFFNESS * dCdt * n1;
 
 		// Jacobian
-		b3Mat33 K11 = -kd * b3Outer(n1, n1);
+		b3Mat33 K11 = -B3_CONTACT_DAMPING_STIFFNESS * b3Outer(n1, n1);
 		
 		// Apply force and Jacobian
 		f[i1] += f1;

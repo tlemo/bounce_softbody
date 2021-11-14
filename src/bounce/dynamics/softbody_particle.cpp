@@ -32,7 +32,6 @@ b3SoftBodyParticle::b3SoftBodyParticle(const b3SoftBodyParticleDef& def, b3SoftB
 	m_position = def.position;
 	m_velocity = def.velocity;
 	m_force.SetZero();
-	m_normalForce.SetZero();
 	m_translation.SetZero();
 	m_massDamping = def.massDamping;
 

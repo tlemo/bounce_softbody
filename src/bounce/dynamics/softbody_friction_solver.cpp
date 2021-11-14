@@ -35,20 +35,21 @@ void b3SoftBodyFrictionSolver::Solve()
 	for (u32 i = 0; i < m_shapeContactCount; ++i)
 	{
 		b3SoftBodySphereAndShapeContact* c = m_shapeContacts[i];
-
+		
 		b3SoftBodySphereShape* s1 = c->m_s1;
 		b3SoftBodyParticle* p1 = s1->m_p;
-
 		b3SoftBodyWorldShape* s2 = c->m_s2;
 
 		b3Vec3 v1 = p1->m_velocity;
 		scalar m1 = p1->m_invMass;
-		scalar normalForce = b3Length(p1->m_normalForce);
-
+		
 		b3Vec3 tangent1 = c->m_tangent1;
 		b3Vec3 tangent2 = c->m_tangent2;
+		scalar normalForce = b3Length(c->m_normalForce);
+		
 		scalar friction = b3MixFriction(s1->m_friction, s2->m_friction);
 
+		// Compute effective mass.
 		scalar tangentMass = m1 > scalar(0) ? scalar(1) / m1 : scalar(0);
 
 		b3Vec2 Cdot;

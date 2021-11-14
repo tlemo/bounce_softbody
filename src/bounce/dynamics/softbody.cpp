@@ -421,7 +421,6 @@ void b3SoftBody::Step(scalar dt, u32 forceIterations, u32 forceSubIterations)
 	for (b3SoftBodyParticle* p = m_particleList.m_head; p; p = p->m_next)
 	{
 		p->m_force.SetZero();
-		p->m_normalForce.SetZero();
 		p->m_translation.SetZero();
 	}
 
