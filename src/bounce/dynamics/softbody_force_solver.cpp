@@ -180,10 +180,9 @@ void b3SoftBodyForceSolver::Solve(const b3Vec3& gravity)
 	b3_softBodyForceSolverMaxSubIterations = solverOutput.maxSubIterations;
 
 	// Copy velocity buffer back to the particles.
-	// Position integration is deferred to post velocity constraint solving.
 	for (u32 i = 0; i < m_particleCount; ++i)
 	{
-		m_particles[i]->m_position = x0[i] + y[i];
+		m_particles[i]->m_position = x[i];
 		m_particles[i]->m_velocity = v[i];
 	}
 }

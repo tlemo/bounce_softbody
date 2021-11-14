@@ -94,11 +94,4 @@ void b3SoftBodySolver::Solve(const b3SoftBodyTimeStep& step, const b3Vec3& gravi
 
 		frictionSolver.Solve();
 	}
-
-	// Integrate positions.
-	scalar h = step.dt;
-	for (u32 i = 0; i < m_particleCount; ++i)
-	{
-		m_particles[i]->m_position += h * m_particles[i]->m_velocity;
-	}
 }
