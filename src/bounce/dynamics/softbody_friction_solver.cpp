@@ -35,7 +35,11 @@ void b3SoftBodyFrictionSolver::Solve()
 	for (u32 i = 0; i < m_shapeContactCount; ++i)
 	{
 		b3SoftBodySphereAndShapeContact* c = m_shapeContacts[i];
-		
+		if (c->m_active == false)
+		{
+			continue;
+		}
+
 		b3SoftBodySphereShape* s1 = c->m_s1;
 		b3SoftBodyParticle* p1 = s1->m_p;
 		b3SoftBodyWorldShape* s2 = c->m_s2;

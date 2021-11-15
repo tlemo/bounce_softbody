@@ -49,7 +49,6 @@ b3SoftBodySphereAndShapeContact::b3SoftBodySphereAndShapeContact(b3SoftBodySpher
 void b3SoftBodySphereAndShapeContact::Update()
 {
 	m_normalForce = scalar(0);
-	
 	m_active = false;
 
 	b3Sphere sphere;
@@ -62,11 +61,10 @@ void b3SoftBodySphereAndShapeContact::Update()
 		return;
 	}
 
-	m_active = true;
-	
 	// The friction solver uses initial tangents.
 	m_tangent1 = b3Perp(manifold.normal);
 	m_tangent2 = b3Cross(m_tangent1, manifold.normal);
+	m_active = true;
 }
 
 void b3SoftBodySphereAndShapeContact::ComputeForces(const b3SparseForceSolverData* data)

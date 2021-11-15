@@ -383,10 +383,7 @@ void b3SoftBody::Solve(const b3SoftBodyTimeStep& step)
 
 	for (b3SoftBodySphereAndShapeContact* c = m_contactManager.m_shapeContactList.m_head; c; c = c->m_next)
 	{
-		if (c->m_active)
-		{
-			solver.Add(c);
-		}
+		solver.Add(c);
 	}
 
 	// Solve
