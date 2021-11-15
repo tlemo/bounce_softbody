@@ -46,13 +46,3 @@ void b3Log(const char* text, ...)
 	vprintf(text, args);
 	va_end(args);
 }
-
-void b3BeginProfileScope(const char* name)
-{
-	B3_NOT_USED(name);
-}
-
-void b3EndProfileScope()
-{
-
-}
