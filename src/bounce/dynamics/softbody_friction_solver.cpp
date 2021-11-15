@@ -45,7 +45,7 @@ void b3SoftBodyFrictionSolver::Solve()
 		
 		b3Vec3 tangent1 = c->m_tangent1;
 		b3Vec3 tangent2 = c->m_tangent2;
-		scalar normalForce = b3Length(c->m_normalForce);
+		scalar normalForce = c->m_normalForce;
 		
 		scalar friction = b3MixFriction(s1->m_friction, s2->m_friction);
 

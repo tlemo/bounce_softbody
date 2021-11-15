@@ -42,14 +42,14 @@ b3SoftBodySphereAndShapeContact::b3SoftBodySphereAndShapeContact(b3SoftBodySpher
 {
 	m_s1 = s1;
 	m_s2 = s2;
-	m_normalForce.SetZero();
+	m_normalForce = scalar(0);
 	m_active = false;
 }
 
 void b3SoftBodySphereAndShapeContact::Update()
 {
+	m_normalForce = scalar(0);
 	m_active = false;
-	m_normalForce.SetZero();
 
 	b3Sphere sphere;
 	sphere.vertex = m_s1->m_p->m_position;
@@ -88,7 +88,7 @@ void b3SoftBodySphereAndShapeContact::ComputeForces(const b3SparseForceSolverDat
 
 	b3Sphere sphere1;
 	sphere1.vertex = x1;
-	sphere1.radius = m_s1->m_radius;
+	sphere1.radius = r1;
 
 	// Evaluate the contact manifold.
 	b3SphereManifold manifold2;
@@ -103,8 +103,8 @@ void b3SoftBodySphereAndShapeContact::ComputeForces(const b3SparseForceSolverDat
 	b3Vec3 c1 = x1 - r1 * n2;
 	b3Vec3 c2 = x2 + r2 * n2;
 
-	// Contact force based in the work:
-	// "Dynamic Deformables: Implementation and Production Practicalities".
+	// Theodore Kim and David Eberle:
+	// "Dynamic Deformables: Implementation and Production Practicalities", page 143.
 	
 	// There is no spring rest lenght.
 	// Therefore, there is no compression force.
@@ -131,8 +131,8 @@ void b3SoftBodySphereAndShapeContact::ComputeForces(const b3SparseForceSolverDat
 		f[i1] += f1;
 		dfdx(i1, i1) += K11;
 
-		// Cache normal force for friction.
-		m_normalForce += f1;
+		// Cache normal force magnitude for friction.
+		m_normalForce += b3Length(f1);
 	}
 	
 	// Apply damping force.
