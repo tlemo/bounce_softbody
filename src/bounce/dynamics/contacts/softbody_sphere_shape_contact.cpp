@@ -49,6 +49,7 @@ b3SoftBodySphereAndShapeContact::b3SoftBodySphereAndShapeContact(b3SoftBodySpher
 void b3SoftBodySphereAndShapeContact::Update()
 {
 	m_normalForce = scalar(0);
+	
 	m_active = false;
 
 	b3Sphere sphere;
@@ -131,7 +132,7 @@ void b3SoftBodySphereAndShapeContact::ComputeForces(const b3SparseForceSolverDat
 		f[i1] += f1;
 		dfdx(i1, i1) += K11;
 
-		// Cache normal force magnitude for friction.
+		// Accumulate normal force magnitude for friction.
 		m_normalForce += b3Length(f1);
 	}
 	
