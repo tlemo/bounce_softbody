@@ -99,9 +99,6 @@ void b3SoftBodySphereAndShapeContact::ComputeForces(const b3SparseForceSolverDat
 	b3Vec3 x2 = manifold2.point;
 	b3Vec3 n2 = manifold2.normal;
 
-	b3Vec3 c1 = x1 - r1 * n2;
-	b3Vec3 c2 = x2 + r2 * n2;
-
 	// Force computation requires normal direction from shape 1 to shape 2.
 	b3Vec3 n1 = -n2;
 
@@ -111,6 +108,10 @@ void b3SoftBodySphereAndShapeContact::ComputeForces(const b3SparseForceSolverDat
 	// Apply normal force.
 	if (B3_CONTACT_STIFFNESS > scalar(0))
 	{
+		// Closest points on the surface of the shapes.
+		b3Vec3 c1 = x1 - r1 * n2;
+		b3Vec3 c2 = x2 + r2 * n2;
+
 		// There is no spring rest lenght.
 		// Therefore, there is no compression force.
 		scalar C = b3Length(c2 - c1);
