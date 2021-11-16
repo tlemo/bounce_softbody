@@ -81,7 +81,10 @@ typedef double scalar64;
 
 // The maximum position error used when computing contact forces. 
 // This helps to prevent large forces.
-#define B3_MAX_CONTACT_LINEAR_CORRECTION scalar(0.1)
+#define B3_MAX_CONTACT_LINEAR_CORRECTION scalar(0.2)
+
+// This scale factor controls how fast overlap is resolved.
+#define B3_BAUMGARTE scalar(0.2)
 
 // Memory
 

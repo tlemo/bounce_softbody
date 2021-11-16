@@ -117,7 +117,7 @@ void b3SoftBodySphereAndShapeContact::ComputeForces(const b3SparseForceSolverDat
 		scalar C = b3Length(c2 - c1);
 
 		// Clamp correction to prevent large forces.
-		C = b3Min(C, B3_MAX_CONTACT_LINEAR_CORRECTION);
+		C = b3Min(B3_BAUMGARTE * C, B3_MAX_CONTACT_LINEAR_CORRECTION);
 
 		// Spring force
 		b3Vec3 f1 = -B3_CONTACT_STIFFNESS * C * n1;
