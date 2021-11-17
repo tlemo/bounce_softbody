@@ -27,6 +27,7 @@ class b3SoftBodyParticle;
 
 struct b3SoftBodySphereShapeDef : public b3SoftBodyShapeDef
 {
+	// Particle
 	b3SoftBodyParticle* p;
 };
 

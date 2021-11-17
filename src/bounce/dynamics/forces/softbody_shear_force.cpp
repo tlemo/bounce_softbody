@@ -91,14 +91,16 @@ b3SoftBodyShearForce::b3SoftBodyShearForce(const b3SoftBodyShearForceDef* def)
 	m_alpha = scalar(0.5) * b3Abs(det);
 }
 
-b3SoftBodyShearForce::~b3SoftBodyShearForce()
-{
-
-}
-
 bool b3SoftBodyShearForce::HasParticle(const b3SoftBodyParticle* particle) const
 {
 	return m_p1 == particle || m_p2 == particle || m_p3 == particle;
+}
+
+void b3SoftBodyShearForce::ClearForces()
+{
+	m_f1.SetZero();
+	m_f2.SetZero();
+	m_f3.SetZero();
 }
 
 void b3SoftBodyShearForce::ComputeForces(const b3SparseForceSolverData* data)
@@ -138,10 +140,6 @@ void b3SoftBodyShearForce::ComputeForces(const b3SparseForceSolverData* data)
 	b3Vec3 wu = inv_det * (dv2 * dx1 - dv1 * dx2);
 	b3Vec3 wv = inv_det * (-du2 * dx1 + du1 * dx2);
 
-	m_f1.SetZero();
-	m_f2.SetZero();
-	m_f3.SetZero();
-
 	// Jacobian
 	b3Vec3 dCdx[3];
 	for (u32 i = 0; i < 3; ++i)
@@ -159,6 +157,10 @@ void b3SoftBodyShearForce::ComputeForces(const b3SparseForceSolverData* data)
 		{
 			fs[i] = -m_ks * C * dCdx[i];
 		}
+		
+		f[i1] += fs[0];
+		f[i2] += fs[1];
+		f[i3] += fs[2];
 
 		m_f1 += fs[0];
 		m_f2 += fs[1];
@@ -208,6 +210,10 @@ void b3SoftBodyShearForce::ComputeForces(const b3SparseForceSolverData* data)
 			fs[i] = -m_kd * dCdt * dCdx[i];
 		}
 
+		f[i1] += fs[0];
+		f[i2] += fs[1];
+		f[i3] += fs[2];
+
 		m_f1 += fs[0];
 		m_f2 += fs[1];
 		m_f3 += fs[2];
@@ -236,8 +242,4 @@ void b3SoftBodyShearForce::ComputeForces(const b3SparseForceSolverData* data)
 		dfdv(i3, i2) += K[2][1];
 		dfdv(i3, i3) += K[2][2];
 	}
-	
-	f[i1] += m_f1;
-	f[i2] += m_f2;
-	f[i3] += m_f3;
 }

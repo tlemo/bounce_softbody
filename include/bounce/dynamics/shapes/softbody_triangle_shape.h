@@ -30,10 +30,12 @@ class b3SoftBodyParticle;
 
 struct b3SoftBodyTriangleShapeDef : public b3SoftBodyShapeDef
 {
+	// Particles
 	b3SoftBodyParticle* p1;
 	b3SoftBodyParticle* p2;
 	b3SoftBodyParticle* p3;
 
+	// Rest vertices
 	b3Vec3 v1, v2, v3;
 };
 

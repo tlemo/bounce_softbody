@@ -27,11 +27,13 @@ class b3SoftBodyParticle;
 
 struct b3SoftBodyTetrahedronShapeDef : public b3SoftBodyShapeDef
 {
+	// Particles
 	b3SoftBodyParticle* p1;
 	b3SoftBodyParticle* p2;
 	b3SoftBodyParticle* p3;
 	b3SoftBodyParticle* p4;
 
+	// Rest vertices
 	b3Vec3 v1, v2, v3, v4;
 };
 

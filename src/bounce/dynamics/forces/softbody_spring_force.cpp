@@ -47,14 +47,15 @@ b3SoftBodySpringForce::b3SoftBodySpringForce(const b3SoftBodySpringForceDef* def
 	m_f2.SetZero();
 }
 
-b3SoftBodySpringForce::~b3SoftBodySpringForce()
-{
-
-}
-
 bool b3SoftBodySpringForce::HasParticle(const b3SoftBodyParticle* particle) const
 {
 	return m_p1 == particle || m_p2 == particle;
+}
+
+void b3SoftBodySpringForce::ClearForces()
+{
+	m_f1.SetZero();
+	m_f2.SetZero();
 }
 
 void b3SoftBodySpringForce::ComputeForces(const b3SparseForceSolverData* data)
@@ -76,9 +77,6 @@ void b3SoftBodySpringForce::ComputeForces(const b3SparseForceSolverData* data)
 
 	b3Mat33 I; I.SetIdentity();
 
-	m_f1.SetZero();
-	m_f2.SetZero();
-
 	b3Vec3 dx = x1 - x2;
 
 	scalar L = b3Length(dx);
@@ -93,8 +91,15 @@ void b3SoftBodySpringForce::ComputeForces(const b3SparseForceSolverData* data)
 			{
 				scalar C = L - m_L0;
 
-				m_f1 += -m_ks * C * n;
-				m_f2 -= -m_ks * C * n;
+				// Force
+				b3Vec3 f1 = -m_ks * C * n;
+				b3Vec3 f2 = -f1;
+
+				f[i1] += f1;
+				f[i2] += f2;
+
+				m_f1 += f1;
+				m_f2 += f2;
 
 				// Force derivative
 				b3Mat33 K11 = -m_ks * (b3Outer(dx, dx) + (scalar(1) - m_L0 / L) * (I - b3Outer(dx, dx)));
@@ -114,8 +119,14 @@ void b3SoftBodySpringForce::ComputeForces(const b3SparseForceSolverData* data)
 			scalar dCdt = b3Dot(n, v1 - v2);
 
 			// Force
-			m_f1 += -m_kd * dCdt * n;
-			m_f2 -= -m_kd * dCdt * n;
+			b3Vec3 f1 = -m_kd * dCdt * n;
+			b3Vec3 f2 = -f1;
+
+			f[i1] += f1;
+			f[i2] += f2;
+
+			m_f1 += f1;
+			m_f2 += f2;
 
 			// Force derivative
 			b3Mat33 K11 = -m_kd * b3Outer(n, n);
@@ -129,7 +140,4 @@ void b3SoftBodySpringForce::ComputeForces(const b3SparseForceSolverData* data)
 			dfdv(i2, i2) += K22;
 		}
 	}
-
-	f[i1] += m_f1;
-	f[i2] += m_f2;
 }

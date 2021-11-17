@@ -20,6 +20,7 @@
 #define B3_SOFTBODY_STRETCH_FORCE_H
 
 #include <bounce/dynamics/forces/softbody_force.h>
+#include <bounce/common/math/vec3.h>
 
 // Stretch force definition.
 // This requires defining the (u, v) coordinates 
@@ -135,8 +136,8 @@ private:
 	friend class b3SoftBodyForce;
 
 	b3SoftBodyStretchForce(const b3SoftBodyStretchForceDef* def);
-	~b3SoftBodyStretchForce();
-
+	
+	void ClearForces();
 	void ComputeForces(const b3SparseForceSolverData* data);
 
 	// Particle 1

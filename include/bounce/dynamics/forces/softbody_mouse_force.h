@@ -20,6 +20,7 @@
 #define B3_SOFTBODY_MOUSE_FORCE_H
 
 #include <bounce/dynamics/forces/softbody_force.h>
+#include <bounce/common/math/vec3.h>
 
 // Mouse force definition.
 // This requires defining a particle and a triangle 
@@ -113,8 +114,8 @@ private:
 	friend class b3SoftBodyForce;
 
 	b3SoftBodyMouseForce(const b3SoftBodyMouseForceDef* def);
-	~b3SoftBodyMouseForce();
-
+	
+	void ClearForces();
 	void ComputeForces(const b3SparseForceSolverData* data);
 
 	// Particle 1

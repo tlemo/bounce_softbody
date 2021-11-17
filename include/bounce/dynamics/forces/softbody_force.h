@@ -19,7 +19,6 @@
 #ifndef B3_SOFTBODY_FORCE_H
 #define B3_SOFTBODY_FORCE_H
 
-#include <bounce/common/math/transform.h>
 #include <bounce/common/template/list.h>
 
 class b3BlockAllocator;
@@ -38,6 +37,7 @@ enum b3SoftBodyForceType
 	e_softBodyTetrahedronElementForce,
 };
 
+// Force definition.
 struct b3SoftBodyForceDef
 {
 	b3SoftBodyForceDef()
@@ -76,9 +76,9 @@ protected:
 	static b3SoftBodyForce* Create(const b3SoftBodyForceDef* def, b3BlockAllocator* allocator);
 	static void Destroy(b3SoftBodyForce* force, b3BlockAllocator* allocator);
 
-	b3SoftBodyForce() { }
 	virtual ~b3SoftBodyForce() { }
 
+	virtual void ClearForces() = 0;
 	virtual void ComputeForces(const b3SparseForceSolverData* data) = 0;
 
 	b3SoftBodyForceType m_type;

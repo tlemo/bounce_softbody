@@ -20,6 +20,7 @@
 #define B3_SOFTBODY_SPRING_FORCE_H
 
 #include <bounce/dynamics/forces/softbody_force.h>
+#include <bounce/common/math/vec3.h>
 
 // Spring force definition.
 // This requires defining two particles, the 
@@ -86,8 +87,8 @@ private:
 	friend class b3SoftBodyForce;
 	
 	b3SoftBodySpringForce(const b3SoftBodySpringForceDef* def);
-	~b3SoftBodySpringForce();
-
+	
+	void ClearForces();
 	void ComputeForces(const b3SparseForceSolverData* data);
 
 	// Particle 1

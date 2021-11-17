@@ -106,14 +106,16 @@ b3SoftBodyStretchForce::b3SoftBodyStretchForce(const b3SoftBodyStretchForceDef* 
 	m_alpha = scalar(0.5) * b3Abs(det);
 }
 
-b3SoftBodyStretchForce::~b3SoftBodyStretchForce()
-{
-
-}
-
 bool b3SoftBodyStretchForce::HasParticle(const b3SoftBodyParticle* particle) const
 {
 	return m_p1 == particle || m_p2 == particle || m_p3 == particle;
+}
+
+void b3SoftBodyStretchForce::ClearForces()
+{
+	m_f1.SetZero();
+	m_f2.SetZero();
+	m_f3.SetZero();
 }
 
 void b3SoftBodyStretchForce::ComputeForces(const b3SparseForceSolverData* data)
@@ -156,10 +158,6 @@ void b3SoftBodyStretchForce::ComputeForces(const b3SparseForceSolverData* data)
 	b3Vec3 wv = inv_det * (-du2 * dx1 + du1 * dx2);
 	scalar len_wv = b3Length(wv);
 
-	m_f1.SetZero();
-	m_f2.SetZero();
-	m_f3.SetZero();
-
 	if (len_wu > scalar(0))
 	{
 		scalar inv_len_wu = scalar(1) / len_wu;
@@ -183,11 +181,15 @@ void b3SoftBodyStretchForce::ComputeForces(const b3SparseForceSolverData* data)
 				fs[i] = -m_ks_u * Cu * dCudx[i];
 			}
 
+			f[i1] += fs[0];
+			f[i2] += fs[1];
+			f[i3] += fs[2];
+
 			m_f1 += fs[0];
 			m_f2 += fs[1];
 			m_f3 += fs[2];
 
-			// Force derivative
+			// Force gradient
 			b3Mat33 K[3][3];
 			for (u32 i = 0; i < 3; ++i)
 			{
@@ -236,11 +238,15 @@ void b3SoftBodyStretchForce::ComputeForces(const b3SparseForceSolverData* data)
 				fs[i] = -m_kd_u * dCudt * dCudx[i];
 			}
 
+			f[i1] += fs[0];
+			f[i2] += fs[1];
+			f[i3] += fs[2];
+
 			m_f1 += fs[0];
 			m_f2 += fs[1];
 			m_f3 += fs[2];
 
-			// Force derivative
+			// Force gradient
 			b3Mat33 K[3][3];
 			for (u32 i = 0; i < 3; ++i)
 			{
@@ -289,11 +295,15 @@ void b3SoftBodyStretchForce::ComputeForces(const b3SparseForceSolverData* data)
 				fs[i] = -m_ks_v * Cv * dCvdx[i];
 			}
 
+			f[i1] += fs[0];
+			f[i2] += fs[1];
+			f[i3] += fs[2];
+
 			m_f1 += fs[0];
 			m_f2 += fs[1];
 			m_f3 += fs[2];
 
-			// Force derivative
+			// Force gradient
 			b3Mat33 K[3][3];
 			for (u32 i = 0; i < 3; ++i)
 			{
@@ -343,11 +353,15 @@ void b3SoftBodyStretchForce::ComputeForces(const b3SparseForceSolverData* data)
 				fs[i] = -m_kd_v * dCvdt * dCvdx[i];
 			}
 
+			f[i1] += fs[0];
+			f[i2] += fs[1];
+			f[i3] += fs[2];
+
 			m_f1 += fs[0];
 			m_f2 += fs[1];
 			m_f3 += fs[2];
 
-			// Force derivative
+			// Force gradient
 			b3Mat33 K[3][3];
 			for (u32 i = 0; i < 3; ++i)
 			{
@@ -372,8 +386,4 @@ void b3SoftBodyStretchForce::ComputeForces(const b3SparseForceSolverData* data)
 			dfdv(i3, i3) += K[2][2];
 		}
 	}
-
-	f[i1] += m_f1;
-	f[i2] += m_f2;
-	f[i3] += m_f3;
 }

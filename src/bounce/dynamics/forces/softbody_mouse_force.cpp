@@ -42,14 +42,17 @@ b3SoftBodyMouseForce::b3SoftBodyMouseForce(const b3SoftBodyMouseForceDef* def)
 	m_f4.SetZero();
 }
 
-b3SoftBodyMouseForce::~b3SoftBodyMouseForce()
-{
-
-}
-
 bool b3SoftBodyMouseForce::HasParticle(const b3SoftBodyParticle* particle) const
 {
 	return m_p1 == particle || m_p2 == particle || m_p3 == particle || m_p4 == particle;
+}
+
+void b3SoftBodyMouseForce::ClearForces()
+{
+	m_f1.SetZero();
+	m_f2.SetZero();
+	m_f3.SetZero();
+	m_f4.SetZero();
 }
 
 void b3SoftBodyMouseForce::ComputeForces(const b3SparseForceSolverData* data)
@@ -76,11 +79,6 @@ void b3SoftBodyMouseForce::ComputeForces(const b3SparseForceSolverData* data)
 	b3Vec3 v4 = v[i4];
 
 	b3Mat33 I; I.SetIdentity();
-
-	m_f1.SetZero();
-	m_f2.SetZero();
-	m_f3.SetZero();
-	m_f4.SetZero();
 
 	scalar w2 = m_w2;
 	scalar w3 = m_w3;
@@ -117,13 +115,15 @@ void b3SoftBodyMouseForce::ComputeForces(const b3SparseForceSolverData* data)
 					fs[i] = -m_km * C * dCdx[i];
 				}
 
+				f[i1] += fs[0];
+				f[i2] += fs[1];
+				f[i3] += fs[2];
+				f[i4] += fs[3];
+
 				m_f1 += fs[0];
 				m_f2 += fs[1];
 				m_f3 += fs[2];
 				m_f4 += fs[3];
-
-				// Verification:
-				// http://www.matrixcalculus.org/
 
 				// Force derivative
 				scalar L3 = L * L * L;
@@ -204,6 +204,11 @@ void b3SoftBodyMouseForce::ComputeForces(const b3SparseForceSolverData* data)
 				fs[i] = -m_kd * dCdt * dCdx[i];
 			}
 
+			f[i1] += fs[0];
+			f[i2] += fs[1];
+			f[i3] += fs[2];
+			f[i4] += fs[3];
+
 			m_f1 += fs[0];
 			m_f2 += fs[1];
 			m_f3 += fs[2];
@@ -242,9 +247,4 @@ void b3SoftBodyMouseForce::ComputeForces(const b3SparseForceSolverData* data)
 			dfdv(i4, i4) += K[3][3];
 		}
 	}
-
-	f[i1] += m_f1;
-	f[i2] += m_f2;
-	f[i3] += m_f3;
-	f[i4] += m_f4;
 }

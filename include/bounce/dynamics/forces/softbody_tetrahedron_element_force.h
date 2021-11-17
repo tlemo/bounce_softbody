@@ -20,6 +20,7 @@
 #define B3_SOFTBODY_TETRAHEDRON_ELEMENT_FORCE_H
 
 #include <bounce/dynamics/forces/softbody_force.h>
+#include <bounce/common/math/mat33.h>
 #include <bounce/common/math/quat.h>
 
 class b3SoftBody;
@@ -157,10 +158,12 @@ private:
 	friend class b3SoftBodyForce;
 	
 	b3SoftBodyTetrahedronElementForce(const b3SoftBodyTetrahedronElementForceDef* def);
-	~b3SoftBodyTetrahedronElementForce();
 
 	// This resets the finite element data.
 	void ResetElementData();
+
+	// Clear forces.
+	void ClearForces();
 
 	// Compute element forces.
 	void ComputeForces(const b3SparseForceSolverData* data);

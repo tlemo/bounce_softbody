@@ -198,11 +198,6 @@ b3SoftBodyTriangleElementForce::b3SoftBodyTriangleElementForce(const b3SoftBodyT
 	ResetElementData();
 }
 
-b3SoftBodyTriangleElementForce::~b3SoftBodyTriangleElementForce()
-{
-
-}
-
 bool b3SoftBodyTriangleElementForce::HasParticle(const b3SoftBodyParticle* particle) const
 {
 	return m_p1 == particle || m_p2 == particle || m_p3 == particle;
@@ -278,6 +273,10 @@ void b3SoftBodyTriangleElementForce::ResetElementData()
 
 	// Convert to block form
 	b3SetK(m_K, K);
+}
+
+void b3SoftBodyTriangleElementForce::ClearForces()
+{
 }
 
 // https://animation.rwth-aachen.de/media/papers/2013-CAG-AdaptiveCloth.pdf

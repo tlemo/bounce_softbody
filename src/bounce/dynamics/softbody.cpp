@@ -403,6 +403,13 @@ void b3SoftBody::Step(scalar dt, u32 forceIterations, u32 forceSubIterations)
 	// Update contacts. This is where some contacts are ceased.
 	m_contactManager.UpdateContacts();
 
+	// Clear (user) internal forces before accumulating them 
+	// inside the solver.
+	for (b3SoftBodyForce* f = m_forceList.m_head; f; f = f->m_next)
+	{
+		f->ClearForces();
+	}
+
 	// Integrate state, solve constraints. 
 	if (step.dt > scalar(0))
 	{
@@ -414,14 +421,14 @@ void b3SoftBody::Step(scalar dt, u32 forceIterations, u32 forceSubIterations)
 		m_inv_dt0 = step.inv_dt;
 	}
 
-	// Clear forces and translations
+	// Clear external forces and translations.
 	for (b3SoftBodyParticle* p = m_particleList.m_head; p; p = p->m_next)
 	{
 		p->m_force.SetZero();
 		p->m_translation.SetZero();
 	}
 
-	// Synchronize triangle shapes
+	// Synchronize triangle shapes.
 	for (b3SoftBodyTriangleShape* t = m_triangleShapeList.m_head; t; t = t->m_next)
 	{
 		b3SoftBodyParticle* p1 = t->m_p1;

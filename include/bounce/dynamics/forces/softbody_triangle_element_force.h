@@ -104,11 +104,13 @@ private:
 	friend class b3SoftBodyForce;
 
 	b3SoftBodyTriangleElementForce(const b3SoftBodyTriangleElementForceDef* def);
-	~b3SoftBodyTriangleElementForce();
 
 	// Reset element data.
 	void ResetElementData();
 
+	// Clear forces;
+	void ClearForces();
+	
 	// Compute element forces.
 	void ComputeForces(const b3SparseForceSolverData* data);
 

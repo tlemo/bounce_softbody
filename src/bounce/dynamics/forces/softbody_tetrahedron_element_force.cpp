@@ -216,11 +216,6 @@ b3SoftBodyTetrahedronElementForce::b3SoftBodyTetrahedronElementForce(const b3Sof
 	ResetElementData();
 }
 
-b3SoftBodyTetrahedronElementForce::~b3SoftBodyTetrahedronElementForce()
-{
-
-}
-
 bool b3SoftBodyTetrahedronElementForce::HasParticle(const b3SoftBodyParticle* particle) const
 {
 	return m_p1 == particle || m_p2 == particle || m_p3 == particle || m_p4 == particle;
@@ -284,6 +279,10 @@ void b3SoftBodyTetrahedronElementForce::ResetElementData()
 	{
 		m_epsilon_plastic[i] = scalar(0);
 	}
+}
+
+void b3SoftBodyTetrahedronElementForce::ClearForces()
+{
 }
 
 // Extract rotation from deformation

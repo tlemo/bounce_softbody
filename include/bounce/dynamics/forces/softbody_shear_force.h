@@ -20,6 +20,7 @@
 #define B3_SOFTBODY_SHEAR_FORCE_H
 
 #include <bounce/dynamics/forces/softbody_force.h>
+#include <bounce/common/math/vec3.h>
 
 // Shear force definition.
 // This requires defining the (u, v) coordinates 
@@ -104,8 +105,8 @@ private:
 	friend class b3SoftBodyForce;
 
 	b3SoftBodyShearForce(const b3SoftBodyShearForceDef* def);
-	~b3SoftBodyShearForce();
-
+	
+	void ClearForces();
 	void ComputeForces(const b3SparseForceSolverData* data);
 
 	// Particle 1
