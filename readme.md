@@ -8,7 +8,7 @@
 * Unconditional simulation stability
 * Stretch, spring, mouse, triangle and tetrahedron element force types
 * Vertex contact and friction with spheres, capsules, and boxes
-* Elasticity, plasticity
+* Viscosity
 * Linear/non-linear time solver
 * Ray-casting
 
