@@ -16,8 +16,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef SOFTBODY_H
-#define SOFTBODY_H
+#ifndef BODY_H
+#define BODY_H
 
 #include "test.h"
 #include "uniform_body.h"
@@ -58,12 +58,12 @@ public:
 			b3DrawSegment(g_debugDrawData, pA, pB, b3Color_white);
 		}
 
-		extern u32 b3_softBodyForceSolverIterations;
-		extern u32 b3_softBodyForceSolverMinSubIterations;
-		extern u32 b3_softBodyForceSolverMaxSubIterations;
+		extern u32 b3_forceSolverIterations;
+		extern u32 b3_forceSolverMinSubIterations;
+		extern u32 b3_forceSolverMaxSubIterations;
 
-		DrawString(b3Color_white, "Iterations = %d", b3_softBodyForceSolverIterations);
-		DrawString(b3Color_white, "Sub-iterations [min] [max] = [%d] [%d]", b3_softBodyForceSolverMinSubIterations, b3_softBodyForceSolverMaxSubIterations);
+		DrawString(b3Color_white, "Iterations = %d", b3_forceSolverIterations);
+		DrawString(b3Color_white, "Sub-iterations [min] [max] = [%d] [%d]", b3_forceSolverMinSubIterations, b3_forceSolverMaxSubIterations);
 
 		scalar E = m_body->GetEnergy();
 		DrawString(b3Color_white, "E = %f", E);

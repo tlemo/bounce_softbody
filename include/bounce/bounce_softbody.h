@@ -19,7 +19,7 @@
 #ifndef BOUNCE_SOFTBODY_H
 #define BOUNCE_SOFTBODY_H
 
-// Include this file header in your project to directly access Bounce Softbody objects.
+// These files constitute the main Bounce Softbody API.
 
 #include <bounce/common/settings.h>
 #include <bounce/common/draw.h>

@@ -27,11 +27,11 @@
 #include <bounce/common/memory/stack_allocator.h>
 
 // Number of non-linear iterations.
-u32 b3_softBodyForceSolverIterations = 0;
+u32 b3_forceSolverIterations = 0;
 
 // Min/max number of inner iterations.
-u32 b3_softBodyForceSolverMinSubIterations = B3_MAX_U32;
-u32 b3_softBodyForceSolverMaxSubIterations = 0;
+u32 b3_forceSolverMinSubIterations = B3_MAX_U32;
+u32 b3_forceSolverMaxSubIterations = 0;
 
 b3ForceSolver::b3ForceSolver(const b3ForceSolverDef& def)
 {
@@ -163,8 +163,8 @@ void b3ForceSolver::Solve(const b3Vec3& gravity)
 	b3SolveBEOutput solverOutput;
 	solverOutput.x = &x;
 	solverOutput.v = &v;
-	solverOutput.minSubIterations = b3_softBodyForceSolverMinSubIterations;
-	solverOutput.maxSubIterations = b3_softBodyForceSolverMaxSubIterations;
+	solverOutput.minSubIterations = b3_forceSolverMinSubIterations;
+	solverOutput.maxSubIterations = b3_forceSolverMaxSubIterations;
 
 	// Integrate F = ma.
 	b3SparseSolveBE(&solverOutput, &solverInput);
@@ -173,11 +173,11 @@ void b3ForceSolver::Solve(const b3Vec3& gravity)
 	m_stack->Free(fixedDofs);
 
 	// Track non-linear iterations.
-	b3_softBodyForceSolverIterations = solverOutput.iterations;
+	b3_forceSolverIterations = solverOutput.iterations;
 	
 	// Track min-max sub-iterations.
-	b3_softBodyForceSolverMinSubIterations = solverOutput.minSubIterations;
-	b3_softBodyForceSolverMaxSubIterations = solverOutput.maxSubIterations;
+	b3_forceSolverMinSubIterations = solverOutput.minSubIterations;
+	b3_forceSolverMaxSubIterations = solverOutput.maxSubIterations;
 
 	// Copy buffers back to the particles.
 	for (u32 i = 0; i < m_particleCount; ++i)

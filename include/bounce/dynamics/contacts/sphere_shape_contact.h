@@ -43,9 +43,9 @@ public:
 
 	b3BodySphereShape* m_s1;
 	b3BodyWorldShape* m_s2;
+	bool m_active;
 	b3Vec3 m_tangent1, m_tangent2;
 	scalar m_normalForce;
-	bool m_active;
 	b3SphereAndShapeContact* m_prev;
 	b3SphereAndShapeContact* m_next;
 };
