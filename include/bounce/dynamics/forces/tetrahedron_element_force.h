@@ -23,10 +23,6 @@
 #include <bounce/common/math/mat33.h>
 #include <bounce/common/math/quat.h>
 
-class b3Body;
-
-struct b3SparseForceSolverData;
-
 // Tetrahedral element force definition.
 // This requires defining the element in the rest state and its material parameters.
 struct b3TetrahedronElementForceDef : public b3ForceDef
