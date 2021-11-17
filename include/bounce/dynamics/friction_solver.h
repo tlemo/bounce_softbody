@@ -19,8 +19,7 @@
 #ifndef B3_FRICTION_SOLVER_H
 #define B3_FRICTION_SOLVER_H
 
-#include <bounce/common/math/mat22.h>
-#include <bounce/common/math/mat33.h>
+#include <bounce/common/math/math.h>
 #include <bounce/dynamics/time_step.h>
 
 class b3StackAllocator;

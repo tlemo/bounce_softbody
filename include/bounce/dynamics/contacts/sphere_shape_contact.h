@@ -20,9 +20,7 @@
 #define B3_SPHERE_AND_SHAPE_CONTACT_H
 
 #include <bounce/common/template/list.h>
-#include <bounce/common/math/vec2.h>
 #include <bounce/common/math/vec3.h>
-#include <bounce/common/math/transform.h>
 
 class b3BlockAllocator;
 class b3BodySphereShape;

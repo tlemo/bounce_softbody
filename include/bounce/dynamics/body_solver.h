@@ -19,8 +19,7 @@
 #ifndef B3_BODY_SOLVER_H
 #define B3_BODY_SOLVER_H
 
-#include <bounce/common/math/mat22.h>
-#include <bounce/common/math/mat33.h>
+#include <bounce/common/math/vec3.h>
 
 class b3StackAllocator;
 

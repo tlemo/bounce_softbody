@@ -20,11 +20,9 @@
 #define B3_FORCE_SOLVER_H
 
 #include <bounce/dynamics/time_step.h>
-
-struct b3Vec3;
+#include <bounce/common/math/vec3.h>
 
 class b3StackAllocator;
-
 class b3Particle;
 class b3Force;
 class b3SphereAndShapeContact;

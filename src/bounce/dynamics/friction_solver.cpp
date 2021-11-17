@@ -21,6 +21,7 @@
 #include <bounce/dynamics/contacts/sphere_shape_contact.h>
 #include <bounce/dynamics/shapes/body_sphere_shape.h>
 #include <bounce/dynamics/shapes/body_world_shape.h>
+#include <bounce/common/math/vec2.h>
 #include <bounce/common/memory/stack_allocator.h>
 
 b3FrictionSolver::b3FrictionSolver(const b3FrictionSolverDef& def)
