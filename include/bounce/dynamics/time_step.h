@@ -16,44 +16,19 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef CAPSULE_CONTACT_H
-#define CAPSULE_CONTACT_H
+#ifndef B3_TIME_STEP_H
+#define B3_TIME_STEP_H
 
-class CapsuleContact : public Body
+#include <bounce/common/settings.h>
+
+// Time step parameters
+struct b3TimeStep
 {
-public:
-	CapsuleContact()
-	{
-		m_mesh.Translate(b3Vec3(0.0f, 10.0f, 0.0f));
-
-		ClothDef def;
-		def.mesh = &m_mesh;
-		def.thickness = 0.2f;
-		def.friction = 0.4f;
-		m_body = new UniformBody(def);
-
-		b3CapsuleShape capsuleShape;
-		capsuleShape.m_center1.Set(0.0f, 0.0f, 5.0f);
-		capsuleShape.m_center2.Set(0.0f, 0.0f, -5.0f);
-		capsuleShape.m_radius = 2.0f;
-
-		b3BodyWorldShapeDef capsuleShapeDef;
-		capsuleShapeDef.shape = &capsuleShape;
-		capsuleShapeDef.friction = 0.5f;
-
-		m_body->CreateWorldShape(capsuleShapeDef);
-
-		m_body->SetGravity(b3Vec3(0.0f, -9.8f, 0.0f));
-
-		m_bodyDragger = new BodyDragger(&m_ray, m_body);
-	}
-
-	static Test* Create()
-	{
-		return new CapsuleContact;
-	}
-
-	GridClothMesh<10, 10> m_mesh;
+	scalar dt;
+	scalar inv_dt;
+	scalar dt_ratio;
+	u32 forceIterations;
+	u32 forceSubIterations;
 };
 
 #endif

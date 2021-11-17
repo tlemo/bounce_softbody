@@ -19,7 +19,7 @@
 #ifndef SPHERE_CONTACT_H
 #define SPHERE_CONTACT_H
 
-class SphereContact : public SoftBody
+class SphereContact : public Body
 {
 public:
 	SphereContact()
@@ -30,12 +30,12 @@ public:
 		def.mesh = &m_mesh;
 		def.thickness = 0.2f;
 		def.friction = 0.8f;
-		m_body = new UniformSoftBody(def);
+		m_body = new UniformBody(def);
 
 		b3SphereShape sphereShape;
 		sphereShape.m_radius = 3.0f;
 
-		b3SoftBodyWorldShapeDef sphereShapeDef;
+		b3BodyWorldShapeDef sphereShapeDef;
 		sphereShapeDef.shape = &sphereShape;
 		sphereShapeDef.friction = 0.5f;
 
@@ -43,7 +43,7 @@ public:
 
 		m_body->SetGravity(b3Vec3(0.0f, -9.8f, 0.0f));
 
-		m_bodyDragger = new SoftBodyDragger(&m_ray, m_body);
+		m_bodyDragger = new BodyDragger(&m_ray, m_body);
 	}
 
 	static Test* Create()

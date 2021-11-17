@@ -55,7 +55,7 @@ static inline b3Color Color(scalar x, scalar a, scalar b)
 	return c;
 }
 
-class StretchMapping : public SoftBody
+class StretchMapping : public Body
 {
 public:
 	StretchMapping()
@@ -67,7 +67,7 @@ public:
 		def.stretchingStiffness = 10000.0f;
 		//def.stretchStiffnessDamping = 100.0f;
 
-		m_body = new UniformSoftBody(def);
+		m_body = new UniformBody(def);
 
 		m_body->SetGravity(b3Vec3(0.0f, -9.8f, 0.0f));
 
@@ -76,11 +76,11 @@ public:
 		{
 			int v = m_clothMesh.GetVertex(0, j);
 
-			b3SoftBodyParticle* p = m_body->GetParticle(v);
-			p->SetType(e_staticSoftBodyParticle);
+			b3Particle* p = m_body->GetParticle(v);
+			p->SetType(e_staticParticle);
 		}
 
-		m_bodyDragger = new SoftBodyDragger(&m_ray, m_body);
+		m_bodyDragger = new BodyDragger(&m_ray, m_body);
 	}
 
 	void Draw() override
@@ -91,19 +91,19 @@ public:
 			tension[i].SetZero();
 		}
 
-		for (b3SoftBodyForce* f = m_body->GetForceList().m_head; f; f = f->GetNext())
+		for (b3Force* f = m_body->GetForceList().m_head; f; f = f->GetNext())
 		{
-			if (f->GetType() == e_softBodyStretchForce)
+			if (f->GetType() == e_stretchForce)
 			{
-				b3SoftBodyStretchForce* s = (b3SoftBodyStretchForce*)f;
+				b3StretchForce* s = (b3StretchForce*)f;
 
 				b3Vec3 f1 = s->GetActionForce1();
 				b3Vec3 f2 = s->GetActionForce2();
 				b3Vec3 f3 = s->GetActionForce3();
 
-				b3SoftBodyParticle* p1 = s->GetParticle1();
-				b3SoftBodyParticle* p2 = s->GetParticle2();
-				b3SoftBodyParticle* p3 = s->GetParticle3();
+				b3Particle* p1 = s->GetParticle1();
+				b3Particle* p2 = s->GetParticle2();
+				b3Particle* p3 = s->GetParticle3();
 
 				u32 v1 = p1->GetMeshIndex();
 				u32 v2 = p2->GetMeshIndex();
@@ -115,19 +115,19 @@ public:
 			}
 		}
 		
-		for (b3SoftBodyParticle* p = m_body->GetParticleList().m_head; p; p = p->GetNext())
+		for (b3Particle* p = m_body->GetParticleList().m_head; p; p = p->GetNext())
 		{
-			if (p->GetType() == e_staticSoftBodyParticle)
+			if (p->GetType() == e_staticParticle)
 			{
 				b3DrawPoint(g_debugDrawData, p->GetPosition(), 4.0f, b3Color_white);
 			}
 
-			if (p->GetType() == e_kinematicSoftBodyParticle)
+			if (p->GetType() == e_kinematicParticle)
 			{
 				b3DrawPoint(g_debugDrawData, p->GetPosition(), 4.0f, b3Color_blue);
 			}
 
-			if (p->GetType() == e_dynamicSoftBodyParticle)
+			if (p->GetType() == e_dynamicParticle)
 			{
 				b3DrawPoint(g_debugDrawData, p->GetPosition(), 4.0f, b3Color_green);
 			}
@@ -135,7 +135,7 @@ public:
 
 		for (int i = 0; i < m_clothMesh.triangleCount; ++i)
 		{
-			SoftBodyMeshTriangle triangle = m_clothMesh.GetTriangle(i);
+			BodyMeshTriangle triangle = m_clothMesh.GetTriangle(i);
 
 			int vi1 = triangle.v1;
 			int vi2 = triangle.v2;

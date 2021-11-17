@@ -16,44 +16,36 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef CAPSULE_CONTACT_H
-#define CAPSULE_CONTACT_H
+#include <bounce/dynamics/shapes/body_world_shape.h>
+#include <bounce/dynamics/body.h>
 
-class CapsuleContact : public Body
+b3BodyWorldShape::b3BodyWorldShape()
 {
-public:
-	CapsuleContact()
+}
+
+void b3BodyWorldShape::Create(b3BlockAllocator* allocator, b3Body* body, const b3BodyWorldShapeDef& def)
+{
+	m_shape = def.shape->Clone(allocator);
+	m_body = body;
+	m_friction = def.friction;
+}
+
+void b3BodyWorldShape::Destroy(b3BlockAllocator* allocator)
+{
+	b3Shape::Destroy(m_shape, allocator);
+}
+
+void b3BodyWorldShape::DestroyContacts()
+{
+	b3SphereAndShapeContact* c = m_body->m_contactManager.m_shapeContactList.m_head;
+	while (c)
 	{
-		m_mesh.Translate(b3Vec3(0.0f, 10.0f, 0.0f));
+		b3SphereAndShapeContact* c0 = c;
+		c = c->m_next;
 
-		ClothDef def;
-		def.mesh = &m_mesh;
-		def.thickness = 0.2f;
-		def.friction = 0.4f;
-		m_body = new UniformBody(def);
-
-		b3CapsuleShape capsuleShape;
-		capsuleShape.m_center1.Set(0.0f, 0.0f, 5.0f);
-		capsuleShape.m_center2.Set(0.0f, 0.0f, -5.0f);
-		capsuleShape.m_radius = 2.0f;
-
-		b3BodyWorldShapeDef capsuleShapeDef;
-		capsuleShapeDef.shape = &capsuleShape;
-		capsuleShapeDef.friction = 0.5f;
-
-		m_body->CreateWorldShape(capsuleShapeDef);
-
-		m_body->SetGravity(b3Vec3(0.0f, -9.8f, 0.0f));
-
-		m_bodyDragger = new BodyDragger(&m_ray, m_body);
+		if (c0->m_s2 == this)
+		{
+			m_body->m_contactManager.Destroy(c0);
+		}
 	}
-
-	static Test* Create()
-	{
-		return new CapsuleContact;
-	}
-
-	GridClothMesh<10, 10> m_mesh;
-};
-
-#endif
+}

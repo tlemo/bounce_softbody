@@ -19,7 +19,7 @@
 #ifndef SHEET_H
 #define SHEET_H
 
-class Sheet : public SoftBody
+class Sheet : public Body
 {
 public:
 	Sheet()
@@ -34,7 +34,7 @@ public:
 		def.density = 0.3f;
 		def.elementYoungModulus = 200.0f;
 
-		m_body = new UniformSoftBody(def);
+		m_body = new UniformBody(def);
 
 		b3Vec3 gravity(0.0f, -9.8f, 0.0f);
 		m_body->SetGravity(gravity);
@@ -43,11 +43,11 @@ public:
 		{
 			int v = m_mesh.GetVertex(0, j, 0);
 
-			b3SoftBodyParticle* p = m_body->GetParticle(v);
-			p->SetType(e_staticSoftBodyParticle);
+			b3Particle* p = m_body->GetParticle(v);
+			p->SetType(e_staticParticle);
 		}
 
-		m_bodyDragger = new SoftBodyDragger(&m_ray, m_body);
+		m_bodyDragger = new BodyDragger(&m_ray, m_body);
 	}
 
 	static Test* Create()

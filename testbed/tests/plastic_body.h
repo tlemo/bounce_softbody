@@ -16,44 +16,47 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef CAPSULE_CONTACT_H
-#define CAPSULE_CONTACT_H
+#ifndef PLASTIC_BODY_H
+#define PLASTIC_BODY_H
 
-class CapsuleContact : public Body
+class PlasticBody : public Body
 {
 public:
-	CapsuleContact()
+	PlasticBody()
 	{
-		m_mesh.Translate(b3Vec3(0.0f, 10.0f, 0.0f));
-
-		ClothDef def;
+		// Create soft body
+		TetDef def;
 		def.mesh = &m_mesh;
-		def.thickness = 0.2f;
-		def.friction = 0.4f;
+		def.density = 0.2f;
+		def.elementYoungModulus = 1000.0f;
+		def.elementPoissonRatio = 0.33f;		
+		def.elementElasticStrainYield = 0.1f;
+		def.elementCreepRate = 0.5f;
+		def.elementMaxPlasticStrain = 1.0f;
+		def.massDamping = 0.2f;
+
 		m_body = new UniformBody(def);
 
-		b3CapsuleShape capsuleShape;
-		capsuleShape.m_center1.Set(0.0f, 0.0f, 5.0f);
-		capsuleShape.m_center2.Set(0.0f, 0.0f, -5.0f);
-		capsuleShape.m_radius = 2.0f;
+		// Up center vertex
+		int i = m_mesh.GetRowVertexCount() - 1;
+		int j = m_mesh.GetColumnVertexCount() / 2;
+		int k = m_mesh.GetDepthVertexCount() / 2;
 
-		b3BodyWorldShapeDef capsuleShapeDef;
-		capsuleShapeDef.shape = &capsuleShape;
-		capsuleShapeDef.friction = 0.5f;
+		int pinIndex = m_mesh.GetVertex(i, j, k);
+		m_body->GetParticle(pinIndex)->SetType(e_staticParticle);
 
-		m_body->CreateWorldShape(capsuleShapeDef);
-
-		m_body->SetGravity(b3Vec3(0.0f, -9.8f, 0.0f));
+		b3Vec3 gravity(0.0f, -9.8f, 0.0f);
+		m_body->SetGravity(gravity);
 
 		m_bodyDragger = new BodyDragger(&m_ray, m_body);
 	}
 
 	static Test* Create()
 	{
-		return new CapsuleContact;
+		return new PlasticBody;
 	}
 
-	GridClothMesh<10, 10> m_mesh;
+	GridTetMesh<2, 2, 2> m_mesh;
 };
 
 #endif

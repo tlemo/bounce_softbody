@@ -28,19 +28,19 @@
 #include <bounce/collision/shapes/capsule_shape.h>
 #include <bounce/collision/shapes/box_shape.h>
 
-#include <bounce/dynamics/softbody.h>
-#include <bounce/dynamics/softbody_particle.h>
+#include <bounce/dynamics/body.h>
+#include <bounce/dynamics/particle.h>
 
-#include <bounce/dynamics/forces/softbody_stretch_force.h>
-#include <bounce/dynamics/forces/softbody_shear_force.h>
-#include <bounce/dynamics/forces/softbody_spring_force.h>
-#include <bounce/dynamics/forces/softbody_mouse_force.h>
-#include <bounce/dynamics/forces/softbody_triangle_element_force.h>
-#include <bounce/dynamics/forces/softbody_tetrahedron_element_force.h>
+#include <bounce/dynamics/forces/stretch_force.h>
+#include <bounce/dynamics/forces/shear_force.h>
+#include <bounce/dynamics/forces/spring_force.h>
+#include <bounce/dynamics/forces/mouse_force.h>
+#include <bounce/dynamics/forces/triangle_element_force.h>
+#include <bounce/dynamics/forces/tetrahedron_element_force.h>
 
-#include <bounce/dynamics/shapes/softbody_sphere_shape.h>
-#include <bounce/dynamics/shapes/softbody_triangle_shape.h>
-#include <bounce/dynamics/shapes/softbody_tetrahedron_shape.h>
-#include <bounce/dynamics/shapes/softbody_world_shape.h>
+#include <bounce/dynamics/shapes/body_sphere_shape.h>
+#include <bounce/dynamics/shapes/body_triangle_shape.h>
+#include <bounce/dynamics/shapes/body_tetrahedron_shape.h>
+#include <bounce/dynamics/shapes/body_world_shape.h>
 
 #endif

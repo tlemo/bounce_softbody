@@ -22,7 +22,7 @@
 #include "GLFW/glfw3.h"
 
 #include "test.h"
-#include "tests/softbody.h"
+#include "tests/body.h"
 #include "tests/sphere_contact.h"
 #include "tests/capsule_contact.h"
 #include "tests/box_contact.h"
@@ -33,7 +33,7 @@
 #include "tests/cloth_element.h"
 #include "tests/sheet.h"
 #include "tests/node_types.h"
-#include "tests/plastic_softbody.h"
+#include "tests/plastic_body.h"
 
 TestSettings* g_testSettings = nullptr;
 Settings* g_settings = nullptr;
@@ -54,7 +54,7 @@ ViewModel::ViewModel(Model* model, GLFWwindow* window)
 	m_settings.RegisterTest("Cloth Element", &ClothElement::Create);
 	m_settings.RegisterTest("Sheet", &Sheet::Create);
 	m_settings.RegisterTest("Node Types", &NodeTypes::Create);
-	m_settings.RegisterTest("Plastic Soft Body", &PlasticSoftBody::Create);
+	m_settings.RegisterTest("Plastic Body", &PlasticBody::Create);
 
 	g_settings = &m_settings;
 	g_testSettings = &m_testSettings;

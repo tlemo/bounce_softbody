@@ -19,7 +19,7 @@
 #ifndef NODE_TYPES_H
 #define NODE_TYPES_H
 
-class NodeTypes : public SoftBody
+class NodeTypes : public Body
 {
 public:
 	NodeTypes()
@@ -33,7 +33,7 @@ public:
 		def.thickness = 0.2f;
 		def.friction = 0.6f;
 
-		m_body = new UniformSoftBody(def);
+		m_body = new UniformBody(def);
 
 		b3Vec3 gravity(0.0f, -9.8f, 0.0f);
 		m_body->SetGravity(gravity);
@@ -44,17 +44,17 @@ public:
 			{
 				int v = m_mesh.GetVertex(i, 0, k);
 
-				b3SoftBodyParticle* p = m_body->GetParticle(v);
-				p->SetType(e_staticSoftBodyParticle);
+				b3Particle* p = m_body->GetParticle(v);
+				p->SetType(e_staticParticle);
 			}
 		}
 
-		m_bodyDragger = new SoftBodyDragger(&m_ray, m_body);
+		m_bodyDragger = new BodyDragger(&m_ray, m_body);
 	}
 
 	void Step()
 	{
-		SoftBody::Step();
+		Body::Step();
 
 		DrawString(b3Color_white, "S - Static");
 		DrawString(b3Color_white, "D - Dynamic");
@@ -62,7 +62,7 @@ public:
 		DrawString(b3Color_white, "Arrows - Apply Force/Velocity/Position");
 	}
 
-	void SetBodyType(b3SoftBodyParticleType type)
+	void SetBodyType(b3ParticleType type)
 	{
 		for (int i = 0; i < m_mesh.GetRowVertexCount(); ++i)
 		{
@@ -70,7 +70,7 @@ public:
 			{
 				int v = m_mesh.GetVertex(i, 0, k);
 
-				b3SoftBodyParticle* p = m_body->GetParticle(v);
+				b3Particle* p = m_body->GetParticle(v);
 				p->SetType(type);
 			}
 		}
@@ -80,22 +80,22 @@ public:
 	{
 		if (button == GLFW_KEY_S)
 		{
-			SetBodyType(e_staticSoftBodyParticle);
+			SetBodyType(e_staticParticle);
 		}
 
 		if (button == GLFW_KEY_K)
 		{
-			SetBodyType(e_kinematicSoftBodyParticle);
+			SetBodyType(e_kinematicParticle);
 		}
 
 		if (button == GLFW_KEY_D)
 		{
-			SetBodyType(e_dynamicSoftBodyParticle);
+			SetBodyType(e_dynamicParticle);
 		}
 
 		for (int i = 0; i < m_mesh.vertexCount; ++i)
 		{
-			b3SoftBodyParticle* p = m_body->GetParticle(i);
+			b3Particle* p = m_body->GetParticle(i);
 
 			b3Vec3 d;
 			d.SetZero();
@@ -125,12 +125,12 @@ public:
 				button == GLFW_KEY_UP ||
 				button == GLFW_KEY_DOWN)
 			{
-				if (p->GetType() == e_staticSoftBodyParticle)
+				if (p->GetType() == e_staticParticle)
 				{
 					p->ApplyTranslation(d);
 				}
 
-				if (p->GetType() == e_kinematicSoftBodyParticle)
+				if (p->GetType() == e_kinematicParticle)
 				{
 					b3Vec3 v = p->GetVelocity();
 
@@ -139,7 +139,7 @@ public:
 					p->SetVelocity(v);
 				}
 
-				if (p->GetType() == e_dynamicSoftBodyParticle)
+				if (p->GetType() == e_dynamicParticle)
 				{
 					b3Vec3 f = 100.0f * d;
 

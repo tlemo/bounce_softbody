@@ -19,7 +19,7 @@
 #ifndef CLOTH_ELEMENT_H
 #define CLOTH_ELEMENT_H
 
-class ClothElement : public SoftBody
+class ClothElement : public Body
 {
 public:
 	ClothElement()
@@ -27,17 +27,17 @@ public:
 		ClothDef def;
 		def.mesh = &m_mesh;
 		def.createElements = true;
-		m_body = new UniformSoftBody(def);
+		m_body = new UniformBody(def);
 
 		for (int i = 0; i < m_mesh.GetColumnVertexCount(); ++i)
 		{
 			int vertex = m_mesh.GetVertex(0, i);
-			m_body->GetParticle(vertex)->SetType(e_staticSoftBodyParticle);
+			m_body->GetParticle(vertex)->SetType(e_staticParticle);
 		}
 
 		m_body->SetGravity(b3Vec3(0.0f, -9.8f, 0.0f));
 		
-		m_bodyDragger = new SoftBodyDragger(&m_ray, m_body);
+		m_bodyDragger = new BodyDragger(&m_ray, m_body);
 		m_bodyDragger->SetStaticDrag(false);
 	}
 

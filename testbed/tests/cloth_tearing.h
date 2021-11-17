@@ -22,26 +22,26 @@
 #include <bounce/common/template/array.h>
 #include <bounce/collision/geometry/plane.h>
 
-class ClothTearing : public SoftBody
+class ClothTearing : public Body
 {
 public:
 	ClothTearing()	
 	{
-		m_body = new UniformSoftBody();
+		m_body = new UniformBody();
 
 		GridClothMesh<10, 10> m;
 
-		b3SoftBodyParticle** particles = (b3SoftBodyParticle * *)malloc(m.vertexCount * sizeof(b3SoftBodyParticle*));
+		b3Particle** particles = (b3Particle * *)malloc(m.vertexCount * sizeof(b3Particle*));
 		for (int i = 0; i < m.vertexCount; ++i)
 		{
-			b3SoftBodyParticleDef pd;
-			pd.type = e_dynamicSoftBodyParticle;
+			b3ParticleDef pd;
+			pd.type = e_dynamicParticle;
 			pd.position = m.GetVertexPosition(i);
 
-			b3SoftBodyParticle* p = m_body->CreateParticle(pd);
+			b3Particle* p = m_body->CreateParticle(pd);
 			particles[i] = p;
 
-			b3SoftBodySphereShapeDef sd;
+			b3BodySphereShapeDef sd;
 			sd.p = p;
 			sd.radius = 0.2f;
 			sd.friction = 0.4f;
@@ -51,16 +51,16 @@ public:
 
 		for (int i = 0; i < m.triangleCount; ++i)
 		{
-			SoftBodyMeshTriangle triangle = m.GetTriangle(i);
+			BodyMeshTriangle triangle = m.GetTriangle(i);
 			int v1 = triangle.v1;
 			int v2 = triangle.v2;
 			int v3 = triangle.v3;
 
-			b3SoftBodyParticle* p1 = particles[v1];
-			b3SoftBodyParticle* p2 = particles[v2];
-			b3SoftBodyParticle* p3 = particles[v3];
+			b3Particle* p1 = particles[v1];
+			b3Particle* p2 = particles[v2];
+			b3Particle* p3 = particles[v3];
 
-			b3SoftBodyTriangleShapeDef tsd;
+			b3BodyTriangleShapeDef tsd;
 			tsd.p1 = p1;
 			tsd.p2 = p2;
 			tsd.p3 = p3;
@@ -72,21 +72,21 @@ public:
 			m_body->CreateTriangleShape(tsd);
 
 			{
-				b3SoftBodySpringForceDef sfd;
+				b3SpringForceDef sfd;
 				sfd.Initialize(p1, p2, 1000.0f, 10.0f);
 
 				CreateSpringForce(sfd);
 			}
 
 			{
-				b3SoftBodySpringForceDef sfd;
+				b3SpringForceDef sfd;
 				sfd.Initialize(p2, p3, 1000.0f, 10.0f);
 
 				CreateSpringForce(sfd);
 			}
 
 			{
-				b3SoftBodySpringForceDef sfd;
+				b3SpringForceDef sfd;
 				sfd.Initialize(p3, p1, 1000.0f, 10.0f);
 
 				CreateSpringForce(sfd);
@@ -96,30 +96,30 @@ public:
 		for (int i = 0; i < m.GetColumnVertexCount(); ++i)
 		{
 			int vertex = m.GetVertex(0, i);
-			particles[vertex]->SetType(e_staticSoftBodyParticle);
+			particles[vertex]->SetType(e_staticParticle);
 		}
 
 		free(particles);
 
 		m_body->SetGravity(b3Vec3(0.0f, -9.8f, 0.0f));
 
-		m_bodyDragger = new SoftBodyDragger(&m_ray, m_body);
+		m_bodyDragger = new BodyDragger(&m_ray, m_body);
 		m_bodyDragger->SetStaticDrag(false);
 	}
 
-	b3SoftBodySpringForce* FindSpringForce(b3SoftBodyParticle* p1, b3SoftBodyParticle* p2)
+	b3SpringForce* FindSpringForce(b3Particle* p1, b3Particle* p2)
 	{
-		for (b3SoftBodyForce* f = m_body->GetForceList().m_head; f; f = f->GetNext())
+		for (b3Force* f = m_body->GetForceList().m_head; f; f = f->GetNext())
 		{
-			if (f->GetType() != e_softBodySpringForce)
+			if (f->GetType() != e_springForce)
 			{
 				continue;
 			}
 
-			b3SoftBodySpringForce* sf = (b3SoftBodySpringForce*)f;
+			b3SpringForce* sf = (b3SpringForce*)f;
 
-			b3SoftBodyParticle* sp1 = sf->GetParticle1();
-			b3SoftBodyParticle* sp2 = sf->GetParticle2();
+			b3Particle* sp1 = sf->GetParticle1();
+			b3Particle* sp2 = sf->GetParticle2();
 
 			if (sp1 == p1 && sp2 == p2)
 			{
@@ -135,44 +135,44 @@ public:
 		return nullptr;
 	}
 
-	b3SoftBodySpringForce* CreateSpringForce(const b3SoftBodySpringForceDef& def)
+	b3SpringForce* CreateSpringForce(const b3SpringForceDef& def)
 	{
-		b3SoftBodySpringForce* sf = FindSpringForce(def.p1, def.p2);
+		b3SpringForce* sf = FindSpringForce(def.p1, def.p2);
 		if (sf != nullptr)
 		{
 			return sf;
 		}
 
-		return (b3SoftBodySpringForce*)m_body->CreateForce(def);
+		return (b3SpringForce*)m_body->CreateForce(def);
 	}
 
 	void DrawSpringForces()
 	{
-		for (b3SoftBodyForce* f = m_body->GetForceList().m_head; f; f = f->GetNext())
+		for (b3Force* f = m_body->GetForceList().m_head; f; f = f->GetNext())
 		{
-			if (f->GetType() != e_softBodySpringForce)
+			if (f->GetType() != e_springForce)
 			{
 				continue;
 			}
 
-			b3SoftBodySpringForce* s = (b3SoftBodySpringForce*)f;
+			b3SpringForce* s = (b3SpringForce*)f;
 
-			b3SoftBodyParticle* p1 = s->GetParticle1();
-			b3SoftBodyParticle* p2 = s->GetParticle2();
+			b3Particle* p1 = s->GetParticle1();
+			b3Particle* p2 = s->GetParticle2();
 
 			b3DrawSegment(g_debugDrawData, p1->GetPosition(), p2->GetPosition(), b3Color_black);
 		}
 	}
 
-	void Partition(b3SoftBodyParticle* p, const b3Plane& plane,
-		b3Array<b3SoftBodyTriangleShape*>& above,
-		b3Array<b3SoftBodyTriangleShape*>& below)
+	void Partition(b3Particle* p, const b3Plane& plane,
+		b3Array<b3BodyTriangleShape*>& above,
+		b3Array<b3BodyTriangleShape*>& below)
 	{
-		for (b3SoftBodyTriangleShape* t = m_body->GetTriangleShapeList().m_head; t; t = t->GetNext())
+		for (b3BodyTriangleShape* t = m_body->GetTriangleShapeList().m_head; t; t = t->GetNext())
 		{
-			b3SoftBodyParticle* p1 = t->GetParticle1();
-			b3SoftBodyParticle* p2 = t->GetParticle2();
-			b3SoftBodyParticle* p3 = t->GetParticle3();
+			b3Particle* p1 = t->GetParticle1();
+			b3Particle* p2 = t->GetParticle2();
+			b3Particle* p3 = t->GetParticle3();
 
 			if (p1 != p && p2 != p && p3 != p)
 			{
@@ -197,16 +197,16 @@ public:
 		}
 	}
 
-	bool HasSpring(const b3Array<b3SoftBodyTriangleShape*>& triangles,
-		b3SoftBodyParticle* pSplit, b3SoftBodyParticle* pOther)
+	bool HasSpring(const b3Array<b3BodyTriangleShape*>& triangles,
+		b3Particle* pSplit, b3Particle* pOther)
 	{
 		for (u32 i = 0; i < triangles.Count(); ++i)
 		{
-			b3SoftBodyTriangleShape* triangle = triangles[i];
+			b3BodyTriangleShape* triangle = triangles[i];
 
-			b3SoftBodyParticle* tp1 = triangle->GetParticle1();
-			b3SoftBodyParticle* tp2 = triangle->GetParticle2();
-			b3SoftBodyParticle* tp3 = triangle->GetParticle3();
+			b3Particle* tp1 = triangle->GetParticle1();
+			b3Particle* tp2 = triangle->GetParticle2();
+			b3Particle* tp3 = triangle->GetParticle3();
 
 			// 1, 2
 			if (tp1 == pSplit && tp2 == pOther)
@@ -248,10 +248,10 @@ public:
 		return false;
 	}
 
-	bool SplitParticle(b3SoftBodyParticle* pSplit, const b3Plane& plane)
+	bool SplitParticle(b3Particle* pSplit, const b3Plane& plane)
 	{
 		// Collect triangles.
-		b3StackArray<b3SoftBodyTriangleShape*, 32> trianglesAbove, trianglesBelow;
+		b3StackArray<b3BodyTriangleShape*, 32> trianglesAbove, trianglesBelow;
 		Partition(pSplit, plane, trianglesAbove, trianglesBelow);
 
 		// There must be at least one triangle on each side of the plane.
@@ -260,13 +260,13 @@ public:
 			return false;
 		}
 
-		b3SoftBodyParticleDef pdNew;
+		b3ParticleDef pdNew;
 		pdNew.type = pSplit->GetType();
 		pdNew.position = pSplit->GetPosition() - 0.2f * plane.normal;
 
-		b3SoftBodyParticle* pNew = m_body->CreateParticle(pdNew);
+		b3Particle* pNew = m_body->CreateParticle(pdNew);
 
-		b3SoftBodySphereShapeDef ssdNew;
+		b3BodySphereShapeDef ssdNew;
 		ssdNew.p = pNew;
 		ssdNew.radius = 0.2f;
 		ssdNew.friction = 0.4f;
@@ -275,17 +275,17 @@ public:
 
 		for (u32 i = 0; i < trianglesBelow.Count(); ++i)
 		{
-			b3SoftBodyTriangleShape* triangle = trianglesBelow[i];
+			b3BodyTriangleShape* triangle = trianglesBelow[i];
 
-			b3SoftBodyParticle* p1 = triangle->GetParticle1();
-			b3SoftBodyParticle* p2 = triangle->GetParticle2();
-			b3SoftBodyParticle* p3 = triangle->GetParticle3();
+			b3Particle* p1 = triangle->GetParticle1();
+			b3Particle* p2 = triangle->GetParticle2();
+			b3Particle* p3 = triangle->GetParticle3();
 
 			m_body->DestroyTriangleShape(triangle);
 
 			if (p1 == pSplit)
 			{
-				b3SoftBodyTriangleShapeDef tdNew;
+				b3BodyTriangleShapeDef tdNew;
 				tdNew.p1 = pNew;
 				tdNew.p2 = p2;
 				tdNew.p3 = p3;
@@ -295,10 +295,10 @@ public:
 
 				m_body->CreateTriangleShape(tdNew);
 
-				b3SoftBodySpringForce* sf1 = FindSpringForce(p1, p2);
+				b3SpringForce* sf1 = FindSpringForce(p1, p2);
 				if (sf1)
 				{
-					b3SoftBodySpringForceDef sNew;
+					b3SpringForceDef sNew;
 					sNew.p1 = pNew;
 					sNew.p2 = p2;
 					sNew.restLength = sf1->GetRestLenght();
@@ -313,10 +313,10 @@ public:
 					}
 				}
 
-				b3SoftBodySpringForce* sf2 = FindSpringForce(p3, p1);
+				b3SpringForce* sf2 = FindSpringForce(p3, p1);
 				if (sf2)
 				{
-					b3SoftBodySpringForceDef sNew;
+					b3SpringForceDef sNew;
 					sNew.p1 = p3;
 					sNew.p2 = pNew;
 					sNew.restLength = sf2->GetRestLenght();
@@ -334,7 +334,7 @@ public:
 			
 			if (p2 == pSplit)
 			{
-				b3SoftBodyTriangleShapeDef tdNew;
+				b3BodyTriangleShapeDef tdNew;
 				tdNew.p1 = p1;
 				tdNew.p2 = pNew;
 				tdNew.p3 = p3;
@@ -344,10 +344,10 @@ public:
 
 				m_body->CreateTriangleShape(tdNew);
 
-				b3SoftBodySpringForce* sf1 = FindSpringForce(p1, p2);
+				b3SpringForce* sf1 = FindSpringForce(p1, p2);
 				if (sf1)
 				{
-					b3SoftBodySpringForceDef sNew;
+					b3SpringForceDef sNew;
 					sNew.p1 = p1;
 					sNew.p2 = pNew;
 					sNew.restLength = sf1->GetRestLenght();
@@ -362,10 +362,10 @@ public:
 					}
 				}
 
-				b3SoftBodySpringForce* sf2 = FindSpringForce(p2, p3);
+				b3SpringForce* sf2 = FindSpringForce(p2, p3);
 				if (sf2)
 				{
-					b3SoftBodySpringForceDef sNew;
+					b3SpringForceDef sNew;
 					sNew.p1 = pNew;
 					sNew.p2 = p3;
 					sNew.restLength = sf2->GetRestLenght();
@@ -383,7 +383,7 @@ public:
 			
 			if (p3 == pSplit)
 			{
-				b3SoftBodyTriangleShapeDef tdNew;
+				b3BodyTriangleShapeDef tdNew;
 				tdNew.p1 = p1;
 				tdNew.p2 = p2;
 				tdNew.p3 = pNew;
@@ -393,10 +393,10 @@ public:
 
 				m_body->CreateTriangleShape(tdNew);
 				
-				b3SoftBodySpringForce* sf1 = FindSpringForce(p2, p3);
+				b3SpringForce* sf1 = FindSpringForce(p2, p3);
 				if (sf1)
 				{
-					b3SoftBodySpringForceDef sNew;
+					b3SpringForceDef sNew;
 					sNew.p1 = p2;
 					sNew.p2 = pNew;
 					sNew.restLength = sf1->GetRestLenght();
@@ -411,10 +411,10 @@ public:
 					}
 				}
 
-				b3SoftBodySpringForce* sf2 = FindSpringForce(p3, p1);
+				b3SpringForce* sf2 = FindSpringForce(p3, p1);
 				if (sf2)
 				{
-					b3SoftBodySpringForceDef sNew;
+					b3SpringForceDef sNew;
 					sNew.p1 = pNew;
 					sNew.p2 = p1;
 					sNew.restLength = sf2->GetRestLenght();
@@ -436,16 +436,16 @@ public:
 
 	bool Tear()
 	{
-		b3SoftBodyForce* f = m_body->GetForceList().m_head;
+		b3Force* f = m_body->GetForceList().m_head;
 		while (f)
 		{
-			if (f->GetType() != e_softBodySpringForce)
+			if (f->GetType() != e_springForce)
 			{
 				f = f->GetNext();
 				continue;
 			}
 
-			b3SoftBodySpringForce* s = (b3SoftBodySpringForce*)f;
+			b3SpringForce* s = (b3SpringForce*)f;
 			f = f->GetNext();
 
 			b3Vec3 tension = s->GetActionForce();
@@ -457,13 +457,13 @@ public:
 				continue;
 			}
 
-			b3SoftBodyParticle* p1 = s->GetParticle1();
-			b3SoftBodyParticle* p2 = s->GetParticle2();
+			b3Particle* p1 = s->GetParticle1();
+			b3Particle* p2 = s->GetParticle2();
 
 			b3Vec3 x1 = p1->GetPosition();
 			b3Vec3 x2 = p2->GetPosition();
 
-			if (p1->GetType() == e_dynamicSoftBodyParticle)
+			if (p1->GetType() == e_dynamicParticle)
 			{
 				b3Vec3 n = b3Normalize(x2 - x1);
 				b3Plane plane(n, x1);
@@ -475,7 +475,7 @@ public:
 				}
 			}
 
-			if (p2->GetType() == e_dynamicSoftBodyParticle)
+			if (p2->GetType() == e_dynamicParticle)
 			{
 				b3Vec3 n = b3Normalize(x1 - x2);
 				b3Plane plane(n, x2);
@@ -493,7 +493,7 @@ public:
 
 	void Step()
 	{
-		SoftBody::Step();
+		Body::Step();
 
 		while (Tear());
 

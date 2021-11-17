@@ -16,44 +16,28 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef CAPSULE_CONTACT_H
-#define CAPSULE_CONTACT_H
+#ifndef B3_CONTACT_MANAGER_H
+#define B3_CONTACT_MANAGER_H
 
-class CapsuleContact : public Body
+#include <bounce/dynamics/contacts/sphere_shape_contact.h>
+#include <bounce/common/template/list.h>
+
+class b3Body;
+class b3BlockAllocator;
+
+// Contact delegator for b3Body.
+class b3ContactManager
 {
 public:
-	CapsuleContact()
-	{
-		m_mesh.Translate(b3Vec3(0.0f, 10.0f, 0.0f));
+	void AddPair(b3BodySphereShape* shape1, b3BodyWorldShape* shape2);
+	void FindNewContacts();
+	void UpdateContacts();
 
-		ClothDef def;
-		def.mesh = &m_mesh;
-		def.thickness = 0.2f;
-		def.friction = 0.4f;
-		m_body = new UniformBody(def);
+	void Destroy(b3SphereAndShapeContact* contact);
 
-		b3CapsuleShape capsuleShape;
-		capsuleShape.m_center1.Set(0.0f, 0.0f, 5.0f);
-		capsuleShape.m_center2.Set(0.0f, 0.0f, -5.0f);
-		capsuleShape.m_radius = 2.0f;
-
-		b3BodyWorldShapeDef capsuleShapeDef;
-		capsuleShapeDef.shape = &capsuleShape;
-		capsuleShapeDef.friction = 0.5f;
-
-		m_body->CreateWorldShape(capsuleShapeDef);
-
-		m_body->SetGravity(b3Vec3(0.0f, -9.8f, 0.0f));
-
-		m_bodyDragger = new BodyDragger(&m_ray, m_body);
-	}
-
-	static Test* Create()
-	{
-		return new CapsuleContact;
-	}
-
-	GridClothMesh<10, 10> m_mesh;
+	b3Body* m_body;
+	b3BlockAllocator* m_allocator;
+	b3List<b3SphereAndShapeContact> m_shapeContactList;
 };
 
 #endif

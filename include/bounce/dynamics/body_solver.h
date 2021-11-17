@@ -16,44 +16,53 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef CAPSULE_CONTACT_H
-#define CAPSULE_CONTACT_H
+#ifndef B3_BODY_SOLVER_H
+#define B3_BODY_SOLVER_H
 
-class CapsuleContact : public Body
+#include <bounce/common/math/mat22.h>
+#include <bounce/common/math/mat33.h>
+
+class b3StackAllocator;
+
+class b3Particle;
+class b3Force;
+class b3SphereAndShapeContact;
+
+struct b3TimeStep;
+
+struct b3BodySolverDef
+{
+	b3StackAllocator* stack;
+	u32 particleCapacity;
+	u32 forceCapacity;
+	u32 shapeContactCapacity;
+};
+
+class b3BodySolver
 {
 public:
-	CapsuleContact()
-	{
-		m_mesh.Translate(b3Vec3(0.0f, 10.0f, 0.0f));
+	b3BodySolver(const b3BodySolverDef& def);
+	~b3BodySolver();
+	
+	void Add(b3Particle* p);
+	void Add(b3Force* f);
+	void Add(b3SphereAndShapeContact* c);
+	
+	void Solve(const b3TimeStep& step, const b3Vec3& gravity);
+private:
+	b3StackAllocator* m_stack;
 
-		ClothDef def;
-		def.mesh = &m_mesh;
-		def.thickness = 0.2f;
-		def.friction = 0.4f;
-		m_body = new UniformBody(def);
+	u32 m_particleCapacity;
+	u32 m_particleCount;
+	b3Particle** m_particles;
 
-		b3CapsuleShape capsuleShape;
-		capsuleShape.m_center1.Set(0.0f, 0.0f, 5.0f);
-		capsuleShape.m_center2.Set(0.0f, 0.0f, -5.0f);
-		capsuleShape.m_radius = 2.0f;
+	u32 m_forceCapacity;
+	u32 m_forceCount;
+	b3Force** m_forces;
 
-		b3BodyWorldShapeDef capsuleShapeDef;
-		capsuleShapeDef.shape = &capsuleShape;
-		capsuleShapeDef.friction = 0.5f;
-
-		m_body->CreateWorldShape(capsuleShapeDef);
-
-		m_body->SetGravity(b3Vec3(0.0f, -9.8f, 0.0f));
-
-		m_bodyDragger = new BodyDragger(&m_ray, m_body);
-	}
-
-	static Test* Create()
-	{
-		return new CapsuleContact;
-	}
-
-	GridClothMesh<10, 10> m_mesh;
+	u32 m_shapeContactCapacity;
+	u32 m_shapeContactCount;
+	b3SphereAndShapeContact** m_shapeContacts;
 };
 
 #endif

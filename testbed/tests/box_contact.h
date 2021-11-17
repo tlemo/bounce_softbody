@@ -19,7 +19,7 @@
 #ifndef BOX_CONTACT_H
 #define BOX_CONTACT_H
 
-class BoxContact : public SoftBody
+class BoxContact : public Body
 {
 public:
 	BoxContact()
@@ -30,13 +30,13 @@ public:
 		def.mesh = &m_mesh;
 		def.thickness = 0.2f;
 		def.friction = 0.8f;
-		m_body = new UniformSoftBody(def);
+		m_body = new UniformBody(def);
 		
 		b3BoxShape boxShape;
 		boxShape.m_extents.Set(3.0f, 3.0f, 3.0f);
 		boxShape.m_radius = 0.2f;
 
-		b3SoftBodyWorldShapeDef boxShapeDef;
+		b3BodyWorldShapeDef boxShapeDef;
 		boxShapeDef.shape = &boxShape;
 		boxShapeDef.friction = 0.5f;
 		
@@ -44,7 +44,7 @@ public:
 
 		m_body->SetGravity(b3Vec3(0.0f, -9.8f, 0.0f));
 
-		m_bodyDragger = new SoftBodyDragger(&m_ray, m_body);
+		m_bodyDragger = new BodyDragger(&m_ray, m_body);
 	}
 
 	static Test* Create()

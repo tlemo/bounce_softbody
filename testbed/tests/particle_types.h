@@ -32,13 +32,13 @@ public:
 		DrawString(b3Color_white, "Arrows - Apply Force/Velocity/Position");
 	}
 
-	void SetClothType(b3SoftBodyParticleType type)
+	void SetClothType(b3ParticleType type)
 	{
 		for (int j = 0; j < m_clothMesh.GetColumnVertexCount(); ++j)
 		{
 			int v = m_clothMesh.GetVertex(0, j);
 
-			b3SoftBodyParticle* p = m_body->GetParticle(v);
+			b3Particle* p = m_body->GetParticle(v);
 			p->SetType(type);
 		}
 
@@ -46,7 +46,7 @@ public:
 		{
 			int v = m_clothMesh.GetVertex(m_clothMesh.GetRowVertexCount() - 1, j);
 
-			b3SoftBodyParticle* p = m_body->GetParticle(v);
+			b3Particle* p = m_body->GetParticle(v);
 			p->SetType(type);
 		}
 	}
@@ -55,20 +55,20 @@ public:
 	{
 		if (button == GLFW_KEY_S)
 		{
-			SetClothType(e_staticSoftBodyParticle);
+			SetClothType(e_staticParticle);
 		}
 
 		if (button == GLFW_KEY_K)
 		{
-			SetClothType(e_kinematicSoftBodyParticle);
+			SetClothType(e_kinematicParticle);
 		}
 
 		if (button == GLFW_KEY_D)
 		{
-			SetClothType(e_dynamicSoftBodyParticle);
+			SetClothType(e_dynamicParticle);
 		}
 
-		for (b3SoftBodyParticle* p = m_body->GetParticleList().m_head; p; p = p->GetNext())
+		for (b3Particle* p = m_body->GetParticleList().m_head; p; p = p->GetNext())
 		{
 			b3Vec3 d;
 			d.SetZero();
@@ -98,12 +98,12 @@ public:
 				button == GLFW_KEY_UP ||
 				button == GLFW_KEY_DOWN)
 			{
-				if (p->GetType() == e_staticSoftBodyParticle)
+				if (p->GetType() == e_staticParticle)
 				{
 					p->ApplyTranslation(d);
 				}
 
-				if (p->GetType() == e_kinematicSoftBodyParticle)
+				if (p->GetType() == e_kinematicParticle)
 				{
 					b3Vec3 v = p->GetVelocity();
 
@@ -112,7 +112,7 @@ public:
 					p->SetVelocity(v);
 				}
 
-				if (p->GetType() == e_dynamicSoftBodyParticle)
+				if (p->GetType() == e_dynamicParticle)
 				{
 					b3Vec3 f = 100.0f * d;
 

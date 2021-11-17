@@ -19,7 +19,7 @@
 #ifndef PINNED_CLOTH_H
 #define PINNED_CLOTH_H
 
-class PinnedCloth : public SoftBody
+class PinnedCloth : public Body
 {
 public:
 	PinnedCloth()
@@ -30,7 +30,7 @@ public:
 		def.density = 0.2f;
 		def.stretchingStiffness = 100000.0f;
 
-		m_body = new UniformSoftBody(def);
+		m_body = new UniformBody(def);
 
 		m_body->SetGravity(b3Vec3(0.0f, -9.8f, 0.0f));
 
@@ -40,11 +40,11 @@ public:
 			int v1 = m_clothMesh.GetVertex(0, j);
 			int v2 = m_clothMesh.GetVertex(m_clothMesh.GetRowVertexCount() - 1, j);
 
-			m_body->GetParticle(v1)->SetType(e_staticSoftBodyParticle);
-			m_body->GetParticle(v2)->SetType(e_staticSoftBodyParticle);
+			m_body->GetParticle(v1)->SetType(e_staticParticle);
+			m_body->GetParticle(v2)->SetType(e_staticParticle);
 		}
 
-		m_bodyDragger = new SoftBodyDragger(&m_ray, m_body);
+		m_bodyDragger = new BodyDragger(&m_ray, m_body);
 	}
 
 	static Test* Create()
