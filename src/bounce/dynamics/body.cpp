@@ -189,14 +189,20 @@ void b3Body::DestroyTetrahedronShape(b3BodyTetrahedronShape* shape)
 
 b3Force* b3Body::CreateForce(const b3ForceDef& def)
 {
+	// Call the factory.
 	b3Force* f = b3Force::Create(&def, &m_blockAllocator);
+	
+	// Add to body list.
 	m_forceList.PushFront(f);
 	return f;
 }
 
 void b3Body::DestroyForce(b3Force* force)
 {
+	// Remove from body list.
 	m_forceList.Remove(force);
+	
+	// Call the factory
 	b3Force::Destroy(force, &m_blockAllocator);
 }
 
