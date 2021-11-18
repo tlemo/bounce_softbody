@@ -50,21 +50,6 @@ void b3SphereAndShapeContact::Update()
 {
 	m_normalForce = scalar(0);
 	m_active = false;
-
-	b3Sphere sphere;
-	sphere.vertex = m_s1->m_p->m_position;
-	sphere.radius = m_s1->m_radius;
-
-	b3SphereManifold manifold;
-	if (m_s2->CollideSphere(&manifold, sphere) == false)
-	{
-		return;
-	}
-
-	// The friction solver uses initial tangents.
-	m_tangent1 = b3Perp(manifold.normal);
-	m_tangent2 = b3Cross(m_tangent1, manifold.normal);
-	m_active = true;
 }
 
 void b3SphereAndShapeContact::ComputeForces(const b3SparseForceSolverData* data)
@@ -94,6 +79,14 @@ void b3SphereAndShapeContact::ComputeForces(const b3SparseForceSolverData* data)
 	if (m_s2->CollideSphere(&manifold2, sphere1) == false)
 	{
 		return;
+	}
+
+	// The friction solver uses initial tangents.
+	if (m_active == false)
+	{
+		m_active = true;
+		m_tangent1 = b3Perp(manifold2.normal);
+		m_tangent2 = b3Cross(m_tangent1, manifold2.normal);
 	}
 
 	b3Vec3 x2 = manifold2.point;
