@@ -84,9 +84,9 @@ void b3SphereAndShapeContact::ComputeForces(const b3SparseForceSolverData* data)
 	// The friction solver uses initial tangents.
 	if (m_active == false)
 	{
-		m_active = true;
 		m_tangent1 = b3Perp(manifold2.normal);
 		m_tangent2 = b3Cross(m_tangent1, manifold2.normal);
+		m_active = true;
 	}
 
 	b3Vec3 x2 = manifold2.point;
