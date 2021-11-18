@@ -221,7 +221,7 @@ void View::Interface()
 
 	if (openAbout)
 	{
-		ImGui::OpenPopup("About Bounce Testbed");
+		ImGui::OpenPopup("About Bounce Softbody Testbed");
 	}
 
 	ImVec2 buttonSize(-1.0f, 0.0f);

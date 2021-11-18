@@ -36,13 +36,13 @@ struct b3RowEntry
 struct b3RowEntryList
 {
 	b3RowEntryList() { }
-	
+
 	void Insert(b3RowEntry* entry);
 
 	void Remove(b3RowEntry* entry);
-	
+
 	b3RowEntry* Search(u32 column);
-	
+
 	b3RowEntry* head;
 	u32 count;
 };
@@ -94,9 +94,9 @@ inline b3RowEntry* b3RowEntryList::Search(u32 column)
 struct b3SparseMat33
 {
 	b3SparseMat33(u32 m);
-	
+
 	b3SparseMat33(const b3SparseMat33& _m);
-	
+
 	~b3SparseMat33();
 
 	b3SparseMat33& operator=(const b3SparseMat33& _m);
@@ -108,10 +108,12 @@ struct b3SparseMat33
 	void SetZero(u32 i, u32 j);
 
 	void SetZeroRow(u32 i);
-	
+
 	void SetZeroColumn(u32 j);
 
 	b3Mat33* Search(u32 i, u32 j);
+
+	const b3Mat33* Search(u32 i, u32 j) const;
 
 	b3Mat33& operator()(u32 i, u32 j);
 
@@ -122,7 +124,7 @@ struct b3SparseMat33
 	void operator-=(const b3SparseMat33& m);
 
 	void operator+=(const b3DiagMat33& m);
-	
+
 	void operator-=(const b3DiagMat33& m);
 
 	u32 GetElementCount() const { return 3 * rowCount * 3 * rowCount; }
@@ -130,7 +132,7 @@ struct b3SparseMat33
 	scalar& GetElement(u32 i, u32 j);
 
 	scalar GetElement(u32 i, u32 j) const;
-	
+
 	void CreateMatrix(scalar* out) const;
 
 	u32 rowCount;
@@ -227,7 +229,20 @@ inline void b3SparseMat33::Copy(const b3SparseMat33& _m)
 	}
 }
 
-inline b3Mat33* b3SparseMat33::Search(u32 i, u32 j) 
+inline b3Mat33* b3SparseMat33::Search(u32 i, u32 j)
+{
+	B3_ASSERT(i < rowCount);
+	B3_ASSERT(j < rowCount);
+	b3RowEntryList* list = rows + i;
+	b3RowEntry* e = list->Search(j);
+	if (e)
+	{
+		return &e->value;
+	}
+	return nullptr;
+}
+
+inline const b3Mat33* b3SparseMat33::Search(u32 i, u32 j) const
 {
 	B3_ASSERT(i < rowCount);
 	B3_ASSERT(j < rowCount);
@@ -256,7 +271,7 @@ inline b3Mat33& b3SparseMat33::operator()(u32 i, u32 j)
 	B3_ASSERT(j < rowCount);
 
 	b3RowEntryList* list = rows + i;
-	
+
 	b3RowEntry* e = list->Search(j);
 	if (e)
 	{
@@ -276,9 +291,9 @@ inline void b3SparseMat33::SetZero(u32 i, u32 j)
 {
 	B3_ASSERT(i < rowCount);
 	B3_ASSERT(j < rowCount);
-	
+
 	b3RowEntryList* list = rows + i;
-	
+
 	b3RowEntry* e = list->Search(j);
 	if (e)
 	{
@@ -485,7 +500,7 @@ inline void b3Mul(b3DenseVec3& out, const b3SparseMat33& A, const b3DenseVec3& v
 	for (u32 i = 0; i < A.rowCount; ++i)
 	{
 		b3RowEntryList* list = A.rows + i;
-		
+
 		for (b3RowEntry* e = list->head; e; e = e->next)
 		{
 			u32 j = e->column;
@@ -513,6 +528,43 @@ inline void b3Mul(b3SparseMat33& out, scalar s, const b3SparseMat33& B)
 		for (b3RowEntry* e = list->head; e; e = e->next)
 		{
 			e->value = s * e->value;
+		}
+	}
+}
+
+inline void b3Mul(b3SparseMat33& out, const b3DiagMat33& A, const b3SparseMat33& B)
+{
+	B3_ASSERT(A.n == B.rowCount);
+	B3_ASSERT(out.rowCount == B.rowCount);
+
+	out = B;
+	
+	// See https://solitaryroad.com/c108.html
+	for (u32 i = 0; i < out.rowCount; ++i)
+	{
+		b3RowEntryList* list = out.rows + i;
+		for (b3RowEntry* e = list->head; e; e = e->next)
+		{
+			e->value = A[i] * e->value;
+		}
+	}
+}
+
+inline void b3Mul(b3SparseMat33& out, const b3SparseMat33& A, const b3DiagMat33& B)
+{
+	B3_ASSERT(A.rowCount == B.n);
+	B3_ASSERT(out.rowCount == A.rowCount);
+
+	out = A;
+
+	// See https://solitaryroad.com/c108.html
+	for (u32 i = 0; i < out.rowCount; ++i)
+	{
+		b3RowEntryList* list = out.rows + i;
+		for (b3RowEntry* e = list->head; e; e = e->next)
+		{
+			u32 j = e->column;
+			e->value = B[j] * e->value;
 		}
 	}
 }
@@ -570,6 +622,20 @@ inline b3DenseVec3 operator*(const b3SparseMat33& A, const b3DenseVec3& v)
 {
 	b3DenseVec3 result(v.n);
 	b3Mul(result, A, v);
+	return result;
+}
+
+inline b3SparseMat33 operator*(const b3DiagMat33& A, const b3SparseMat33& B)
+{
+	b3SparseMat33 result(B.rowCount);
+	b3Mul(result, A, B);
+	return result;
+}
+
+inline b3SparseMat33 operator*(const b3SparseMat33& A, const b3DiagMat33& B)
+{
+	b3SparseMat33 result(A.rowCount);
+	b3Mul(result, A, B);
 	return result;
 }
 

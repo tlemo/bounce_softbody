@@ -115,15 +115,21 @@ void b3SparseSolveBE(b3SolveBEOutput* output, const b3SolveBEInput* input)
 	const b3DenseVec3& fe = *input->fe;
 	const b3DiagMat33& M = *input->M;
 	const b3DenseVec3& y = *input->y;
-	
-	u32 fixedDofCount = input->fixedDofCount;
-	u32* fixedDofs = input->fixedDofs;
+	const b3DiagMat33& S = *input->S;
+	const b3DenseVec3& z = *input->z;
 
 	u32 maxIterations = input->maxIterations;
 	scalar epsilon = input->tolerance;
 
 	u32 maxSubIterations = input->maxSubIterations;
 	scalar subEpsilon = input->subTolerance;
+
+	// S^T
+	b3DiagMat33 ST(dofCount);
+	b3Transpose(ST, S);
+
+	b3DiagMat33 I(dofCount);
+	I.SetIdentity();
 
 	b3DenseVec3 x = x0;
 	b3DenseVec3 v = v0;
@@ -156,54 +162,32 @@ void b3SparseSolveBE(b3SolveBEOutput* output, const b3SolveBEInput* input)
 
 		forceModel->ComputeForces(&solverData);
 
-		// Dirichlet boundary condition via elimination.
-		for (u32 k = 0; k < fixedDofCount; ++k)
-		{
-			u32 i = fixedDofs[k];
-
-			// Zero out the rows and columns.
-			dfdx.SetZeroRow(i);
-			dfdx.SetZeroColumn(i);
-
-			dfdv.SetZeroRow(i);
-			dfdv.SetZeroColumn(i);
-		}
-
-		// Solve Ax = b
-		// Because the mass matrix is a positive diagonal, it 
-		// fixes under-determination of A due to elimination.
 		b3SparseMat33 A = M - h * dfdv - (h * h) * dfdx;
-
-		b3DenseVec3 b = M * (v0 - v) + h * (fe + fi) + h * dfdx * (x0 - x + h * v + y);
 		
-		// Zero out the rows in the right side.
-		for (u32 k = 0; k < fixedDofCount; ++k)
-		{
-			u32 i = fixedDofs[k];
-			b[i].SetZero();
-		}
+		b3DenseVec3 b = M * (v0 - v) + h * (fe + fi) + h * dfdx * (x0 - x + h * v + y);
 
+		// Pre-filter as in "Smoothed aggregation multigrid for cloth simulation", 
+		// by Tamstorf, R., T. Jones, and S. McCormick.
+		// A' = S * A * ST + I - S
+		// b' = S * (b - A * z)
+		b3SparseMat33 pA = S * A * ST + I - S;
+		b3DenseVec3 pb = S * (b - A * z);
+
+		// Solve pA * y = pb, 
+		// where y = x - z
 		b3SolveCGInput subInput;
-		subInput.A = &A;
-		subInput.b = &b;
+		subInput.A = &pA;
+		subInput.b = &pb;
 		subInput.maxIterations = maxSubIterations;
 		subInput.tolerance = subEpsilon;
 
 		b3SolveCGOutput subOutput;
 		subOutput.x = &dv;
 
-		// Solve Ax = b
 		bool subSolved = b3SparseSolveCG(&subOutput, &subInput);
 		if (subSolved == false)
 		{
 			break;
-		}
-
-		// Zero solution rows to be sure.
-		for (u32 k = 0; k < fixedDofCount; ++k)
-		{
-			u32 i = fixedDofs[k];
-			dv[i].SetZero();
 		}
 
 		// Track min/max sub-iterations.
@@ -223,7 +207,7 @@ void b3SparseSolveBE(b3SolveBEOutput* output, const b3SolveBEInput* input)
 			++iteration;
 
 			error0 = error;
-
+			
 			if (error <= epsilon * epsilon)
 			{
 				break;

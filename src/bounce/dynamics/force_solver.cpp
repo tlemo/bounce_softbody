@@ -92,8 +92,9 @@ void b3ForceSolver::Solve(const b3Vec3& gravity)
 	b3DenseVec3 x(m_particleCount);
 	b3DenseVec3 v(m_particleCount);
 	b3DiagMat33 M(m_particleCount);
-	u32 fixedDofCount = 0;
-
+	b3DiagMat33 S(m_particleCount);
+	b3DenseVec3 z(m_particleCount);
+	
 	for (u32 i = 0; i < m_particleCount; ++i)
 	{
 		b3Particle* p = m_particles[i];
@@ -102,6 +103,7 @@ void b3ForceSolver::Solve(const b3Vec3& gravity)
 		v0[i] = p->m_velocity;
 		fe[i] = p->m_force;
 		y[i] = p->m_translation;
+		z[i].SetZero();
 
 		if (p->m_type == e_dynamicParticle)
 		{
@@ -110,27 +112,18 @@ void b3ForceSolver::Solve(const b3Vec3& gravity)
 
 			// Apply weight
 			fe[i] += p->m_mass * gravity;
+
+			// Set as unconstrained particle.
+			S[i].SetIdentity();
 		}
 		else
 		{
 			// Ensure a non-zero mass because zero masses 
 			// can make the system unsolvable.
 			M[i] = b3Mat33Diagonal(scalar(1));
-			++fixedDofCount;
-		}
-	}
-	
-	// Collect the constrained degrees of freedom.
-	u32* fixedDofs = (u32*)m_stack->Allocate(fixedDofCount * sizeof(u32));
 
-	fixedDofCount = 0;
-	for (u32 i = 0; i < m_particleCount; ++i)
-	{
-		b3Particle* p = m_particles[i];
-		if (p->m_type != e_dynamicParticle)
-		{
-			fixedDofs[fixedDofCount] = i;
-			++fixedDofCount;
+			// Constrain particle.
+			S[i].SetZero();
 		}
 	}
 
@@ -154,8 +147,8 @@ void b3ForceSolver::Solve(const b3Vec3& gravity)
 	solverInput.fe = &fe;
 	solverInput.M = &M;
 	solverInput.y = &y;
-	solverInput.fixedDofCount = fixedDofCount;
-	solverInput.fixedDofs = fixedDofs;
+	solverInput.S = &S;
+	solverInput.z = &z;
 	solverInput.maxIterations = m_step.forceIterations;
 	solverInput.maxSubIterations = m_step.forceSubIterations;
 	
@@ -168,9 +161,6 @@ void b3ForceSolver::Solve(const b3Vec3& gravity)
 
 	// Integrate F = ma.
 	b3SparseSolveBE(&solverOutput, &solverInput);
-
-	// Free temporary memory.
-	m_stack->Free(fixedDofs);
 
 	// Track non-linear iterations.
 	b3_forceSolverIterations = solverOutput.iterations;

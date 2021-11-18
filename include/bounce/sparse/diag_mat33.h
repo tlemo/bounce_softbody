@@ -106,6 +106,15 @@ struct b3DiagMat33
 	u32 n;
 };
 
+inline void b3Transpose(b3DiagMat33& out, const b3DiagMat33& A)
+{
+	B3_ASSERT(out.n == A.n);
+	for (u32 i = 0; i < A.n; ++i)
+	{
+		out[i] = b3Transpose(A[i]);
+	}
+}
+
 inline void b3Add(b3DiagMat33& out, const b3DiagMat33& a, const b3DiagMat33& b)
 {
 	B3_ASSERT(out.n == a.n && a.n == b.n);

@@ -74,7 +74,7 @@ struct TestSettings
 		hertz = 60.0f;
 		inv_hertz = 1.0f / hertz;
 		forceIterations = 1;
-		forceSubIterations = 30;
+		forceSubIterations = 40;
 		pause = true;
 		singlePlay = false;
 	}

@@ -54,7 +54,6 @@ struct b3SolveBEInput
 	// Default constructor sets some parameters for convenience.
 	b3SolveBEInput()
 	{
-		fixedDofCount = 0;
 		maxIterations = 1;
 		tolerance = B3_EPSILON;
 		maxSubIterations = 20;
@@ -73,9 +72,8 @@ struct b3SolveBEInput
 	const b3DenseVec3* fe; // external forces constant over time-step [t, t + h]
 	const b3DiagMat33* M; // mass matrix for inertial effects
 	const b3DenseVec3* y; // translation such that x(t + h) = x(t + h) + y
-
-	u32 fixedDofCount; // number of constrained degrees of freedom
-	u32* fixedDofs; // indices to constrained degrees of freedom
+	const b3DiagMat33* S; // constraint filter matrix
+	const b3DenseVec3* z; // desired subsolver solution (usually zero)
 
 	u32 maxIterations; // max of outer iterations
 	scalar tolerance; // outer tolerance. units: m^2/s^2 
