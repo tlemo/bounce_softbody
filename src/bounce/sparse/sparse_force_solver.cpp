@@ -131,12 +131,12 @@ void b3SparseSolveBE(b3SolveBEOutput* output, const b3SolveBEInput* input)
 	b3DiagMat33 I(dofCount);
 	I.SetIdentity();
 
+	// Keep track initial guess.
+	b3DenseVec3 py(dofCount);
+	py.SetZero();
+
 	b3DenseVec3 x = x0;
 	b3DenseVec3 v = v0;
-
-	// Keep track initial guess.
-	b3DenseVec3 dv(dofCount);
-	dv.SetZero();
 
 	scalar error0 = scalar(0);
 	scalar error = scalar(0);
@@ -182,13 +182,16 @@ void b3SparseSolveBE(b3SolveBEOutput* output, const b3SolveBEInput* input)
 		subInput.tolerance = subEpsilon;
 
 		b3SolveCGOutput subOutput;
-		subOutput.x = &dv;
+		subOutput.x = &py;
 
 		bool subSolved = b3SparseSolveCG(&subOutput, &subInput);
 		if (subSolved == false)
 		{
 			break;
 		}
+
+		// Recover x = y + z
+		b3DenseVec3 dv = py + z;
 
 		// Track min/max sub-iterations.
 		output->minSubIterations = b3Min(output->minSubIterations, subOutput.iterations);
