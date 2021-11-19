@@ -539,7 +539,10 @@ inline void b3Mul(b3SparseMat33& out, const b3DiagMat33& A, const b3SparseMat33&
 
 	out = B;
 	
-	// See https://solitaryroad.com/c108.html
+	// Pre multiplication:
+	// [a11 0 ] [b11 b12] = [a11 * b11  a11 * b12]
+	// [0  a22] [b21 b22]   [a22 * b21  a22 * b22]
+	// cij = aii * bij
 	for (u32 i = 0; i < out.rowCount; ++i)
 	{
 		b3RowEntryList* list = out.rows + i;
@@ -557,14 +560,17 @@ inline void b3Mul(b3SparseMat33& out, const b3SparseMat33& A, const b3DiagMat33&
 
 	out = A;
 
-	// See https://solitaryroad.com/c108.html
+	// Post multiplication:
+	// [a11 a12] * [b11 0 ] = [a11 * b11  a12 * b22]
+	// [a21 a22]   [0  b22]   [a21 * b11  a22 * b22]
+	// cij = aij * bjj
 	for (u32 i = 0; i < out.rowCount; ++i)
 	{
 		b3RowEntryList* list = out.rows + i;
 		for (b3RowEntry* e = list->head; e; e = e->next)
 		{
 			u32 j = e->column;
-			e->value = B[j] * e->value;
+			e->value = e->value * B[j];
 		}
 	}
 }
