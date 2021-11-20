@@ -25,8 +25,14 @@
 
 class b3Particle;
 
+// Body tetrahedron shape definition.
 struct b3BodyTetrahedronShapeDef : public b3BodyShapeDef
 {
+	b3BodyTetrahedronShapeDef()
+	{
+		type = e_bodyTetrahedronShape;
+	}
+
 	// Particles
 	b3Particle* p1;
 	b3Particle* p2;

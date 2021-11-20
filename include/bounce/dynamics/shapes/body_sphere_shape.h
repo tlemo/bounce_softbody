@@ -25,8 +25,14 @@
 
 class b3Particle;
 
+// Body sphere shape definition.
 struct b3BodySphereShapeDef : public b3BodyShapeDef
 {
+	b3BodySphereShapeDef()
+	{
+		type = e_bodySphereShape;
+	}
+
 	// Particle
 	b3Particle* p;
 };

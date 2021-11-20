@@ -50,7 +50,6 @@ struct b3ParticleDef
 	}
 
 	// The particle type.
-	// Types: static, kinematic, and dynamic.
 	b3ParticleType type;
 
 	// Initial position of the particle.
@@ -108,10 +107,10 @@ public:
 	// Apply a translation.
 	void ApplyTranslation(const b3Vec3& translation);
 
-	// Set the mass coefficient of damping.
+	// Set the coefficient of mass damping.
 	void SetMassDamping(scalar massDamping);
 
-	// Get the mass coefficient of damping.
+	// Get the coefficient of mass damping.
 	scalar GetMassDamping() const;
 
 	// Get the mesh index.
@@ -139,7 +138,6 @@ private:
 	friend class b3BodyTriangleShape;
 	friend class b3BodyTetrahedronShape;
 	friend class b3SphereAndShapeContact;
-	friend class b3BodyContactSolver;
 	friend class b3Force;
 	friend class b3StretchForce;
 	friend class b3ShearForce;

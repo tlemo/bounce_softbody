@@ -31,7 +31,7 @@ enum b3BodyShapeType
 	e_maxBodyShapes
 };
 
-// Shape definition.
+// Body shape definition.
 struct b3BodyShapeDef
 {
 	b3BodyShapeDef()
@@ -58,7 +58,7 @@ struct b3BodyShapeDef
 	u32 meshIndex;
 };
 
-// This is an internal shape.
+// This is an internal body shape.
 class b3BodyShape
 {
 public:
@@ -76,16 +76,15 @@ public:
 	scalar GetDensity() const;
 
 	// Set the coefficient of friction of this shape.
+	// This represents both static and dynamic friction.
 	void SetFriction(scalar friction);
 
 	// Get the coefficient of friction of this shape.
-	// This represents both static and dynamic friction.
 	scalar GetFriction() const;
 protected:
 	friend class b3Body;
 	friend class b3Particle;
 	friend class b3ContactManager;
-	friend class b3BodyContactSolver;
 
 	b3BodyShape(const b3BodyShapeDef& def, b3Body* body);
 	virtual ~b3BodyShape() { }

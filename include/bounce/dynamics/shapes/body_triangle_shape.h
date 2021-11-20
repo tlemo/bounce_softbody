@@ -28,8 +28,14 @@ struct b3RayCastOutput;
 
 class b3Particle;
 
+// Body triangle shape definition.
 struct b3BodyTriangleShapeDef : public b3BodyShapeDef
 {
+	b3BodyTriangleShapeDef()
+	{
+		type = e_bodyTriangleShape;
+	}
+
 	// Particles
 	b3Particle* p1;
 	b3Particle* p2;
@@ -65,7 +71,6 @@ private:
 	friend class b3Body;
 	friend class b3Particle;
 	friend class b3ContactManager;
-	friend class b3BodyContactSolver;
 	friend class b3List<b3BodyTriangleShape>;
 
 	b3BodyTriangleShape(const b3BodyTriangleShapeDef& def, b3Body* body);
