@@ -80,10 +80,12 @@ typedef double scalar64;
 #define B3_CONTACT_DAMPING_STIFFNESS scalar(0.0)
 
 // The maximum position error used when computing contact forces. 
-// This helps to prevent large forces.
+// This helps to prevent large forces and overshoot.
 #define B3_MAX_CONTACT_LINEAR_CORRECTION scalar(0.2)
 
-// This scale factor controls how fast overlap is resolved.
+// This scale factor controls how fast overlap is resolved. Ideally this would be 1 so
+// that overlap is removed in one time step. However using values close to 1 often lead
+// to overshoot.
 #define B3_BAUMGARTE scalar(0.2)
 
 // Memory
