@@ -57,8 +57,8 @@ private:
 	u32 m_forceCount;
 	b3Force** m_forces;
 
-	b3SphereAndShapeContact** m_shapeContacts;
 	u32 m_shapeContactCount;
+	b3SphereAndShapeContact** m_shapeContacts;
 };
 
 #endif

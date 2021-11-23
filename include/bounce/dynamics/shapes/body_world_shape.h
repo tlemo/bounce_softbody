@@ -64,10 +64,10 @@ public:
 	void Draw(b3Draw* draw) const;
 
 	// Set the coefficient of friction of this shape.
+	// This represents both static and dynamic friction.
 	void SetFriction(scalar friction);
 
 	// Get the coefficient of friction of this shape.
-	// This represents both static and dynamic friction.
 	scalar GetFriction() const;
 
 	// Return the next world shape in the body list of world shapes.

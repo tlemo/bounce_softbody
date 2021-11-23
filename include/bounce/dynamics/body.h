@@ -186,9 +186,6 @@ protected:
 
 	// Dynamic tree.
 	b3DynamicTree m_tree;
-
-	// Used to compute the time step ratio.
-	scalar m_inv_dt0;
 };
 
 inline void b3Body::SetGravity(const b3Vec3& gravity)

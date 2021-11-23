@@ -37,15 +37,16 @@ struct b3BodyTriangleShapeDef : public b3BodyShapeDef
 	}
 
 	// Particles
-	b3Particle* p1;
-	b3Particle* p2;
-	b3Particle* p3;
+	b3Particle* p1 = nullptr;
+	b3Particle* p2 = nullptr;
+	b3Particle* p3 = nullptr;
 
 	// Rest vertices
 	b3Vec3 v1, v2, v3;
 };
 
-// Triangle shape.
+// Triangle shape. Used for computing the mass of the particles in a body.
+// This shape is also used for ray-casting.
 class b3BodyTriangleShape : public b3BodyShape
 {
 public:
@@ -92,7 +93,7 @@ private:
 	// Dynamic tree proxy.
 	u32 m_proxyId;
 
-	// Links to the body triangle shape list.
+	// Links to the body list.
 	b3BodyTriangleShape* m_prev;
 	b3BodyTriangleShape* m_next;
 };

@@ -45,7 +45,7 @@ struct b3BodyShapeDef
 	// Type.
 	b3BodyShapeType type;
 	
-	// Skin.
+	// Radius.
 	scalar radius;
 
 	// Coefficient of friction.
@@ -68,6 +68,9 @@ public:
 	// Get the body.
 	b3Body* GetBody();
 	const b3Body* GetBody() const;
+
+	// Set the shape radius.
+	void SetRadius(scalar radius);
 
 	// Get the shape radius.
 	scalar GetRadius() const;
@@ -132,6 +135,12 @@ inline const b3Body* b3BodyShape::GetBody() const
 	return m_body;
 }
 
+inline void b3BodyShape::SetRadius(scalar radius)
+{
+	B3_ASSERT(radius >= scalar(0));
+	m_radius = radius;
+}
+
 inline scalar b3BodyShape::GetRadius() const
 {
 	return m_radius;
@@ -139,6 +148,7 @@ inline scalar b3BodyShape::GetRadius() const
 
 inline void b3BodyShape::SetFriction(scalar friction)
 {
+	B3_ASSERT(friction >= scalar(0));
 	m_friction = friction;
 }
 

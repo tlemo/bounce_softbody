@@ -34,7 +34,7 @@ struct b3BodySphereShapeDef : public b3BodyShapeDef
 	}
 
 	// Particle
-	b3Particle* p;
+	b3Particle* p = nullptr;
 };
 
 // Sphere shape.
@@ -68,7 +68,7 @@ private:
 	// Particle
 	b3Particle* m_p;
 
-	// Links to the body sphere shape list.
+	// Links to the body list.
 	b3BodySphereShape* m_prev;
 	b3BodySphereShape* m_next;
 };

@@ -44,12 +44,3 @@ b3BodyTetrahedronShape::b3BodyTetrahedronShape(const b3BodyTetrahedronShapeDef& 
 	scalar sign = b3Sign(det);
 	m_volume = inv6 * sign * det;
 }
-
-b3AABB b3BodyTetrahedronShape::ComputeAABB() const
-{
-	b3AABB aabb;
-	aabb.lowerBound = b3Min(m_p1->m_position, b3Min(m_p2->m_position, b3Min(m_p3->m_position, m_p4->m_position)));
-	aabb.upperBound = b3Max(m_p1->m_position, b3Max(m_p2->m_position, b3Max(m_p3->m_position, m_p4->m_position)));
-	aabb.Extend(m_radius);
-	return aabb;
-}

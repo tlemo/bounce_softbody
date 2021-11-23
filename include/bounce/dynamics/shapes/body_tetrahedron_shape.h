@@ -34,16 +34,16 @@ struct b3BodyTetrahedronShapeDef : public b3BodyShapeDef
 	}
 
 	// Particles
-	b3Particle* p1;
-	b3Particle* p2;
-	b3Particle* p3;
-	b3Particle* p4;
+	b3Particle* p1 = nullptr;
+	b3Particle* p2 = nullptr;
+	b3Particle* p3 = nullptr;
+	b3Particle* p4 = nullptr;
 
 	// Rest vertices
 	b3Vec3 v1, v2, v3, v4;
 };
 
-// Tetrahedron shape
+// Tetrahedron shape. Used for computing the mass of the particles in a body.
 class b3BodyTetrahedronShape : public b3BodyShape
 {
 public:
@@ -72,9 +72,6 @@ private:
 	friend class b3List<b3BodyTetrahedronShape>;
 
 	b3BodyTetrahedronShape(const b3BodyTetrahedronShapeDef& def, b3Body* body);
-	
-	// Compute AABB
-	b3AABB ComputeAABB() const;
 
 	// Particles
 	b3Particle* m_p1;
@@ -85,7 +82,7 @@ private:
 	// Rest volume. Used for computing the mass of the particles.
 	scalar m_volume;
 
-	// Links to the body tetrahedron shape list.
+	// Links to the body list.
 	b3BodyTetrahedronShape* m_prev;
 	b3BodyTetrahedronShape* m_next;
 };

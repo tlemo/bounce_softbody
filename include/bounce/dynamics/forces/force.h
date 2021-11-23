@@ -45,7 +45,10 @@ struct b3ForceDef
 		meshIndex = B3_MAX_U32;
 	}
 	
+	// Force type.
 	b3ForceType type;
+
+	// Feature index into mesh.
 	u32 meshIndex;
 };
 
@@ -78,12 +81,19 @@ protected:
 
 	virtual ~b3Force() { }
 
+	// Clear internal forces stored for the user.
 	virtual void ClearForces() = 0;
+
+	// Compute forces and Jacobians.
 	virtual void ComputeForces(const b3SparseForceSolverData* data) = 0;
 
+	// Force type.
 	b3ForceType m_type;
+	
+	// Feature index into mesh.
 	u32 m_meshIndex;
 
+	// Links to body list.
 	b3Force* m_prev;
 	b3Force* m_next;
 };

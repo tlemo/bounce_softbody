@@ -31,10 +31,8 @@ b3Body::b3Body()
 {
 	m_contactManager.m_body = this;
 	m_contactManager.m_allocator = &m_blockAllocator;
-
-	m_gravity.SetZero();
 	
-	m_inv_dt0 = scalar(0);
+	m_gravity.SetZero();
 }
 
 b3Body::~b3Body()
@@ -404,12 +402,11 @@ void b3Body::Step(scalar dt, u32 forceIterations, u32 forceSubIterations)
 	step.forceIterations = forceIterations;
 	step.forceSubIterations = forceSubIterations;
 	step.inv_dt = dt > scalar(0) ? scalar(1) / dt : scalar(0);
-	step.dt_ratio = m_inv_dt0 * dt;
-
+	
 	// Update contacts. This is where some contacts are ceased.
 	m_contactManager.UpdateContacts();
 
-	// Clear (user) internal forces before accumulating them 
+	// Clear internal forces before accumulating them 
 	// inside the solver.
 	for (b3Force* f = m_forceList.m_head; f; f = f->m_next)
 	{
@@ -420,11 +417,6 @@ void b3Body::Step(scalar dt, u32 forceIterations, u32 forceSubIterations)
 	if (step.dt > scalar(0))
 	{
 		Solve(step);
-	}
-
-	if (step.dt > scalar(0))
-	{
-		m_inv_dt0 = step.inv_dt;
 	}
 
 	// Clear external forces and translations.
