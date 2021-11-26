@@ -87,8 +87,14 @@ public:
 	const b3Particle* GetParticle3() const { return m_p3; }
 	b3Particle* GetParticle3() { return m_p3; }
 
+	// Set the shearing stiffness.
+	void SetShearingStiffness(scalar stiffness);
+
 	// Get the shearing stiffness.
 	scalar GetShearingStiffness() const;
+
+	// Set the damping stiffness.
+	void SetDampingStiffness(scalar dampingStiffness);
 
 	// Get the damping stiffness.
 	scalar GetDampingStiffness() const;
@@ -139,9 +145,21 @@ private:
 	b3Vec3 m_f1, m_f2, m_f3;
 };
 
+inline void b3ShearForce::SetShearingStiffness(scalar stiffness)
+{
+	B3_ASSERT(stiffness >= scalar(0));
+	m_ks = stiffness;
+}
+
 inline scalar b3ShearForce::GetShearingStiffness() const
 {
 	return m_ks;
+}
+
+inline void b3ShearForce::SetDampingStiffness(scalar dampingStiffness)
+{
+	B3_ASSERT(dampingStiffness >= scalar(0));
+	m_kd = dampingStiffness;
 }
 
 inline scalar b3ShearForce::GetDampingStiffness() const

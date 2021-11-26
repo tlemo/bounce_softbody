@@ -93,8 +93,14 @@ public:
 	// Get the natural spring length.
 	scalar GetRestLenght() const;
 
-	// Get the mouse stiffness.
-	scalar GetMouseStiffness() const;
+	// Set the spring stiffness.
+	void SetStiffness(scalar stiffness);
+
+	// Get the spring stiffness.
+	scalar GetStiffness() const;
+
+	// Set the damping stiffness.
+	void SetDampingStiffness(scalar dampingStiffness);
 
 	// Get the damping stiffness.
 	scalar GetDampingStiffness() const;
@@ -133,8 +139,8 @@ private:
 	// Barycentric coordinates in the rest state
 	scalar m_w2, m_w3, m_w4;
 
-	// Mouse stiffness
-	scalar m_km;
+	// Spring stiffness
+	scalar m_ks;
 
 	// Damping stiffness
 	scalar m_kd;
@@ -151,9 +157,21 @@ inline scalar b3MouseForce::GetRestLenght() const
 	return m_L0;
 }
 
-inline scalar b3MouseForce::GetMouseStiffness() const
+inline void b3MouseForce::SetStiffness(scalar stiffness)
 {
-	return m_km;
+	B3_ASSERT(stiffness >= scalar(0));
+	m_ks = stiffness;
+}
+
+inline scalar b3MouseForce::GetStiffness() const
+{
+	return m_ks;
+}
+
+inline void b3MouseForce::SetDampingStiffness(scalar dampingStiffness)
+{
+	B3_ASSERT(dampingStiffness >= scalar(0));
+	m_kd = dampingStiffness;
 }
 
 inline scalar b3MouseForce::GetDampingStiffness() const

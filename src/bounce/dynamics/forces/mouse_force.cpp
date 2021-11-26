@@ -33,7 +33,7 @@ b3MouseForce::b3MouseForce(const b3MouseForceDef* def)
 	m_w2 = def->w2;
 	m_w3 = def->w3;
 	m_w4 = def->w4;
-	m_km = def->stiffness;
+	m_ks = def->stiffness;
 	m_kd = def->dampingStiffness;
 	m_L0 = def->restLength;
 	m_f1.SetZero();
@@ -102,7 +102,7 @@ void b3MouseForce::ComputeForces(const b3SparseForceSolverData* data)
 		dCdx[2] = -w3 * n;
 		dCdx[3] = -w4 * n;
 
-		if (m_km > scalar(0))
+		if (m_ks > scalar(0))
 		{
 			if (L > m_L0)
 			{
@@ -112,7 +112,7 @@ void b3MouseForce::ComputeForces(const b3SparseForceSolverData* data)
 				b3Vec3 fs[4];
 				for (u32 i = 0; i < 4; ++i)
 				{
-					fs[i] = -m_km * C * dCdx[i];
+					fs[i] = -m_ks * C * dCdx[i];
 				}
 
 				f[i1] += fs[0];
@@ -130,42 +130,38 @@ void b3MouseForce::ComputeForces(const b3SparseForceSolverData* data)
 
 				scalar inv_L3 = L3 > scalar(0) ? scalar(1) / L3 : scalar(0);
 
-				b3Mat33 d2Cdxij[4][4];
+				b3Mat33 d2Cdx[4][4];
 				
 				b3Mat33 A = inv_L * I - inv_L3 * b3Outer(d, d);
 
-				d2Cdxij[0][0] = A;
-				d2Cdxij[0][1] = -w2 * A;
-				d2Cdxij[0][2] = -w3 * A;
-				d2Cdxij[0][3] = -w4 * A;
+				d2Cdx[0][0] = A;
+				d2Cdx[0][1] = -w2 * A;
+				d2Cdx[0][2] = -w3 * A;
+				d2Cdx[0][3] = -w4 * A;
 
 				b3Mat33 B = inv_L3 * b3Outer(d, d) - inv_L * I;
 
-				d2Cdxij[1][0] = w2 * B;
-				d2Cdxij[1][1] = -w2 * w2 * B;
-				d2Cdxij[1][2] = -w2 * w3 * B;
-				d2Cdxij[1][3] = -w2 * w4 * B;
+				d2Cdx[1][0] = w2 * B;
+				d2Cdx[1][1] = -w2 * w2 * B;
+				d2Cdx[1][2] = -w2 * w3 * B;
+				d2Cdx[1][3] = -w2 * w4 * B;
 
-				d2Cdxij[2][0] = w3 * B;
-				d2Cdxij[2][1] = -w2 * w3 * B;
-				d2Cdxij[2][2] = -w3 * w3 * B;
-				d2Cdxij[2][3] = -w3 * w4 * B;
+				d2Cdx[2][0] = w3 * B;
+				d2Cdx[2][1] = -w2 * w3 * B;
+				d2Cdx[2][2] = -w3 * w3 * B;
+				d2Cdx[2][3] = -w3 * w4 * B;
 
-				d2Cdxij[3][0] = w4 * B;
-				d2Cdxij[3][1] = -w2 * w4 * B;
-				d2Cdxij[3][2] = -w3 * w4 * B;
-				d2Cdxij[3][3] = -w4 * w4 * B;
+				d2Cdx[3][0] = w4 * B;
+				d2Cdx[3][1] = -w2 * w4 * B;
+				d2Cdx[3][2] = -w3 * w4 * B;
+				d2Cdx[3][3] = -w4 * w4 * B;
 
 				b3Mat33 K[4][4];
 				for (u32 i = 0; i < 4; ++i)
 				{
 					for (u32 j = 0; j < 4; ++j)
 					{
-						b3Mat33 d2Cdx = d2Cdxij[i][j];
-						
-						b3Mat33 Kij = -m_km * (b3Outer(dCdx[i], dCdx[j]) + C * d2Cdx);
-
-						K[i][j] = Kij;
+						K[i][j] = -m_ks * (b3Outer(dCdx[i], dCdx[j]) + C * d2Cdx[i][j]);
 					}
 				}
 

@@ -75,6 +75,9 @@ public:
 	// Get the shape radius.
 	scalar GetRadius() const;
 
+	// Set the shape density.
+	void SetDensity(scalar density);
+
 	// Get the shape density.
 	scalar GetDensity() const;
 
@@ -107,7 +110,7 @@ protected:
 	// Density
 	scalar m_density;
 
-	// Mesh index
+	// Feature index into mesh 
 	u32 m_meshIndex;
 };
 
@@ -155,6 +158,12 @@ inline void b3BodyShape::SetFriction(scalar friction)
 inline scalar b3BodyShape::GetFriction() const
 {
 	return m_friction;
+}
+
+inline void b3BodyShape::SetDensity(scalar density)
+{
+	B3_ASSERT(density >= scalar(0));
+	m_density = density;
 }
 
 inline scalar b3BodyShape::GetDensity() const

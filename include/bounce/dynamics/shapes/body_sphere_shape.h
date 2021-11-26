@@ -37,7 +37,7 @@ struct b3BodySphereShapeDef : public b3BodyShapeDef
 	b3Particle* p = nullptr;
 };
 
-// Sphere shape.
+// Sphere shape. This is used for collision detection and resolution.
 class b3BodySphereShape : public b3BodyShape
 {
 public:

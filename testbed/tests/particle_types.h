@@ -34,20 +34,22 @@ public:
 
 	void SetClothType(b3ParticleType type)
 	{
-		for (int j = 0; j < m_clothMesh.GetColumnVertexCount(); ++j)
+		for (int i = 0; i < m_clothMesh.GetRowVertexCount(); ++i)
 		{
-			int v = m_clothMesh.GetVertex(0, j);
+			int v1 = m_clothMesh.GetVertex(i, 0);
+			int v2 = m_clothMesh.GetVertex(i, m_clothMesh.GetColumnVertexCount() - 1);
 
-			b3Particle* p = m_body->GetParticle(v);
-			p->SetType(type);
+			m_body->GetParticle(v1)->SetType(type);
+			m_body->GetParticle(v2)->SetType(type);
 		}
 
 		for (int j = 0; j < m_clothMesh.GetColumnVertexCount(); ++j)
 		{
-			int v = m_clothMesh.GetVertex(m_clothMesh.GetRowVertexCount() - 1, j);
+			int v1 = m_clothMesh.GetVertex(0, j);
+			int v2 = m_clothMesh.GetVertex(m_clothMesh.GetRowVertexCount() - 1, j);
 
-			b3Particle* p = m_body->GetParticle(v);
-			p->SetType(type);
+			m_body->GetParticle(v1)->SetType(type);
+			m_body->GetParticle(v2)->SetType(type);
 		}
 	}
 

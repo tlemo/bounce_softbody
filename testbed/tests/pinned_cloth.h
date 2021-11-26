@@ -35,6 +35,15 @@ public:
 		m_body->SetGravity(b3Vec3(0.0f, -9.8f, 0.0f));
 
 		// Freeze some particles
+		for (int i = 0; i < m_clothMesh.GetRowVertexCount(); ++i)
+		{
+			int v1 = m_clothMesh.GetVertex(i, 0);
+			int v2 = m_clothMesh.GetVertex(i, m_clothMesh.GetColumnVertexCount() - 1);
+
+			m_body->GetParticle(v1)->SetType(e_staticParticle);
+			m_body->GetParticle(v2)->SetType(e_staticParticle);
+		}
+		
 		for (int j = 0; j < m_clothMesh.GetColumnVertexCount(); ++j)
 		{
 			int v1 = m_clothMesh.GetVertex(0, j);

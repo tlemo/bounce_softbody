@@ -136,6 +136,7 @@ inline void b3BodyWorldShape::Draw(b3Draw* draw) const
 
 inline void b3BodyWorldShape::SetFriction(scalar friction)
 {
+	B3_ASSERT(friction >= scalar(0));
 	m_friction = friction;
 }
 

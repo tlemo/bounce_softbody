@@ -72,8 +72,14 @@ public:
 	// Get the spring natural rest length.
 	scalar GetRestLenght() const;
 
+	// Set the spring stiffness.
+	void SetStiffness(scalar stiffness);
+
 	// Get the spring stiffness.
 	scalar GetStiffness() const;
+
+	// Set the damping stiffness.
+	void SetDampingStiffness(scalar dampingStiffness);
 
 	// Get the damping stiffness.
 	scalar GetDampingStiffness() const;
@@ -115,9 +121,22 @@ inline scalar b3SpringForce::GetRestLenght() const
 	return m_L0;
 }
 
+inline void b3SpringForce::SetStiffness(scalar stiffness)
+{
+	B3_ASSERT(stiffness >= scalar(0));
+	m_ks = stiffness;
+}
+
+
 inline scalar b3SpringForce::GetStiffness() const
 {
 	return m_ks;
+}
+
+inline void b3SpringForce::SetDampingStiffness(scalar dampingStiffness)
+{
+	B3_ASSERT(dampingStiffness >= scalar(0));
+	m_kd = dampingStiffness;
 }
 
 inline scalar b3SpringForce::GetDampingStiffness() const
