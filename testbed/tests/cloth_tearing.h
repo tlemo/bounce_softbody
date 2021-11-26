@@ -301,7 +301,7 @@ public:
 					b3SpringForceDef sNew;
 					sNew.p1 = pNew;
 					sNew.p2 = p2;
-					sNew.restLength = sf1->GetRestLenght();
+					sNew.restLength = sf1->GetRestLength();
 					sNew.stiffness = sf1->GetStiffness();
 					sNew.dampingStiffness = sf1->GetDampingStiffness();
 
@@ -319,7 +319,7 @@ public:
 					b3SpringForceDef sNew;
 					sNew.p1 = p3;
 					sNew.p2 = pNew;
-					sNew.restLength = sf2->GetRestLenght();
+					sNew.restLength = sf2->GetRestLength();
 					sNew.stiffness = sf2->GetStiffness();
 					sNew.dampingStiffness = sf2->GetDampingStiffness();
 					
@@ -350,7 +350,7 @@ public:
 					b3SpringForceDef sNew;
 					sNew.p1 = p1;
 					sNew.p2 = pNew;
-					sNew.restLength = sf1->GetRestLenght();
+					sNew.restLength = sf1->GetRestLength();
 					sNew.stiffness = sf1->GetStiffness();
 					sNew.dampingStiffness = sf1->GetDampingStiffness();
 
@@ -368,7 +368,7 @@ public:
 					b3SpringForceDef sNew;
 					sNew.p1 = pNew;
 					sNew.p2 = p3;
-					sNew.restLength = sf2->GetRestLenght();
+					sNew.restLength = sf2->GetRestLength();
 					sNew.stiffness = sf2->GetStiffness();
 					sNew.dampingStiffness = sf2->GetDampingStiffness();
 					
@@ -399,7 +399,7 @@ public:
 					b3SpringForceDef sNew;
 					sNew.p1 = p2;
 					sNew.p2 = pNew;
-					sNew.restLength = sf1->GetRestLenght();
+					sNew.restLength = sf1->GetRestLength();
 					sNew.stiffness = sf1->GetStiffness();
 					sNew.dampingStiffness = sf1->GetDampingStiffness();
 					
@@ -417,7 +417,7 @@ public:
 					b3SpringForceDef sNew;
 					sNew.p1 = pNew;
 					sNew.p2 = p1;
-					sNew.restLength = sf2->GetRestLenght();
+					sNew.restLength = sf2->GetRestLength();
 					sNew.stiffness = sf2->GetStiffness();
 					sNew.dampingStiffness = sf2->GetDampingStiffness();
 					

@@ -90,8 +90,11 @@ public:
 	const b3Particle* GetParticle4() const { return m_p4; }
 	b3Particle* GetParticle4() { return m_p4; }
 	
+	// Set the natural spring length.
+	void SetRestLength(scalar restLength);
+
 	// Get the natural spring length.
-	scalar GetRestLenght() const;
+	scalar GetRestLength() const;
 
 	// Set the spring stiffness.
 	void SetStiffness(scalar stiffness);
@@ -152,7 +155,13 @@ private:
 	b3Vec3 m_f1, m_f2, m_f3, m_f4;
 };
 
-inline scalar b3MouseForce::GetRestLenght() const
+inline void b3MouseForce::SetRestLength(scalar restLength)
+{
+	B3_ASSERT(restLength >= scalar(0));
+	m_L0 = restLength;
+}
+
+inline scalar b3MouseForce::GetRestLength() const
 {
 	return m_L0;
 }

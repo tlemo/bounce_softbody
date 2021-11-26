@@ -69,8 +69,11 @@ public:
 	const b3Particle* GetParticle2() const { return m_p2; }
 	b3Particle* GetParticle2() { return m_p2; }
 
+	// Set the spring natural rest length.
+	void SetRestLength(scalar restLength);
+
 	// Get the spring natural rest length.
-	scalar GetRestLenght() const;
+	scalar GetRestLength() const;
 
 	// Set the spring stiffness.
 	void SetStiffness(scalar stiffness);
@@ -116,7 +119,13 @@ private:
 	b3Vec3 m_f1, m_f2;
 };
 
-inline scalar b3SpringForce::GetRestLenght() const
+inline void b3SpringForce::SetRestLength(scalar restLength)
+{
+	B3_ASSERT(restLength >= scalar(0));
+	m_L0 = restLength;
+}
+
+inline scalar b3SpringForce::GetRestLength() const
 {
 	return m_L0;
 }
