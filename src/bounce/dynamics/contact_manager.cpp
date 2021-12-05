@@ -35,7 +35,13 @@ void b3ContactManager::AddPair(b3BodySphereShape* s1, b3BodyWorldShape* s2)
 		}
 	}
 
-	// Create a new contact.
+	// Should the entities collide with each other?
+	if (s1->m_p->m_type != e_dynamicParticle)
+	{
+		return;
+	}
+
+	// Call the factory.
 	b3SphereAndShapeContact* c = b3SphereAndShapeContact::Create(s1, s2, m_allocator);
 
 	// Push the contact to the contact list.
