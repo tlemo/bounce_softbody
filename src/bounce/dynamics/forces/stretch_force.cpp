@@ -69,7 +69,7 @@ b3StretchForce::b3StretchForce(const b3StretchForceDef* def)
 	m_ks_u = def->stiffness_u;
 	m_kd_u = def->damping_stiffness_u;
 	m_b_u = def->b_u;
-	m_ks_v = def->stiffness_u;
+	m_ks_v = def->stiffness_v;
 	m_kd_v = def->damping_stiffness_v;
 	m_b_v = def->b_v;
 	m_f1.SetZero();
