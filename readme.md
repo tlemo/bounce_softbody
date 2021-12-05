@@ -2,12 +2,30 @@
 
 ## Features
 
-### Soft Body
+### Common
 
-* Soft body using forces
+* Efficient data structures with no use of STL
+* Fast memory allocators
+* Built-in math library
+* Tunable settings used across the entire library
+* Included debug draw utility
+
+### Sparse
+
+* Fairly efficient sparse matrix and vector structures
+* Full Backward Euler method
+* Pre-filtered Pre-conditioned Conjugate Gradient (PPCG) method
+
+### Collision
+
+* Spheres, capsules, and boxes
+* Dynamic tree
+
+### Dynamics
+
 * Unconditional simulation stability
 * Stretch, spring, mouse, triangle and tetrahedron element force types
-* Vertex contact and friction with spheres, capsules, and boxes
+* Vertex contact, friction
 * Viscosity
 * Linear/non-linear time solver
 * Ray-casting
