@@ -40,18 +40,12 @@ public:
 
 			b3Particle* p = m_body->CreateParticle(pd);
 			particles[i] = p;
-
-			b3BodySphereShapeDef sd;
-			sd.p = p;
-			sd.radius = 0.2f;
-			sd.friction = 0.4f;
-
-			m_body->CreateSphereShape(sd);
 		}
 
 		for (int i = 0; i < m.triangleCount; ++i)
 		{
 			BodyMeshTriangle triangle = m.GetTriangle(i);
+			
 			int v1 = triangle.v1;
 			int v2 = triangle.v2;
 			int v3 = triangle.v3;
@@ -266,13 +260,6 @@ public:
 
 		b3Particle* pNew = m_body->CreateParticle(pdNew);
 
-		b3BodySphereShapeDef ssdNew;
-		ssdNew.p = pNew;
-		ssdNew.radius = 0.2f;
-		ssdNew.friction = 0.4f;
-		
-		m_body->CreateSphereShape(ssdNew);
-
 		for (u32 i = 0; i < trianglesBelow.Count(); ++i)
 		{
 			b3BodyTriangleShape* triangle = trianglesBelow[i];
@@ -450,7 +437,7 @@ public:
 
 			b3Vec3 tension = s->GetActionForce();
 
-			const scalar kMaxTension = 1000.0f;
+			const scalar kMaxTension = 2000.0f;
 
 			if (b3LengthSquared(tension) <= kMaxTension * kMaxTension)
 			{
