@@ -36,7 +36,7 @@ struct b3ShearForceDef : public b3ForceDef
 		v2 = scalar(0);
 		u3 = scalar(0);
 		v3 = scalar(0);
-		shearingStiffness = scalar(0);
+		stiffness = scalar(0);
 		dampingStiffness = scalar(0);
 	}
 	
@@ -62,7 +62,7 @@ struct b3ShearForceDef : public b3ForceDef
 	scalar u3, v3;
 
 	// Shearing stiffness
-	scalar shearingStiffness;
+	scalar stiffness;
 
 	// Damping stiffness
 	scalar dampingStiffness;
@@ -88,10 +88,10 @@ public:
 	b3Particle* GetParticle3() { return m_p3; }
 
 	// Set the shearing stiffness.
-	void SetShearingStiffness(scalar stiffness);
+	void SetStiffness(scalar stiffness);
 
 	// Get the shearing stiffness.
-	scalar GetShearingStiffness() const;
+	scalar GetStiffness() const;
 
 	// Set the damping stiffness.
 	void SetDampingStiffness(scalar dampingStiffness);
@@ -127,7 +127,7 @@ private:
 	// Area
 	scalar m_alpha;
 
-	// inverse duv matrix
+	// (u, v) matrix
 	scalar m_du1, m_dv1;
 	scalar m_du2, m_dv2;
 	scalar m_inv_det;
@@ -145,13 +145,13 @@ private:
 	b3Vec3 m_f1, m_f2, m_f3;
 };
 
-inline void b3ShearForce::SetShearingStiffness(scalar stiffness)
+inline void b3ShearForce::SetStiffness(scalar stiffness)
 {
 	B3_ASSERT(stiffness >= scalar(0));
 	m_ks = stiffness;
 }
 
-inline scalar b3ShearForce::GetShearingStiffness() const
+inline scalar b3ShearForce::GetStiffness() const
 {
 	return m_ks;
 }

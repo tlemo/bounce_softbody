@@ -36,14 +36,6 @@ public:
 
 	bool GetStaticDrag() const;
 
-	void SetMouseStiffness(scalar k);
-
-	scalar GetMouseStiffness();
-
-	void SetMouseDamping(scalar k);
-
-	scalar GetMouseDamping();
-	
 	bool IsDragging() const;
 
 	bool StartDragging();
@@ -55,22 +47,24 @@ public:
 	b3Vec3 GetPointA() const;
 
 	b3Vec3 GetPointB() const;
+
+	b3MouseForce* GetMouseForce();
+	const b3MouseForce* GetMouseForce() const;
 private:
 	b3Ray* m_ray;
-	scalar m_x;
+	scalar m_fraction;
 
 	b3Body* m_body;
 	
 	bool m_isDragging;
+	
 	b3Particle* m_p1;
 	b3Particle* m_p2;
 	b3Particle* m_p3;
 	scalar m_u, m_v;
 
-	scalar m_km;
-	scalar m_kd;
 	b3Particle* m_particle;
-	b3MouseForce* m_mf;
+	b3MouseForce* m_mouseForce;
 
 	bool m_staticDrag;
 	b3ParticleType m_t1, m_t2, m_t3;
@@ -81,29 +75,20 @@ inline bool BodyDragger::GetStaticDrag() const
 	return m_staticDrag;
 }
 
-inline void BodyDragger::SetMouseStiffness(scalar k)
-{
-	m_km = k;
-}
-
-inline scalar BodyDragger::GetMouseStiffness()
-{
-	return m_km;
-}
-
-inline void BodyDragger::SetMouseDamping(scalar k)
-{
-	m_kd = k;
-}
-
-inline scalar BodyDragger::GetMouseDamping()
-{
-	return m_kd;
-}
-
 inline bool BodyDragger::IsDragging() const
 {
 	return m_isDragging;
+}
+
+
+inline b3MouseForce* BodyDragger::GetMouseForce()
+{
+	return m_mouseForce;
+}
+
+inline const b3MouseForce* BodyDragger::GetMouseForce() const
+{
+	return m_mouseForce;
 }
 
 #endif

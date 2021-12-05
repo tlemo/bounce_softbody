@@ -29,8 +29,6 @@ BodyDragger::BodyDragger(b3Ray* ray, b3Body* body)
 	m_ray = ray;
 	m_body = body;
 	m_isDragging = false;
-	m_km = 100000.0f;
-	m_kd = 1000.0f;
 }
 
 bool BodyDragger::StartDragging()
@@ -44,7 +42,7 @@ bool BodyDragger::StartDragging()
 	}
 
 	m_isDragging = true;
-	m_x = rayOut.fraction;
+	m_fraction = rayOut.fraction;
 
 	m_p1 = rayOut.triangle->GetParticle1();
 	m_p2 = rayOut.triangle->GetParticle2();
@@ -96,11 +94,11 @@ bool BodyDragger::StartDragging()
 		def.w2 = m_u;
 		def.w3 = m_v;
 		def.w4 = 1.0f - m_u - m_v;
-		def.stiffness = m_km;
-		def.dampingStiffness = m_kd;
+		def.stiffness = 100000.0f;
+		def.dampingStiffness = 1000.0f;
 		def.restLength = 0.0f;
 
-		m_mf = (b3MouseForce*)m_body->CreateForce(def);
+		m_mouseForce = (b3MouseForce*)m_body->CreateForce(def);
 	}
 
 	return true;
@@ -155,7 +153,7 @@ void BodyDragger::StopDragging()
 	}
 	else
 	{
-		m_body->DestroyForce(m_mf);
+		m_body->DestroyForce(m_mouseForce);
 		m_body->DestroyParticle(m_particle);
 	}
 
@@ -176,5 +174,5 @@ b3Vec3 BodyDragger::GetPointA() const
 b3Vec3 BodyDragger::GetPointB() const
 {
 	B3_ASSERT(IsDragging() == true);
-	return (1.0f - m_x) * m_ray->A() + m_x * m_ray->B();
+	return (1.0f - m_fraction) * m_ray->A() + m_fraction * m_ray->B();
 }

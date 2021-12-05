@@ -36,10 +36,10 @@ struct b3StretchForceDef : public b3ForceDef
 		v2 = scalar(0);
 		u3 = scalar(0);
 		v3 = scalar(0);
-		stretching_stiffness_u = scalar(0);
+		stiffness_u = scalar(0);
 		damping_stiffness_u = scalar(0);
 		b_u = scalar(1);
-		stretching_stiffness_v = scalar(0);
+		stiffness_v = scalar(0);
 		damping_stiffness_v = scalar(0);
 		b_v = scalar(1);
 	}
@@ -66,7 +66,7 @@ struct b3StretchForceDef : public b3ForceDef
 	scalar u3, v3;
 
 	// Stretching stiffness in u direction
-	scalar stretching_stiffness_u;
+	scalar stiffness_u;
 
 	// Damping stiffness in u direction
 	scalar damping_stiffness_u;
@@ -75,7 +75,7 @@ struct b3StretchForceDef : public b3ForceDef
 	scalar b_u;
 
 	// Stretching stiffness in v direction
-	scalar stretching_stiffness_v;
+	scalar stiffness_v;
 
 	// Damping stiffness in v direction
 	scalar damping_stiffness_v;
@@ -107,10 +107,10 @@ public:
 	const b3Particle* GetParticle3() const { return m_p3; }
 	
 	// Set the spring stiffness in the u direction.
-	void SetStretchingStiffnessU(scalar stiffness);
+	void SetStiffnessU(scalar stiffness);
 
 	// Get the spring stiffness in the u direction.
-	scalar GetStrechingStiffnessU() const;
+	scalar GetStiffnessU() const;
 
 	// Set the damping stiffness in the u direction.
 	void SetDampingStiffnessU(scalar dampingStiffness);
@@ -125,10 +125,10 @@ public:
 	scalar GetBU() const;
 	
 	// Set the spring stiffness in the v direction.
-	void SetStretchingStiffnessV(scalar stiffness);
+	void SetStiffnessV(scalar stiffness);
 
 	// Get the spring stiffness in the v direction.
-	scalar GetStrechingStiffnessV() const;
+	scalar GetStiffnessV() const;
 
 	// Set the damping stiffness in the v direction.
 	void SetDampingStiffnessV(scalar dampingStiffness);
@@ -200,13 +200,13 @@ private:
 	b3Vec3 m_f1, m_f2, m_f3;
 };
 
-inline void b3StretchForce::SetStretchingStiffnessU(scalar stiffness)
+inline void b3StretchForce::SetStiffnessU(scalar stiffness)
 {
 	B3_ASSERT(stiffness >= scalar(0));
 	m_ks_u = stiffness;
 }
 
-inline scalar b3StretchForce::GetStrechingStiffnessU() const
+inline scalar b3StretchForce::GetStiffnessU() const
 {
 	return m_ks_u;
 }
@@ -233,13 +233,13 @@ inline scalar b3StretchForce::GetBU() const
 	return m_b_u;
 }
 
-inline void b3StretchForce::SetStretchingStiffnessV(scalar stiffness)
+inline void b3StretchForce::SetStiffnessV(scalar stiffness)
 {
 	B3_ASSERT(stiffness >= scalar(0));
 	m_ks_v = stiffness;
 }
 
-inline scalar b3StretchForce::GetStrechingStiffnessV() const
+inline scalar b3StretchForce::GetStiffnessV() const
 {
 	return m_ks_v;
 }

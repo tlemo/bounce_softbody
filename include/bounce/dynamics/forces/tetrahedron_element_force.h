@@ -198,7 +198,6 @@ private:
 	// Solver shared
 	b3Mat33 m_invE; // 3 x 3
 	b3Quat m_q; // 3 x 3
-	b3Mat33* m_Kp[16]; // 12 x 12
 	b3Mat33 m_K[16]; // 12 x 12
 	scalar m_B[72]; // 6 x 12
 	scalar m_P[72]; // V * BT * E -> 12 x 6

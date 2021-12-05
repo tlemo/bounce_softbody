@@ -102,24 +102,21 @@ UniformBody::UniformBody(const ClothDef& def)
 		}
 		else
 		{
-			if (def.stretchingStiffness > scalar(0))
-			{
-				b3StretchForceDef fd;
-				fd.Initialize(v1, v2, v3);
+			b3StretchForceDef fd;
+			fd.Initialize(v1, v2, v3);
 
-				fd.p1 = p1;
-				fd.p2 = p2;
-				fd.p3 = p3;
-				fd.stretching_stiffness_u = def.stretchingStiffness;
-				fd.damping_stiffness_u = def.stretchStiffnessDamping;
-				fd.b_u = scalar(1);
-				fd.stretching_stiffness_v = def.stretchingStiffness;
-				fd.damping_stiffness_v = def.stretchStiffnessDamping;
-				fd.b_v = scalar(1);
-				fd.meshIndex = i;
+			fd.p1 = p1;
+			fd.p2 = p2;
+			fd.p3 = p3;
+			fd.stiffness_u = def.stretchingStiffness;
+			fd.damping_stiffness_u = def.stretchStiffnessDamping;
+			fd.b_u = scalar(1);
+			fd.stiffness_v = def.stretchingStiffness;
+			fd.damping_stiffness_v = def.stretchStiffnessDamping;
+			fd.b_v = scalar(1);
+			fd.meshIndex = i;
 
-				CreateForce(fd);
-			}
+			CreateForce(fd);
 		}
 	}
 }

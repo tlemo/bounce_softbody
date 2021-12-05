@@ -55,7 +55,7 @@ b3ShearForce::b3ShearForce(const b3ShearForceDef* def)
 	m_p1 = def->p1;
 	m_p2 = def->p2;
 	m_p3 = def->p3;
-	m_ks = def->shearingStiffness;
+	m_ks = def->stiffness;
 	m_kd = def->dampingStiffness;
 	m_f1.SetZero();
 	m_f2.SetZero();
