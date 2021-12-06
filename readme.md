@@ -1,5 +1,7 @@
 ## Bounce Softbody
 
+Bounce Softbody is a small 3D softbody physics engine.
+
 ## Features
 
 ### Common
