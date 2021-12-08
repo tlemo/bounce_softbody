@@ -42,12 +42,13 @@ UniformBody::UniformBody(const ClothDef& def)
 		b3Particle* p = CreateParticle(pd);
 		m_particles[i] = p;
 
-		b3BodySphereShapeDef sd;
+		b3SphereFixtureDef sd;
 		sd.p = p;
 		sd.radius = def.thickness;
 		sd.friction = def.friction;
 		sd.meshIndex = i;
-		CreateSphereShape(sd);
+		
+		CreateSphere(sd);
 	}
 
 	// Create triangles
@@ -67,7 +68,7 @@ UniformBody::UniformBody(const ClothDef& def)
 		b3Vec3 v2 = p2->GetPosition();
 		b3Vec3 v3 = p3->GetPosition();
 
-		b3BodyTriangleShapeDef td;
+		b3TriangleFixtureDef td;
 		td.p1 = p1;
 		td.p2 = p2;
 		td.p3 = p3;
@@ -79,7 +80,7 @@ UniformBody::UniformBody(const ClothDef& def)
 		td.friction = def.friction;
 		td.meshIndex = i;
 
-		CreateTriangleShape(td);
+		CreateTriangle(td);
 
 		if (def.createElements)
 		{
@@ -141,13 +142,13 @@ UniformBody::UniformBody(const TetDef& def)
 
 		m_particles[i] = p;
 
-		b3BodySphereShapeDef sd;
+		b3SphereFixtureDef sd;
 		sd.p = p;
 		sd.radius = def.thickness;
 		sd.friction = def.friction;
 		sd.meshIndex = i;
 
-		CreateSphereShape(sd);
+		CreateSphere(sd);
 	}
 
 	// Create triangles
@@ -163,7 +164,7 @@ UniformBody::UniformBody(const TetDef& def)
 		b3Particle* p2 = m_particles[v2];
 		b3Particle* p3 = m_particles[v3];
 
-		b3BodyTriangleShapeDef td;
+		b3TriangleFixtureDef td;
 		td.p1 = p1;
 		td.p2 = p2;
 		td.p3 = p3;
@@ -177,7 +178,7 @@ UniformBody::UniformBody(const TetDef& def)
 		// Zero mass contribution
 		td.density = scalar(0);
 
-		CreateTriangleShape(td);
+		CreateTriangle(td);
 	}
 
 	// Create tetrahedrons
@@ -200,7 +201,7 @@ UniformBody::UniformBody(const TetDef& def)
 		b3Vec3 v3 = p3->GetPosition();
 		b3Vec3 v4 = p4->GetPosition();
 
-		b3BodyTetrahedronShapeDef td;
+		b3TetrahedronFixtureDef td;
 		td.p1 = p1;
 		td.p2 = p2;
 		td.p3 = p3;
@@ -214,7 +215,7 @@ UniformBody::UniformBody(const TetDef& def)
 		td.friction = def.friction;
 		td.meshIndex = i;
 
-		CreateTetrahedronShape(td);
+		CreateTetrahedron(td);
 
 		// Create element
 		b3TetrahedronElementForceDef fd;

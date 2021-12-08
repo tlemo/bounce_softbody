@@ -19,8 +19,8 @@
 #ifndef B3_BODY_DRAGGER_H
 #define B3_BODY_DRAGGER_H
 
-#include <bounce/common/math/vec3.h>
-#include <bounce/dynamics/particle.h>
+#include <bounce_softbody/common/math/vec3.h>
+#include <bounce_softbody/dynamics/particle.h>
 
 struct b3Ray;
 class b3Body;

@@ -19,7 +19,7 @@
 #ifndef GL_TRIANGLES_RENDERER_H
 #define GL_TRIANGLES_RENDERER_H
 
-#include <bounce/common/graphics/debug_triangles.h>
+#include <bounce_softbody/common/graphics/debug_triangles.h>
 #include "glad/glad.h"
 
 class GLTrianglesRenderer : public b3DebugTrianglesRenderer

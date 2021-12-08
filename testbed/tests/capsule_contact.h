@@ -37,11 +37,11 @@ public:
 		capsuleShape.m_center2.Set(0.0f, 0.0f, -5.0f);
 		capsuleShape.m_radius = 2.0f;
 
-		b3BodyWorldShapeDef capsuleShapeDef;
-		capsuleShapeDef.shape = &capsuleShape;
-		capsuleShapeDef.friction = 0.5f;
+		b3WorldFixtureDef fixtureDef;
+		fixtureDef.shape = &capsuleShape;
+		fixtureDef.friction = 0.5f;
 
-		m_body->CreateWorldShape(capsuleShapeDef);
+		m_body->CreateFixture(fixtureDef);
 
 		m_body->SetGravity(b3Vec3(0.0f, -9.8f, 0.0f));
 

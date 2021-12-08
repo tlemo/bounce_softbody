@@ -36,11 +36,11 @@ public:
 		boxShape.m_extents.Set(3.0f, 3.0f, 3.0f);
 		boxShape.m_radius = 0.2f;
 
-		b3BodyWorldShapeDef boxShapeDef;
-		boxShapeDef.shape = &boxShape;
-		boxShapeDef.friction = 0.5f;
+		b3WorldFixtureDef fixtureDef;
+		fixtureDef.shape = &boxShape;
+		fixtureDef.friction = 0.5f;
 		
-		m_body->CreateWorldShape(boxShapeDef);
+		m_body->CreateFixture(fixtureDef);
 
 		m_body->SetGravity(b3Vec3(0.0f, -9.8f, 0.0f));
 

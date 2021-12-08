@@ -25,8 +25,8 @@
 
 #include "GLFW/glfw3.h"
 
-#include <bounce/common/graphics/camera.h>
-#include <bounce/common/graphics/color.h>
+#include <bounce_softbody/common/graphics/camera.h>
+#include <bounce_softbody/common/graphics/color.h>
 
 #include <stdio.h>
 

@@ -23,8 +23,8 @@
 #include "open_gl/gl_lines_renderer.h"
 #include "open_gl/gl_triangles_renderer.h"
 
-#include <bounce/common/graphics/camera.h>
-#include <bounce/common/graphics/debugdraw.h>
+#include <bounce_softbody/common/graphics/camera.h>
+#include <bounce_softbody/common/graphics/debugdraw.h>
 
 class Test;
 

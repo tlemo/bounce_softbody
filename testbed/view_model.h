@@ -19,7 +19,7 @@
 #ifndef VIEW_MODEL_H
 #define VIEW_MODEL_H
 
-#include <bounce/common/math/vec2.h>
+#include <bounce_softbody/common/math/vec2.h>
 
 struct GLFWwindow;
 

@@ -19,8 +19,8 @@
 #ifndef DRAW_H
 #define DRAW_H
 
-#include <bounce/common/draw.h>
-#include <bounce/common/graphics/debugdraw.h>
+#include <bounce_softbody/common/draw.h>
+#include <bounce_softbody/common/graphics/debugdraw.h>
 
 struct b3DebugDrawData;
 

@@ -17,11 +17,11 @@
 */
 
 #include "body_dragger.h"
-#include <bounce/collision/geometry/geometry.h>
-#include <bounce/collision/geometry/ray.h>
-#include <bounce/dynamics/body.h>
-#include <bounce/dynamics/shapes/body_triangle_shape.h>
-#include <bounce/dynamics/forces/mouse_force.h>
+#include <bounce_softbody/collision/geometry/geometry.h>
+#include <bounce_softbody/collision/geometry/ray.h>
+#include <bounce_softbody/dynamics/body.h>
+#include <bounce_softbody/dynamics/fixtures/triangle_fixture.h>
+#include <bounce_softbody/dynamics/forces/mouse_force.h>
 
 BodyDragger::BodyDragger(b3Ray* ray, b3Body* body)
 {

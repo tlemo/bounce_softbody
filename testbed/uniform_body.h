@@ -19,7 +19,7 @@
 #ifndef UNIFORM_BODY_H
 #define UNIFORM_BODY_H
 
-#include <bounce/bounce_softbody.h>
+#include <bounce_softbody/bounce_softbody.h>
 
 struct BodyMeshTriangle
 {

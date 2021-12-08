@@ -19,7 +19,7 @@
 #ifndef GL_POINTS_RENDERER_H
 #define GL_POINTS_RENDERER_H
 
-#include <bounce/common/graphics/debug_points.h>
+#include <bounce_softbody/common/graphics/debug_points.h>
 #include "glad/glad.h"
 
 class GLPointsRenderer : public b3DebugPointsRenderer

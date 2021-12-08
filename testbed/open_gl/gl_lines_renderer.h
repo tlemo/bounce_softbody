@@ -19,7 +19,7 @@
 #ifndef GL_LINES_RENDERER_H
 #define GL_LINES_RENDERER_H
 
-#include <bounce/common/graphics/debug_lines.h>
+#include <bounce_softbody/common/graphics/debug_lines.h>
 #include "glad/glad.h"
 
 class GLLinesRenderer : public b3DebugLinesRenderer

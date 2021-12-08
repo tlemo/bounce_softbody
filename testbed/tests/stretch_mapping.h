@@ -166,7 +166,7 @@ public:
 
 			scalar L = (L1 + L2 + L3) / 3.0f;
 
-			const scalar kMaxT = 40000.0f;
+			const scalar kMaxT = 30000.0f;
 			b3Color color = Color(L, 0.0f, kMaxT);
 			
 			b3Vec3 n1 = b3Cross(v2 - v1, v3 - v1);

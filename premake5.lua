@@ -57,9 +57,9 @@ workspace(solution_name)
 		
 		files 
 		{ 
-			bounce_softbody_inc_dir .. "/bounce/**.h", 
-			bounce_softbody_inc_dir .. "/bounce/**.inl",
-			bounce_softbody_src_dir .. "/bounce/**.cpp" 
+			bounce_softbody_inc_dir .. "/bounce_softbody/**.h", 
+			bounce_softbody_inc_dir .. "/bounce_softbody/**.inl",
+			bounce_softbody_src_dir .. "/bounce_softbody/**.cpp" 
 		}
 			
 	project "glad"

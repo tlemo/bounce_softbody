@@ -19,8 +19,8 @@
 #ifndef CLOTH_TEARING_H
 #define CLOTH_TEARING_H
 
-#include <bounce/common/template/array.h>
-#include <bounce/collision/geometry/plane.h>
+#include <bounce_softbody/common/template/array.h>
+#include <bounce_softbody/collision/geometry/plane.h>
 
 class ClothTearing : public Body
 {
@@ -54,16 +54,16 @@ public:
 			b3Particle* p2 = particles[v2];
 			b3Particle* p3 = particles[v3];
 
-			b3BodyTriangleShapeDef tsd;
-			tsd.p1 = p1;
-			tsd.p2 = p2;
-			tsd.p3 = p3;
-			tsd.v1 = p1->GetPosition();
-			tsd.v2 = p2->GetPosition();
-			tsd.v3 = p3->GetPosition();
-			tsd.density = 0.1f;
+			b3TriangleFixtureDef tfd;
+			tfd.p1 = p1;
+			tfd.p2 = p2;
+			tfd.p3 = p3;
+			tfd.v1 = p1->GetPosition();
+			tfd.v2 = p2->GetPosition();
+			tfd.v3 = p3->GetPosition();
+			tfd.density = 0.1f;
 
-			m_body->CreateTriangleShape(tsd);
+			m_body->CreateTriangle(tfd);
 
 			{
 				b3SpringForceDef sfd;
@@ -159,10 +159,10 @@ public:
 	}
 
 	void Partition(b3Particle* p, const b3Plane& plane,
-		b3Array<b3BodyTriangleShape*>& above,
-		b3Array<b3BodyTriangleShape*>& below)
+		b3Array<b3TriangleFixture*>& above,
+		b3Array<b3TriangleFixture*>& below)
 	{
-		for (b3BodyTriangleShape* t = m_body->GetTriangleShapeList().m_head; t; t = t->GetNext())
+		for (b3TriangleFixture* t = m_body->GetTriangleList().m_head; t; t = t->GetNext())
 		{
 			b3Particle* p1 = t->GetParticle1();
 			b3Particle* p2 = t->GetParticle2();
@@ -191,12 +191,12 @@ public:
 		}
 	}
 
-	bool HasSpring(const b3Array<b3BodyTriangleShape*>& triangles,
+	bool HasSpring(const b3Array<b3TriangleFixture*>& triangles,
 		b3Particle* pSplit, b3Particle* pOther)
 	{
 		for (u32 i = 0; i < triangles.Count(); ++i)
 		{
-			b3BodyTriangleShape* triangle = triangles[i];
+			b3TriangleFixture* triangle = triangles[i];
 
 			b3Particle* tp1 = triangle->GetParticle1();
 			b3Particle* tp2 = triangle->GetParticle2();
@@ -245,7 +245,7 @@ public:
 	bool SplitParticle(b3Particle* pSplit, const b3Plane& plane)
 	{
 		// Collect triangles.
-		b3StackArray<b3BodyTriangleShape*, 32> trianglesAbove, trianglesBelow;
+		b3StackArray<b3TriangleFixture*, 32> trianglesAbove, trianglesBelow;
 		Partition(pSplit, plane, trianglesAbove, trianglesBelow);
 
 		// There must be at least one triangle on each side of the plane.
@@ -262,17 +262,17 @@ public:
 
 		for (u32 i = 0; i < trianglesBelow.Count(); ++i)
 		{
-			b3BodyTriangleShape* triangle = trianglesBelow[i];
+			b3TriangleFixture* triangle = trianglesBelow[i];
 
 			b3Particle* p1 = triangle->GetParticle1();
 			b3Particle* p2 = triangle->GetParticle2();
 			b3Particle* p3 = triangle->GetParticle3();
 
-			m_body->DestroyTriangleShape(triangle);
+			m_body->DestroyTriangle(triangle);
 
 			if (p1 == pSplit)
 			{
-				b3BodyTriangleShapeDef tdNew;
+				b3TriangleFixtureDef tdNew;
 				tdNew.p1 = pNew;
 				tdNew.p2 = p2;
 				tdNew.p3 = p3;
@@ -280,7 +280,7 @@ public:
 				tdNew.v2 = p2->GetPosition();
 				tdNew.v3 = p3->GetPosition();
 
-				m_body->CreateTriangleShape(tdNew);
+				m_body->CreateTriangle(tdNew);
 
 				b3SpringForce* sf1 = FindSpringForce(p1, p2);
 				if (sf1)
@@ -321,7 +321,7 @@ public:
 			
 			if (p2 == pSplit)
 			{
-				b3BodyTriangleShapeDef tdNew;
+				b3TriangleFixtureDef tdNew;
 				tdNew.p1 = p1;
 				tdNew.p2 = pNew;
 				tdNew.p3 = p3;
@@ -329,7 +329,7 @@ public:
 				tdNew.v2 = pNew->GetPosition();
 				tdNew.v3 = p3->GetPosition();
 
-				m_body->CreateTriangleShape(tdNew);
+				m_body->CreateTriangle(tdNew);
 
 				b3SpringForce* sf1 = FindSpringForce(p1, p2);
 				if (sf1)
@@ -370,7 +370,7 @@ public:
 			
 			if (p3 == pSplit)
 			{
-				b3BodyTriangleShapeDef tdNew;
+				b3TriangleFixtureDef tdNew;
 				tdNew.p1 = p1;
 				tdNew.p2 = p2;
 				tdNew.p3 = pNew;
@@ -378,7 +378,7 @@ public:
 				tdNew.v2 = p2->GetPosition();
 				tdNew.v3 = pNew->GetPosition();
 
-				m_body->CreateTriangleShape(tdNew);
+				m_body->CreateTriangle(tdNew);
 				
 				b3SpringForce* sf1 = FindSpringForce(p2, p3);
 				if (sf1)

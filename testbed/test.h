@@ -23,10 +23,10 @@
 #include "draw.h"
 #include "view_model.h"
 
-#include <bounce/bounce_softbody.h>
-#include <bounce/common/graphics/camera.h>
-#include <bounce/common/graphics/debugdraw.h>
-#include <bounce/collision/geometry/ray.h>
+#include <bounce_softbody/bounce_softbody.h>
+#include <bounce_softbody/common/graphics/camera.h>
+#include <bounce_softbody/common/graphics/debugdraw.h>
+#include <bounce_softbody/collision/geometry/ray.h>
 
 extern void DrawString(const b3Color& color, const b3Vec2& ps, const char* string, ...);
 extern void DrawString(const b3Color& color, const b3Vec3& pw, const char* string, ...);

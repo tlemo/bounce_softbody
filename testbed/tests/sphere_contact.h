@@ -35,11 +35,11 @@ public:
 		b3SphereShape sphereShape;
 		sphereShape.m_radius = 3.0f;
 
-		b3BodyWorldShapeDef sphereShapeDef;
-		sphereShapeDef.shape = &sphereShape;
-		sphereShapeDef.friction = 0.5f;
+		b3WorldFixtureDef fixtureDef;
+		fixtureDef.shape = &sphereShape;
+		fixtureDef.friction = 0.5f;
 
-		m_body->CreateWorldShape(sphereShapeDef);
+		m_body->CreateFixture(fixtureDef);
 
 		m_body->SetGravity(b3Vec3(0.0f, -9.8f, 0.0f));
 
