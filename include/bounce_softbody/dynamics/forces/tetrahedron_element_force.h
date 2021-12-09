@@ -68,7 +68,6 @@ struct b3TetrahedronElementForceDef : public b3ForceDef
 	scalar poissonRatio;
 
 	// Coefficient of stiffness damping.
-	// You can tune this value if you see vibrations in your simulation.
 	scalar stiffnessDamping;
 };
 
@@ -141,8 +140,8 @@ private:
 	// Reference tetrahedron
 	b3Vec3 m_x1, m_x2, m_x3, m_x4;
 
-	// Reference volume
-	scalar m_V;
+	// Reference inverse deformation
+	b3Mat33 m_invE;
 
 	// Young Modulus
 	scalar m_E;
@@ -150,17 +149,15 @@ private:
 	// Poisson Ratio
 	scalar m_nu;
 
+	// Stiffness matrix in block form
+	// This is originally a 12 x 12 matrix
+	b3Mat33 m_K[16];
+	
+	// Rotation of deformation to improve coherence
+	b3Quat m_q; 
+
 	// Stiffness damping
 	scalar m_stiffnessDamping;
-
-	// Solver shared
-	b3Mat33 m_invE; // 3 x 3
-	b3Mat33 m_K[16]; // 12 x 12
-	scalar m_B[72]; // 6 x 12
-	scalar m_P[72]; // V * BT * E -> 12 x 6
-	
-	// Rotation to improve coherence
-	b3Quat m_q; 
 };
 
 inline void b3TetrahedronElementForce::SetYoungModulus(scalar E)

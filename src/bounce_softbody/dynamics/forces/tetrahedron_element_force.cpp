@@ -230,7 +230,7 @@ void b3TetrahedronElementForce::ResetElementData()
 	scalar det = b3Det(e1, e2, e3);
 	
 	// Volume
-	m_V = b3Abs(det) / scalar(6);
+	scalar V = b3Abs(det) / scalar(6);
 	
 	B3_ASSERT(det != scalar(0));
 	det = scalar(1) / det;
@@ -241,7 +241,7 @@ void b3TetrahedronElementForce::ResetElementData()
 	b3ComputeD(D, m_E, m_nu);
 
 	// 6 x 12
-	scalar* B = m_B;
+	scalar B[72];
 	b3ComputeB(B, m_invE);
 
 	// 12 x 6
@@ -257,19 +257,11 @@ void b3TetrahedronElementForce::ResetElementData()
 	b3Mul(BT_D_B, BT_D, 12, 6, B, 6, 12);
 	for (u32 i = 0; i < 144; ++i)
 	{
-		BT_D_B[i] *= m_V;
+		BT_D_B[i] *= V;
 	}
 
 	// Convert K to block form.
 	b3SetK(m_K, BT_D_B);
-
-	// 12 x 6
-	scalar* P = m_P;
-	b3Mul(P, BT, 12, 6, D, 6, 6);
-	for (u32 i = 0; i < 72; ++i)
-	{
-		P[i] *= m_V;
-	}
 }
 
 void b3TetrahedronElementForce::ClearForces()

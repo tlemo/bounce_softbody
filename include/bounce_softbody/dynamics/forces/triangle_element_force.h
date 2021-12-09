@@ -129,10 +129,7 @@ private:
 	// Rest triangle vertices in 2D
 	b3Vec2 m_x1, m_x2, m_x3;
 
-	// Rest triangle area in 2D
-	scalar m_A;
-
-	// Initial inverse deformation in 2D
+	// Rest inverse deformation in 2D
 	b3Mat22 m_invS;
 
 	// Young Modulus in 2D
@@ -140,14 +137,6 @@ private:
 
 	// Poisson Ratio in 2D
 	scalar m_nu_xy, m_nu_yx;
-
-	// Elasticity tensor
-	// This is a 3x3 matrix
-	b3Mat33 m_C;
-
-	// Shape functions derivative matrix
-	// This is a 3x6 matrix
-	scalar m_B[18];
 
 	// Blocked stiffness matrix
 	// This is a 6x6 matrix

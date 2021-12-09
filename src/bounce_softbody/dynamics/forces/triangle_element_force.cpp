@@ -244,31 +244,32 @@ void b3TriangleElementForce::ResetElementData()
 	B3_ASSERT(det != scalar(0));
 
 	// Area
-	m_A = scalar(0.5) * b3Abs(det);
+	scalar A = scalar(0.5) * b3Abs(det);
 
 	// S^-1
 	m_invS = det * b3Adjugate(S);
 
 	// 3x3
-	m_C = b3ComputeC(m_E_x, m_E_y, m_E_s, m_nu_xy, m_nu_yx);
+	b3Mat33 C = b3ComputeC(m_E_x, m_E_y, m_E_s, m_nu_xy, m_nu_yx);
 
 	// 3x6
-	b3ComputeB(m_B, m_invS);
+	scalar B[18];
+	b3ComputeB(B, m_invS);
 
 	// 6x3
 	scalar BT[18];
-	b3Transpose(BT, m_B, 3, 6);
+	b3Transpose(BT, B, 3, 6);
 
 	// 6x3
 	scalar BT_C[18];
-	b3Mul(BT_C, BT, 6, 3, &m_C.x.x, 3, 3);
+	b3Mul(BT_C, BT, 6, 3, &C.x.x, 3, 3);
 
 	// 6x6
 	scalar K[36];
-	b3Mul(K, BT_C, 6, 3, m_B, 3, 6);
+	b3Mul(K, BT_C, 6, 3, B, 3, 6);
 	for (u32 i = 0; i < 36; ++i)
 	{
-		K[i] *= m_A;
+		K[i] *= A;
 	}
 
 	// Convert to block form
