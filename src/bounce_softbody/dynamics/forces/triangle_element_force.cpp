@@ -22,6 +22,9 @@
 #include <bounce_softbody/sparse/dense_vec3.h>
 #include <bounce_softbody/sparse/sparse_mat33.h>
 
+// Implementation of "Adaptive cloth simulation using corotational finite elements" by 
+// Jan Bender and Crispin Deul.
+
 // Compute the orthotropic elastic tensor given Young Modulus and Poisson's Ratio.
 // This is a 3x3 matrix.
 static B3_FORCE_INLINE b3Mat33 b3ComputeC(scalar Ex, scalar Ey, scalar Es,
@@ -280,7 +283,6 @@ void b3TriangleElementForce::ClearForces()
 {
 }
 
-// https://animation.rwth-aachen.de/media/papers/2013-CAG-AdaptiveCloth.pdf
 void b3TriangleElementForce::ComputeForces(const b3SparseForceSolverData* data)
 {
 	const b3DenseVec3& p = *data->x;
