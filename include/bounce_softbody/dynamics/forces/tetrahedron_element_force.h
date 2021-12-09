@@ -33,9 +33,6 @@ struct b3TetrahedronElementForceDef : public b3ForceDef
 		youngModulus = scalar(500);
 		poissonRatio = scalar(0.3);
 		stiffnessDamping = scalar(0);
-		elasticStrainYield = B3_MAX_SCALAR;
-		creepRate = scalar(0);
-		maxPlasticStrain = scalar(0);
 	}
 
 	// Particle 1
@@ -73,20 +70,6 @@ struct b3TetrahedronElementForceDef : public b3ForceDef
 	// Coefficient of stiffness damping.
 	// You can tune this value if you see vibrations in your simulation.
 	scalar stiffnessDamping;
-
-	// Material elastic strain yield in [0, inf]
-	// This is a dimensionless value.
-	// Set to inf to disable plasticity.
-	scalar elasticStrainYield;
-
-	// Material creep rate in [0, 1 / dt] 
-	// Units are Hz
-	// This is usually set to the simulation frequency 
-	scalar creepRate;
-
-	// Material maximum plastic strain in [0, inf]
-	// This is a dimensionless value
-	scalar maxPlasticStrain;
 };
 
 // Element force acting on a tetrahedron.
@@ -129,27 +112,6 @@ public:
 
 	// Get the coefficient of stiffness damping.
 	scalar GetStiffnessDamping() const;
-
-	// Set the elastic strain yield in range [0, inf].
-	// Set this value to inf to disable plasticity.
-	void SetElasticStrainYield(scalar yield);
-
-	// Get the elastic strain yield in range [0, inf].
-	scalar GetElasticStrainYield() const;
-
-	// Set the material creep rate in hertz.
-	// Plasticity must be enabled for this value to take effect.
-	void SetCreepRate(scalar hz);
-
-	// Get the material creep rate in hertz.
-	scalar GetCreepRate() const;
-
-	// Set the material maximum plastic strain in the range [0, inf].
-	// Plasticity must be enabled for this value to take effect.
-	void SetMaxPlasticStrain(scalar max);
-
-	// Get the material maximum plastic strain in the range [0, inf].
-	scalar GetMaxPlasticStrain() const;
 private:
 	friend class b3Force;
 	
@@ -182,25 +144,23 @@ private:
 	// Reference volume
 	scalar m_V;
 
-	// Elasticity
+	// Young Modulus
 	scalar m_E;
+
+	// Poisson Ratio
 	scalar m_nu;
 
 	// Stiffness damping
 	scalar m_stiffnessDamping;
 
-	// Plasticity
-	scalar m_c_yield;
-	scalar m_c_creep;
-	scalar m_c_max;
-	scalar m_epsilon_plastic[6]; // 6 x 1
-
 	// Solver shared
 	b3Mat33 m_invE; // 3 x 3
-	b3Quat m_q; // 3 x 3
 	b3Mat33 m_K[16]; // 12 x 12
 	scalar m_B[72]; // 6 x 12
 	scalar m_P[72]; // V * BT * E -> 12 x 6
+	
+	// Rotation to improve coherence
+	b3Quat m_q; 
 };
 
 inline void b3TetrahedronElementForce::SetYoungModulus(scalar E)
@@ -242,39 +202,6 @@ inline void b3TetrahedronElementForce::SetStiffnessDamping(scalar damping)
 inline scalar b3TetrahedronElementForce::GetStiffnessDamping() const
 {
 	return m_stiffnessDamping;
-}
-
-inline void b3TetrahedronElementForce::SetElasticStrainYield(scalar yield)
-{
-	B3_ASSERT(yield >= scalar(0));
-	m_c_yield = yield;
-}
-
-inline scalar b3TetrahedronElementForce::GetElasticStrainYield() const
-{
-	return m_c_yield;
-}
-
-inline void b3TetrahedronElementForce::SetCreepRate(scalar hz)
-{
-	B3_ASSERT(hz >= scalar(0));
-	m_c_creep = hz;
-}
-
-inline scalar b3TetrahedronElementForce::GetCreepRate() const
-{
-	return m_c_creep;
-}
-
-inline void b3TetrahedronElementForce::SetMaxPlasticStrain(scalar max)
-{
-	B3_ASSERT(max >= scalar(0));
-	m_c_max = max;
-}
-
-inline scalar b3TetrahedronElementForce::GetMaxPlasticStrain() const
-{
-	return m_c_max;
 }
 
 #endif

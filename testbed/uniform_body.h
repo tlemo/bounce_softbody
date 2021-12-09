@@ -121,13 +121,9 @@ struct TetDef
 		massDamping = scalar(0);
 		thickness = scalar(0.02);
 		friction = scalar(0.3);
-
 		elementYoungModulus = scalar(1000);
 		elementPoissonRatio = scalar(0.3);
 		elementStiffnessDamping = scalar(0);
-		elementElasticStrainYield = B3_MAX_SCALAR;
-		elementCreepRate = scalar(0);
-		elementMaxPlasticStrain = scalar(0);
 	}
 	
 	scalar density;
@@ -140,9 +136,6 @@ struct TetDef
 	scalar elementYoungModulus;
 	scalar elementPoissonRatio;
 	scalar elementStiffnessDamping;
-	scalar elementElasticStrainYield;
-	scalar elementCreepRate;
-	scalar elementMaxPlasticStrain;
 };
 
 // b3Body wrapper. 

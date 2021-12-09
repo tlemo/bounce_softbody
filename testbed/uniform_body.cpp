@@ -229,9 +229,6 @@ UniformBody::UniformBody(const TetDef& def)
 		fd.v4 = v4;
 		fd.youngModulus = def.elementYoungModulus;
 		fd.poissonRatio = def.elementPoissonRatio;
-		fd.elasticStrainYield = def.elementElasticStrainYield;
-		fd.creepRate = def.elementCreepRate;
-		fd.maxPlasticStrain = def.elementMaxPlasticStrain;
 		fd.stiffnessDamping = def.elementStiffnessDamping;
 		fd.meshIndex = i;
 

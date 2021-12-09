@@ -32,9 +32,6 @@
 // Basically, increasing the stiffness damping or taking smaller time steps may 
 // help preventing those unstable configurations.
 
-// Enables the stiffness warping.
-bool b3_enableStiffnessWarping = true;
-
 // Compute the elasticity matrix given Young modulus and Poisson's ratio
 // This is a 6 x 6 matrix 
 static B3_FORCE_INLINE void b3ComputeD(scalar out[36],
@@ -179,6 +176,7 @@ static B3_FORCE_INLINE scalar& b3GetElement(b3Mat33 K[16], u32 i, u32 j)
 	return a(ii, jj);
 }
 
+// Convert a 12-by-12 matrix to its 3-by-3 block form.
 static B3_FORCE_INLINE void b3SetK(b3Mat33 K[16], scalar Ke[144])
 {
 	for (u32 i = 0; i < 12; ++i)
@@ -207,9 +205,6 @@ b3TetrahedronElementForce::b3TetrahedronElementForce(const b3TetrahedronElementF
 	m_x4 = def->v4;
 	m_E = def->youngModulus;
 	m_nu = def->poissonRatio;
-	m_c_yield = def->elasticStrainYield;
-	m_c_creep = def->creepRate;
-	m_c_max = def->maxPlasticStrain;
 	m_stiffnessDamping = def->stiffnessDamping;
 	m_q.SetIdentity();
 
@@ -265,6 +260,7 @@ void b3TetrahedronElementForce::ResetElementData()
 		BT_D_B[i] *= m_V;
 	}
 
+	// Convert K to block form.
 	b3SetK(m_K, BT_D_B);
 
 	// 12 x 6
@@ -273,11 +269,6 @@ void b3TetrahedronElementForce::ResetElementData()
 	for (u32 i = 0; i < 72; ++i)
 	{
 		P[i] *= m_V;
-	}
-
-	for (u32 i = 0; i < 6; ++i)
-	{
-		m_epsilon_plastic[i] = scalar(0);
 	}
 }
 
@@ -356,32 +347,23 @@ void b3TetrahedronElementForce::ComputeForces(const b3SparseForceSolverData* dat
 	b3Vec3 v2 = v[i2];
 	b3Vec3 v3 = v[i3];
 	b3Vec3 v4 = v[i4];
+
+	b3Vec3 e1 = p2 - p1;
+	b3Vec3 e2 = p3 - p1;
+	b3Vec3 e3 = p4 - p1;
+
+	b3Mat33 E(e1, e2, e3);
+
+	b3Mat33 F = E * m_invE;
+
+	b3Quat q = b3ExtractRotation(F, m_q);
 	
-	b3Mat33 R;
-	if (b3_enableStiffnessWarping)
-	{
-		b3Vec3 e1 = p2 - p1;
-		b3Vec3 e2 = p3 - p1;
-		b3Vec3 e3 = p4 - p1;
+	m_q = q;
 
-		b3Mat33 E(e1, e2, e3);
-
-		b3Mat33 F = E * m_invE;
-
-		b3Quat q = b3ExtractRotation(F, m_q);
-		m_q = q;
-
-		R = q.GetRotationMatrix();
-	}
-	else
-	{
-		R.SetIdentity();
-	}
+	b3Mat33 R = q.GetRotationMatrix();
 
 	// Inverse rotation
 	b3Mat33 RT = b3Transpose(R);
-
-	// Elasticity
 
 	// Element stiffness matrix
 	b3Mat33 K[16];
@@ -483,51 +465,4 @@ void b3TetrahedronElementForce::ComputeForces(const b3SparseForceSolverData* dat
 			}
 		}
 	}
-
-	// Plasticity
-
-	// 6 x 1
-	scalar epsilon_total[6];
-	b3Mul(epsilon_total, m_B, 6, 12, &us[0].x, 12, 1);
-
-	// 6 x 1
-	scalar epsilon_elastic[6];
-	for (u32 i = 0; i < 6; ++i)
-	{
-		epsilon_elastic[i] = epsilon_total[i] - m_epsilon_plastic[i];
-	}
-
-	scalar len_epsilon_elastic = b3Length(epsilon_elastic, 6);
-	if (len_epsilon_elastic > m_c_yield)
-	{
-		scalar amount = data->h * b3Min(m_c_creep, data->inv_h);
-		for (u32 i = 0; i < 6; ++i)
-		{
-			m_epsilon_plastic[i] += amount * epsilon_elastic[i];
-		}
-	}
-
-	scalar len_epsilon_plastic = b3Length(m_epsilon_plastic, 6);
-	if (len_epsilon_plastic > m_c_max)
-	{
-		scalar scale = m_c_max / len_epsilon_plastic;
-		for (u32 i = 0; i < 6; ++i)
-		{
-			m_epsilon_plastic[i] *= scale;
-		}
-	}
-
-	b3Vec3 fs_plastic[4];
-	b3Mul(&fs_plastic[0].x, m_P, 12, 6, m_epsilon_plastic, 6, 1);
-
-	// Rotate the forces to deformed frame
-	fs_plastic[0] = R * fs_plastic[0];
-	fs_plastic[1] = R * fs_plastic[1];
-	fs_plastic[2] = R * fs_plastic[2];
-	fs_plastic[3] = R * fs_plastic[3];
-
-	f[i1] += fs_plastic[0];
-	f[i2] += fs_plastic[1];
-	f[i3] += fs_plastic[2];
-	f[i4] += fs_plastic[3];
 }
