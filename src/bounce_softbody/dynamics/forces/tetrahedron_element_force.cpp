@@ -344,14 +344,18 @@ void b3TetrahedronElementForce::ComputeForces(const b3SparseForceSolverData* dat
 	b3Vec3 e2 = p3 - p1;
 	b3Vec3 e3 = p4 - p1;
 
+	// Deformation
 	b3Mat33 E(e1, e2, e3);
 
+	// Deformation gradient
 	b3Mat33 F = E * m_invE;
 
+	// Extract rotation from deformation gradient
 	b3Quat q = b3ExtractRotation(F, m_q);
 	
 	m_q = q;
 
+	// Rotation matrix
 	b3Mat33 R = q.GetRotationMatrix();
 
 	// Inverse rotation

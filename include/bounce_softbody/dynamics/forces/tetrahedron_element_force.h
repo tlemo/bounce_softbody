@@ -153,7 +153,7 @@ private:
 	// This is originally a 12 x 12 matrix
 	b3Mat33 m_K[16];
 	
-	// Rotation of deformation to improve coherence
+	// Rotation of deformation
 	b3Quat m_q; 
 
 	// Stiffness damping
