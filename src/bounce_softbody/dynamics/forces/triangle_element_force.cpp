@@ -126,11 +126,10 @@ static B3_FORCE_INLINE void b3ComputeB(scalar out[18],
 	}
 }
 
-// Extract rotation from a matrix.
+// Polar Decomposition
+// "Matrix Animation and Polar Decomposition" by Ken Shoemake, Tom Duff.
 static B3_FORCE_INLINE b3Mat22 b3ExtractRotation(const b3Mat22& M)
 {
-	// Polar Decomposition
-	// https://research.cs.wisc.edu/graphics/Courses/838-s2002/Papers/polar-decomp.pdf
 	scalar m11 = M.x.x, m12 = M.y.x;
 	scalar m21 = M.x.y, m22 = M.y.y;
 

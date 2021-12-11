@@ -269,8 +269,8 @@ void b3TetrahedronElementForce::ClearForces()
 }
 
 // Extract rotation from deformation
-// https://animation.rwth-aachen.de/media/papers/2016-MIG-StableRotation.pdf
-static b3Quat b3ExtractRotation(const b3Mat33& A, const b3Quat& q0, u32 maxIterations = 20)
+// "A Robust Method to Extract the Rotational Part of Deformations", Matthias Muller et al.
+static b3Quat b3ExtractRotation(const b3Mat33& A, const b3Quat& q0, u32 maxIterations = 32)
 {
 	b3Quat q = q0;
 
